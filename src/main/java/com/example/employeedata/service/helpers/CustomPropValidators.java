@@ -8,6 +8,7 @@ import com.example.employeedata.exception.ValidationException;
 public final class CustomPropValidators {
     public static final int MIN_EMPLOYEE_AGE = 18;
     public static final int MAX_EMPLOYEE_AGE = 80;
+    public static final int MAX_PROJECT_TEAM_SIZE = 100;
 
     public static void validateBirthDate(LocalDate birthDate, String errResource) {
         if (LocalDate.now().getYear() - birthDate.getYear() < MIN_EMPLOYEE_AGE) {
@@ -41,6 +42,14 @@ public final class CustomPropValidators {
         }
 
         return devLangValues[devLang];
+    }
+
+    public static void validateTeamSize(int teamSize, String errResource) {
+        if(teamSize < 0) {
+            throw new ValidationException(
+                errResource, "team size", teamSize,
+                errResource + "'s team size cannot be out of scope");
+        }
     }
 
     public static String normalizeStr(String str) {

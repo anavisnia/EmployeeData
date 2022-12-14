@@ -16,12 +16,10 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotEmpty(message = "Title must not be blank")
     @Column(nullable = false)
     private String title;
 
     @Column(nullable = true)
-    @Max(100)
     private int teamSize;
 
     @Column(nullable = false)
