@@ -5,7 +5,7 @@ import java.util.*;
 
 import javax.validation.constraints.*;
 
-public class ProjectDto {
+public class CreateProjectDto {
     @Pattern(regexp="^[a-zA-Z0-9 \\p{L}]+$", message = "Name must only consist of letters and numbers.")
     @NotEmpty(message = "Title must not be blank.")
     @Size(min = 3, max = 500)
@@ -33,11 +33,11 @@ public class ProjectDto {
         this.title = title;
     }
 
-    public int getTeamSize() {
+    public Integer getTeamSize() {
         return teamSize;
     }
 
-    public void setTeamSize(int teamSize) {
+    public void setTeamSize(Integer teamSize) {
         this.teamSize = teamSize;
     }
 
@@ -57,7 +57,7 @@ public class ProjectDto {
         this.terminationDate = terminationDate;
     }
 
-    public int getDevLanguage() {
+    public Integer getDevLanguage() {
         return devLanguage;
     }
 

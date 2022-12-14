@@ -2,13 +2,12 @@ package com.example.employeedata.service;
 
 import java.util.*;
 
-import com.example.employeedata.dto.ProjectDto;
-import com.example.employeedata.entity.Project;
+import com.example.employeedata.dto.*;
 
 public interface ProjectService {
-    Project save(ProjectDto projectDto);
-    List<Project> getAll();
-    Project getById(long id);
-    Project update(long id, ProjectDto projectDto);
-    void delete(long id);
+    ProjectDto saveProject(CreateProjectDto projectDto);
+    List<ProjectDto> getAllProjects();
+    ProjectDto getProjectById(Long id);
+    ProjectDto updateProject(Long id, EditProjectDto projectDto);
+    void deleteProject(Long id);
 }

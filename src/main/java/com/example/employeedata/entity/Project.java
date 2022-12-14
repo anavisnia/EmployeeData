@@ -4,9 +4,8 @@ import java.time.*;
 import java.util.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
 
-import com.example.employeedata.entity.helpers.DevLanguage;
+import com.example.employeedata.enums.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
@@ -14,13 +13,13 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String title;
 
     @Column(nullable = true)
-    private int teamSize;
+    private Integer teamSize;
 
     @Column(nullable = false)
     private String customer;
@@ -35,11 +34,11 @@ public class Project {
     @JsonBackReference
     private Set<Employee> employees = new HashSet<>();
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -51,11 +50,11 @@ public class Project {
         this.title = title;
     }
 
-    public int getTeamSize() {
+    public Integer getTeamSize() {
         return teamSize;
     }
 
-    public void setTeamSize(int teamSize) {
+    public void setTeamSize(Integer teamSize) {
         this.teamSize = teamSize;
     }
 

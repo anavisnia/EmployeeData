@@ -6,7 +6,6 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.employeedata.dto.*;
-import com.example.employeedata.entity.Employee;
 import com.example.employeedata.service.EmployeeService;
 
 @RestController
@@ -19,33 +18,34 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Employee> saveEmployee(@RequestBody EmployeeDto employeeDto) {
-        return new ResponseEntity<Employee>(employeeService.save(employeeDto), HttpStatus.CREATED);
+    public ResponseEntity<EmployeeDto> saveEmployee(@RequestBody CreateEmployeeDto employeeDto) {
+        return new ResponseEntity<EmployeeDto>(employeeService.saveEmployee(employeeDto), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Employee>> allEmployees() {
-        return new ResponseEntity<List<Employee>>(employeeService.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
+        return new ResponseEntity<List<EmployeeDto>>(employeeService.getAllEmployees(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable(name = "id") long id) {
-        return new ResponseEntity<Employee>(employeeService.getById(id), HttpStatus.OK);
+    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable Long id) {
+        return new ResponseEntity<EmployeeDto>(employeeService.getEmployeeById(id), HttpStatus.OK);
     }
 
     @GetMapping("/project/{id}")
-    public ResponseEntity<List<Employee>> getEmployeesByProjectId(@PathVariable(name = "id") long id) {
-        return new ResponseEntity<List<Employee>>(employeeService.getByProjectId(id), HttpStatus.OK);
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByProjectId(@PathVariable Long id) {
+        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeeByProjectId(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable(name = "id") long id, @RequestBody EditEmployeeDto editEmployeeDto) {
-        return new ResponseEntity<Employee>(employeeService.update(id, editEmployeeDto), HttpStatus.OK);
+    public ResponseEntity updateEmployee(@PathVariable Long id, @RequestBody EditEmployeeDto editEmployeeDto) {
+        employeeService.updateEmployee(id, editEmployeeDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteEmployee(@PathVariable(name = "id") long id) {
-        employeeService.delete(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity deleteEmployee(@PathVariable Long id) {
+        employeeService.deleteEmployee(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

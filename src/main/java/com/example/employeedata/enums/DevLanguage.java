@@ -1,4 +1,4 @@
-package com.example.employeedata.entity.helpers;
+package com.example.employeedata.enums;
 
 public enum DevLanguage {
     Unknown, //0

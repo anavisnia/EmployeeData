@@ -15,9 +15,9 @@ public class EditEmployeeDto {
     @Size(min = 3, max = 100)
     private String lastName;
     
-    private int role;
+    private Integer role;
 
-    private int devLanguage;
+    private Integer devLanguage;
     
     private List<Long> projectIds = new ArrayList<>();
 
@@ -37,19 +37,19 @@ public class EditEmployeeDto {
         this.lastName = lastName;
     }
 
-    public int getRole() {
+    public Integer getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(Integer role) {
         this.role = role;
     }
 
-    public int getDevLanguage() {
+    public Integer getDevLanguage() {
         return devLanguage;
     }
 
-    public void setDevLanguage(int devLanguage) {
+    public void setDevLanguage(Integer devLanguage) {
         this.devLanguage = devLanguage;
     }
 
