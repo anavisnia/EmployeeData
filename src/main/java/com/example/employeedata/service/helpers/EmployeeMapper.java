@@ -28,7 +28,7 @@ public class EmployeeMapper {
         employee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
         CustomPropValidators.validateBirthDate(employeeDto.getBirthDate(), errResource);
         employee.setBirthDate(employeeDto.getBirthDate());
-        CustomPropValidators.validateRole(employeeDto.getRole(), errResource);
+        employee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
         employee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
         employee.setProjects(new HashSet<>(projects));
 
