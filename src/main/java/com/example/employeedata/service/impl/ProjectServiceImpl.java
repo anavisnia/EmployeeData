@@ -2,12 +2,13 @@ package com.example.employeedata.service.impl;
 
 import java.util.*;
 
+import javax.persistence.*;
 import javax.validation.*;
 
 import org.springframework.stereotype.Service;
 
 import com.example.employeedata.dto.ProjectDto;
-import com.example.employeedata.entity.Project;
+import com.example.employeedata.entity.*;
 import com.example.employeedata.exception.*;
 import com.example.employeedata.repository.*;
 import com.example.employeedata.service.ProjectService;
@@ -18,11 +19,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final Validator validator;
     private final ProjectRepository projectRepository;
+    private final EmployeeRepository employeeRepository;
     private final String resourceErrName = "Project";
-    
-    public ProjectServiceImpl(Validator validator, ProjectRepository projectRepository) {
+
+    public ProjectServiceImpl(Validator validator,
+            ProjectRepository projectRepository,
+            EmployeeRepository employeeRepository) {
         this.validator = validator;
         this.projectRepository = projectRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
@@ -80,7 +85,18 @@ public class ProjectServiceImpl implements ProjectService {
             new ResourceNotFoundException(resourceErrName, "id", id)
         );
 
+        removeProjectsFromEmployees(id, existingProject);
+        
         projectRepository.delete(existingProject);
+    }
+
+    @PreRemove
+    private void removeProjectsFromEmployees(long id, Project project) {
+        List<Employee> employees = employeeRepository.findAllEmployeesByProjectId(id);
+        for (Employee employee : employees) {
+            employee.getProjects().remove(project);
+        }
+        employeeRepository.saveAll(employees);
     }
     
 }
