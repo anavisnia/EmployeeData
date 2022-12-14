@@ -11,6 +11,7 @@ public class ProjectMapper {
 
         project.setTitle(projectDto.getTitle());
         project.setCustomer(projectDto.getCustomer());
+        CustomPropValidators.validateTeamSize(projectDto.getTeamSize(), errResource);
         project.setTeamSize(projectDto.getTeamSize());
         project.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
         project.setTerminationDate(projectDto.getTerminationDate());
@@ -21,6 +22,7 @@ public class ProjectMapper {
         existingProject.setId(existingProject.getId());
         existingProject.setTitle(projectDto.getTitle());
         existingProject.setCustomer(projectDto.getCustomer());
+        CustomPropValidators.validateTeamSize(projectDto.getTeamSize(), errResource);
         existingProject.setTeamSize(projectDto.getTeamSize());
         existingProject.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
         existingProject.setTerminationDate(projectDto.getTerminationDate());

@@ -11,6 +11,7 @@ public class ProjectDto {
     @Size(min = 3, max = 500)
     private String title;
 
+    @Max(100)
     private int teamSize;
 
     @Pattern(regexp = "^[A-Za-z0-9- \\p{L},._-|]+$", message = "should only consist of letters, numbers or symbols `,`, `.`, `-`, `_`, `|`.")
