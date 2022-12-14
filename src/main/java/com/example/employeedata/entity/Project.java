@@ -24,11 +24,9 @@ public class Project {
     @Max(100)
     private int teamSize;
 
-    @NotEmpty(message = "customer name must not be blank")
     @Column(nullable = false)
     private String customer;
 
-    @NotEmpty(message = "Termination date must not be blank")
     @Column(nullable = false)
     private LocalDate terminationDate;
 
