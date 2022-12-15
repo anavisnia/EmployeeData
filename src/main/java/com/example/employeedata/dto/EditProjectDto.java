@@ -1,7 +1,6 @@
 package com.example.employeedata.dto;
 
 import java.time.LocalDate;
-import java.util.*;
 
 import javax.validation.constraints.*;
 
@@ -22,8 +21,6 @@ public class EditProjectDto {
     private LocalDate terminationDate;
 
     private Integer devLanguage;
-    
-    private List<Long> employeeIds = new ArrayList<>();
 
     public String getTitle() {
         return title;
@@ -63,10 +60,6 @@ public class EditProjectDto {
 
     public void setDevLanguage(Integer devLanguage) {
         this.devLanguage = devLanguage;
-    }
-
-    public List<Long> getEmployeeIds() {
-        return employeeIds;
     }
     
 }

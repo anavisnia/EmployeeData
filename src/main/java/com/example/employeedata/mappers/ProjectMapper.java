@@ -41,7 +41,7 @@ public class ProjectMapper {
         dto.setCustomer(project.getCustomer());
         dto.setTeamSize(project.getTeamSize());
         dto.setTerminationDate(project.getTerminationDate());
-        dto.setDevLanguage(project.getDevLanguage().ordinal());
+        dto.setDevLanguage(project.getDevLanguage().label);
 
         return dto;
     }

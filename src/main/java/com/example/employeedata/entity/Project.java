@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 import com.example.employeedata.enums.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "projects")
@@ -32,6 +33,7 @@ public class Project {
 
     @ManyToMany(mappedBy = "projects")
     @JsonBackReference
+    @JsonIgnore
     private Set<Employee> employees = new HashSet<>();
 
     public Long getId() {
@@ -80,10 +82,6 @@ public class Project {
 
     public void setDevLanguage(DevLanguage devLanguage) {
         this.devLanguage = devLanguage;
-    }
-
-    public Set<Employee> getEmployees() {
-        return employees;
     }
 
 }

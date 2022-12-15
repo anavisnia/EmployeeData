@@ -7,8 +7,8 @@ public class EmployeeDto {
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
-    private Integer role;
-    private Integer devLanguage;
+    private String role;
+    private String devLanguage;
     private List<Long> projectIds = new ArrayList<>();
 
     public String getFirstName() {
@@ -35,19 +35,19 @@ public class EmployeeDto {
         this.birthDate = birthDate;
     }
 
-    public Integer getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Integer role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
-    public Integer getDevLanguage() {
+    public String getDevLanguage() {
         return devLanguage;
     }
 
-    public void setDevLanguage(Integer devLanguage) {
+    public void setDevLanguage(String devLanguage) {
         this.devLanguage = devLanguage;
     }
 

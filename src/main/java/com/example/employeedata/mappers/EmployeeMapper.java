@@ -68,8 +68,8 @@ public class EmployeeMapper {
         dto.setFirstName(employee.getFirstName());
         dto.setLastName(employee.getLastName());
         dto.setBirthDate(employee.getBirthDate());
-        dto.setDevLanguage(employee.getDevLanguage().ordinal());
-        dto.setRole(employee.getRole().ordinal());
+        dto.setDevLanguage(employee.getDevLanguage().label);
+        dto.setRole(employee.getRole().label);
         dto.setProjectIds(getProjectIds(employee.getProjects()));
 
         return dto;
