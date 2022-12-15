@@ -17,7 +17,7 @@ public enum Role {
     UX_Designer("UX Designer"), //13
     UI_Designer("UI Designer"); //14
 
-    public String label;
+    public final String label;
 
     Role(String label) {
         this.label = label;
