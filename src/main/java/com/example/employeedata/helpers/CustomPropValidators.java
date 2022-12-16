@@ -1,8 +1,8 @@
-package com.example.employeedata.service.helpers;
+package com.example.employeedata.helpers;
 
 import java.time.LocalDate;
 
-import com.example.employeedata.entity.helpers.*;
+import com.example.employeedata.enums.*;
 import com.example.employeedata.exception.ValidationException;
 
 public final class CustomPropValidators {

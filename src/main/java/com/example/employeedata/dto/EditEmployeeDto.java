@@ -5,19 +5,21 @@ import java.util.*;
 import javax.validation.constraints.*;
 
 public class EditEmployeeDto {
-    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "Name must only consist of letters.")
-    @NotEmpty(message = "Name must not be blank.")
+    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 40)
     private String firstName;
 
-    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "Surname must only consist of letters.")
-    @NotEmpty(message = "Surname must not be blank.")
+    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 100)
     private String lastName;
     
-    private int role;
+    @Min(0)
+    private Integer role;
 
-    private int devLanguage;
+    @Min(0)
+    private Integer devLanguage;
     
     private List<Long> projectIds = new ArrayList<>();
 
@@ -37,19 +39,19 @@ public class EditEmployeeDto {
         this.lastName = lastName;
     }
 
-    public int getRole() {
+    public Integer getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(Integer role) {
         this.role = role;
     }
 
-    public int getDevLanguage() {
+    public Integer getDevLanguage() {
         return devLanguage;
     }
 
-    public void setDevLanguage(int devLanguage) {
+    public void setDevLanguage(Integer devLanguage) {
         this.devLanguage = devLanguage;
     }
 

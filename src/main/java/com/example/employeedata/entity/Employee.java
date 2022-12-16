@@ -5,7 +5,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import com.example.employeedata.entity.helpers.*;
+import com.example.employeedata.enums.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     
     @Column(nullable = false)
     private String firstName;
@@ -39,11 +39,11 @@ public class Employee {
     @JsonManagedReference
     private Set<Project> projects = new HashSet<>();
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

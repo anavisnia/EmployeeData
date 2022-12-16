@@ -1,14 +1,15 @@
-package com.example.employeedata.service.helpers;
+package com.example.employeedata.mappers;
 
 import java.util.*;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
+import com.example.employeedata.helpers.CustomPropValidators;
 
 public class EmployeeMapper {
     public static String errResource = "Employee";
 
-    public static Employee mapToEmployee(EmployeeDto employeeDto) {
+    public static Employee mapToEmployee(CreateEmployeeDto employeeDto) {
         Employee employee = new Employee();
         
         employee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
@@ -21,7 +22,7 @@ public class EmployeeMapper {
         return employee;
     }
 
-    public static Employee mapToEmployee(EmployeeDto employeeDto, List<Project> projects) {
+    public static Employee mapToEmployee(CreateEmployeeDto employeeDto, List<Project> projects) {
         Employee employee = new Employee();
         
         employee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
@@ -59,5 +60,42 @@ public class EmployeeMapper {
         existingEmployee.setProjects(new HashSet<>(projects));
         
         return existingEmployee;
+    }
+
+    public static EmployeeDto mapToEmployeeDto(Employee employee) {
+        EmployeeDto dto = new EmployeeDto();
+
+        dto.setFirstName(employee.getFirstName());
+        dto.setLastName(employee.getLastName());
+        dto.setBirthDate(employee.getBirthDate());
+        dto.setDevLanguage(employee.getDevLanguage().label);
+        dto.setRole(employee.getRole().label);
+        dto.setProjectIds(getProjectIds(employee.getProjects()));
+
+        return dto;
+    }
+
+    public static List<EmployeeDto> mapToListEmployeesDto(List<Employee> employees) {
+        List<EmployeeDto> dtos = new ArrayList<EmployeeDto>();
+
+        if (!employees.isEmpty()) {
+            for (Employee employee : employees) {
+                dtos.add(mapToEmployeeDto(employee));
+            }
+        }
+
+        return dtos;
+    }
+
+    private static List<Long> getProjectIds(Set<Project> projects) {
+        List<Long> projectIds = new ArrayList<>();
+
+        if (!projects.isEmpty()) {
+            for (Project project : projects) {
+                projectIds.add(project.getId());
+            }
+        }
+
+        return projectIds;
     }
 }

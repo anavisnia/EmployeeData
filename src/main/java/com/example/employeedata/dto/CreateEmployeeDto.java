@@ -3,12 +3,27 @@ package com.example.employeedata.dto;
 import java.time.LocalDate;
 import java.util.*;
 
-public class EmployeeDto {
+import javax.validation.constraints.*;
+
+public class CreateEmployeeDto {
+    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @NotEmpty(message = "must not be blank")
+    @Size(min = 3, max = 40)
     private String firstName;
+
+    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @NotEmpty(message = "must not be blank")
+    @Size(min = 3, max = 100)
     private String lastName;
+
     private LocalDate birthDate;
-    private String role;
-    private String devLanguage;
+
+    @Min(0)
+    private Integer role;
+
+    @Min(0)
+    private Integer devLanguage;
+    
     private List<Long> projectIds = new ArrayList<>();
 
     public String getFirstName() {
@@ -35,19 +50,19 @@ public class EmployeeDto {
         this.birthDate = birthDate;
     }
 
-    public String getRole() {
+    public Integer getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Integer role) {
         this.role = role;
     }
 
-    public String getDevLanguage() {
+    public Integer getDevLanguage() {
         return devLanguage;
     }
 
-    public void setDevLanguage(String devLanguage) {
+    public void setDevLanguage(Integer devLanguage) {
         this.devLanguage = devLanguage;
     }
 

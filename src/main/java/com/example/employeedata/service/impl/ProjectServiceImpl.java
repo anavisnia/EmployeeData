@@ -7,12 +7,12 @@ import javax.validation.*;
 
 import org.springframework.stereotype.Service;
 
-import com.example.employeedata.dto.ProjectDto;
+import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
 import com.example.employeedata.exception.*;
+import com.example.employeedata.mappers.ProjectMapper;
 import com.example.employeedata.repository.*;
 import com.example.employeedata.service.ProjectService;
-import com.example.employeedata.service.helpers.ProjectMapper;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -31,43 +31,45 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project save(ProjectDto projectDto) {
-        Set<ConstraintViolation<ProjectDto>> violations = validator.validate(projectDto);
+    public ProjectDto saveProject(CreateProjectDto projectDto) {
+        Set<ConstraintViolation<CreateProjectDto>> violations = validator.validate(projectDto);
 
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<ProjectDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
+            for (ConstraintViolation<CreateProjectDto> constraintViolation : violations) {
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
             }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
 
         Project project = ProjectMapper.mapToProject(projectDto);
-        return projectRepository.save(project);
+        return ProjectMapper.mapToProjectDto(projectRepository.save(project));
     }
 
     @Override
-    public List<Project> getAll() {
-        return projectRepository.findAll();
+    public List<ProjectDto> getAllProjects() {
+        return ProjectMapper.mapToListProjectsDto(projectRepository.findAll());
     }
 
     @Override
-    public Project getById(long id) {
-        return projectRepository.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException(resourceErrName, "id", id)
+    public ProjectDto getProjectById(Long id) {
+        return ProjectMapper.mapToProjectDto(
+            projectRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(resourceErrName, "id", id)
+            )
         );
     }
 
     @Override
-    public Project update(long id, ProjectDto projectDto) {
-        Set<ConstraintViolation<ProjectDto>> violations = validator.validate(projectDto);
+    public ProjectDto updateProject(Long id, EditProjectDto projectDto) {
+        Set<ConstraintViolation<EditProjectDto>> violations = validator.validate(projectDto);
 
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<ProjectDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
+            for (ConstraintViolation<EditProjectDto> constraintViolation : violations) {
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
             }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
 
         Project existingProject = projectRepository.findById(id).orElseThrow(() ->
@@ -76,11 +78,11 @@ public class ProjectServiceImpl implements ProjectService {
 
         existingProject = ProjectMapper.mapToProject(existingProject, projectDto);
 
-        return projectRepository.save(existingProject);
+        return ProjectMapper.mapToProjectDto(projectRepository.save(existingProject));
     }
 
     @Override
-    public void delete(long id) {
+    public void deleteProject(Long id) {
         Project existingProject = projectRepository.findById(id).orElseThrow(() ->
             new ResourceNotFoundException(resourceErrName, "id", id)
         );
@@ -91,7 +93,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @PreRemove
-    private void removeProjectsFromEmployees(long id, Project project) {
+    private void removeProjectsFromEmployees(Long id, Project project) {
         List<Employee> employees = employeeRepository.findAllEmployeesByProjectId(id);
         for (Employee employee : employees) {
             employee.getProjects().remove(project);

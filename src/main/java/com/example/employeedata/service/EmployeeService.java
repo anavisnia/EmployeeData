@@ -3,13 +3,12 @@ package com.example.employeedata.service;
 import java.util.*;
 
 import com.example.employeedata.dto.*;
-import com.example.employeedata.entity.Employee;
 
 public interface EmployeeService {
-    Employee save(EmployeeDto employeeDto);
-    List<Employee> getAll();
-    Employee getById(long id);
-    List<Employee> getByProjectId(long id);
-    Employee update(long id, EditEmployeeDto EditEmployeeDto);
-    void delete(long id);
+    EmployeeDto saveEmployee(CreateEmployeeDto employeeDto);
+    List<EmployeeDto> getAllEmployees();
+    EmployeeDto getEmployeeById(Long id);
+    List<EmployeeDto> getEmployeeByProjectId(Long id);
+    void updateEmployee(Long id, EditEmployeeDto EditEmployeeDto);
+    void deleteEmployee(Long id);
 }

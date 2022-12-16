@@ -2,12 +2,26 @@ package com.example.employeedata.dto;
 
 import java.time.LocalDate;
 
-public class ProjectDto {
+import javax.validation.constraints.*;
+
+public class EditProjectDto {
+    @Pattern(regexp="^[a-zA-Z0-9 \\p{L}]+$", message = "must only consist of letters and numbers")
+    @NotEmpty(message = "must not be blank")
+    @Size(min = 3, max = 500)
     private String title;
+
+    @Max(100)
     private Integer teamSize;
+
+    @Pattern(regexp = "^[A-Za-z0-9- \\p{L},._-|]+$", message = "should only consist of letters, numbers or symbols `,`, `.`, `-`, `_`, `|`")
+    @NotEmpty(message = "must not be blank")
+    @Size(min = 3, max = 500)
     private String customer;
+
     private LocalDate terminationDate;
-    private String devLanguage;
+
+    @Min(0)
+    private Integer devLanguage;
 
     public String getTitle() {
         return title;
@@ -17,7 +31,7 @@ public class ProjectDto {
         this.title = title;
     }
 
-    public int getTeamSize() {
+    public Integer getTeamSize() {
         return teamSize;
     }
 
@@ -41,12 +55,12 @@ public class ProjectDto {
         this.terminationDate = terminationDate;
     }
 
-    public String getDevLanguage() {
+    public Integer getDevLanguage() {
         return devLanguage;
     }
 
-    public void setDevLanguage(String devLanguage) {
+    public void setDevLanguage(Integer devLanguage) {
         this.devLanguage = devLanguage;
     }
-
+    
 }

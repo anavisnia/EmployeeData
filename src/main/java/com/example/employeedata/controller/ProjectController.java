@@ -5,8 +5,7 @@ import java.util.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.employeedata.dto.ProjectDto;
-import com.example.employeedata.entity.Project;
+import com.example.employeedata.dto.*;
 import com.example.employeedata.service.ProjectService;
 
 @RestController
@@ -19,28 +18,28 @@ public class ProjectController {
     }
     
     @PostMapping("/add")
-    public ResponseEntity<Project> saveProject(@RequestBody ProjectDto projectDto) {
-        return new ResponseEntity<Project>(projectService.save(projectDto), HttpStatus.CREATED);
+    public ResponseEntity<ProjectDto> saveProject(@RequestBody CreateProjectDto projectDto) {
+        return new ResponseEntity<ProjectDto>(projectService.saveProject(projectDto), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Project>> allProjects() {
-        return new ResponseEntity<List<Project>>(projectService.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<ProjectDto>> allProjects() {
+        return new ResponseEntity<List<ProjectDto>>(projectService.getAllProjects(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProjectById(@PathVariable(name= "id") long id) {
-        return new ResponseEntity<Project>(projectService.getById(id), HttpStatus.OK);
+    public ResponseEntity<ProjectDto> getProjectById(@PathVariable Long id) {
+        return new ResponseEntity<ProjectDto>(projectService.getProjectById(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Project> updateProject(@PathVariable(name = "id") long id, @RequestBody ProjectDto projectDto) {
-        return new ResponseEntity<Project>(projectService.update(id, projectDto), HttpStatus.OK);
+    public ResponseEntity updateProject(@PathVariable Long id, @RequestBody EditProjectDto projectDto) {
+        return new ResponseEntity<>(projectService.updateProject(id, projectDto), HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteProject(@PathVariable(name = "id") long id) {
-        projectService.delete(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity deleteProject(@PathVariable Long id) {
+        projectService.deleteProject(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
