@@ -37,9 +37,9 @@ public class ProjectServiceImpl implements ProjectService {
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (ConstraintViolation<CreateProjectDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
             }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
 
         Project project = ProjectMapper.mapToProject(projectDto);
@@ -67,9 +67,9 @@ public class ProjectServiceImpl implements ProjectService {
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (ConstraintViolation<EditProjectDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
             }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
 
         Project existingProject = projectRepository.findById(id).orElseThrow(() ->

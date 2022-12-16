@@ -5,18 +5,20 @@ import java.util.*;
 import javax.validation.constraints.*;
 
 public class EditEmployeeDto {
-    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "Name must only consist of letters.")
-    @NotEmpty(message = "Name must not be blank.")
+    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 40)
     private String firstName;
 
-    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "Surname must only consist of letters.")
-    @NotEmpty(message = "Surname must not be blank.")
+    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 100)
     private String lastName;
     
+    @Min(0)
     private Integer role;
 
+    @Min(0)
     private Integer devLanguage;
     
     private List<Long> projectIds = new ArrayList<>();

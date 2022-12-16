@@ -23,4 +23,8 @@ public enum DevLanguage {
     public String toString() {
         return label;
     }
+
+    public static final Integer size() {
+        return DevLanguage.values().length;
+    }
 }

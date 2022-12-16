@@ -5,21 +5,22 @@ import java.time.LocalDate;
 import javax.validation.constraints.*;
 
 public class CreateProjectDto {
-    @Pattern(regexp="^[a-zA-Z0-9 \\p{L}]+$", message = "Name must only consist of letters and numbers.")
-    @NotEmpty(message = "Title must not be blank.")
+    @Pattern(regexp="^[a-zA-Z0-9 \\p{L}]+$", message = "must only consist of letters and numbers")
+    @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 500)
     private String title;
 
     @Max(100)
     private Integer teamSize;
 
-    @Pattern(regexp = "^[A-Za-z0-9- \\p{L},._-|]+$", message = "should only consist of letters, numbers or symbols `,`, `.`, `-`, `_`, `|`.")
-    @NotEmpty(message = "Customer must not be blank.")
+    @Pattern(regexp = "^[A-Za-z0-9- \\p{L},._-|]+$", message = "should only consist of letters, numbers or symbols `,`, `.`, `-`, `_`, `|`")
+    @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 500)
     private String customer;
 
     private LocalDate terminationDate;
 
+    @Min(0)
     private Integer devLanguage;
 
     public String getTitle() {
