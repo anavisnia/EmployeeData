@@ -32,9 +32,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (ConstraintViolation<CreateEmployeeDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
             }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
 
         Employee employee = new Employee();
@@ -79,9 +79,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             for (ConstraintViolation<EditEmployeeDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getMessage());
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
             }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violations);
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
 
         if (editEmployeeDto.getProjectIds().isEmpty()) {

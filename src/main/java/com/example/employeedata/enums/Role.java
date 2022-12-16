@@ -27,4 +27,8 @@ public enum Role {
     public String toString() {
         return label;
     }
+
+    public static final Integer size() {
+        return Role.values().length;
+    }
 }
