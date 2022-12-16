@@ -18,8 +18,8 @@ public class ProjectController {
     }
     
     @PostMapping("/add")
-    public ResponseEntity<ProjectDto> saveProject(@RequestBody CreateProjectDto projectDto) {
-        return new ResponseEntity<ProjectDto>(projectService.saveProject(projectDto), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> saveProject(@RequestBody CreateProjectDto projectDto) {
+        return new ResponseEntity<ResponseDto>(projectService.saveProject(projectDto), HttpStatus.CREATED);
     }
 
     @GetMapping

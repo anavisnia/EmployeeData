@@ -18,8 +18,8 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<EmployeeDto> saveEmployee(@RequestBody CreateEmployeeDto employeeDto) {
-        return new ResponseEntity<EmployeeDto>(employeeService.saveEmployee(employeeDto), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> saveEmployee(@RequestBody CreateEmployeeDto employeeDto) {
+        return new ResponseEntity<ResponseDto>(employeeService.saveEmployee(employeeDto), HttpStatus.CREATED);
     }
 
     @GetMapping

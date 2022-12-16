@@ -20,7 +20,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final Validator validator;
     private final ProjectRepository projectRepository;
     private final EmployeeRepository employeeRepository;
-    private final String resourceErrName = "Project";
+    private final String resourceName = "Project";
 
     public ProjectServiceImpl(Validator validator,
             ProjectRepository projectRepository,
@@ -31,7 +31,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDto saveProject(CreateProjectDto projectDto) {
+    public ResponseDto saveProject(CreateProjectDto projectDto) {
         Set<ConstraintViolation<CreateProjectDto>> violations = validator.validate(projectDto);
 
         if (!violations.isEmpty()) {
@@ -43,7 +43,9 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         Project project = ProjectMapper.mapToProject(projectDto);
-        return ProjectMapper.mapToProjectDto(projectRepository.save(project));
+        Project dbResponse = projectRepository.save(project);
+
+        return new ResponseDto(dbResponse.getId(), resourceName);
     }
 
     @Override
@@ -55,7 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectDto getProjectById(Long id) {
         return ProjectMapper.mapToProjectDto(
             projectRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(resourceErrName, "id", id)
+                new ResourceNotFoundException(resourceName, "id", id)
             )
         );
     }
@@ -73,7 +75,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         Project existingProject = projectRepository.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException(resourceErrName, "id", id)
+            new ResourceNotFoundException(resourceName, "id", id)
         );
 
         existingProject = ProjectMapper.mapToProject(existingProject, projectDto);
@@ -84,7 +86,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void deleteProject(Long id) {
         Project existingProject = projectRepository.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException(resourceErrName, "id", id)
+            new ResourceNotFoundException(resourceName, "id", id)
         );
 
         removeProjectsFromEmployees(id, existingProject);

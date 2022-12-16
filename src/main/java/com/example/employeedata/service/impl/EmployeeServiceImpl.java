@@ -18,6 +18,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final Validator validator;
     private final EmployeeRepository employeeRepository;
     private final ProjectRepository projectRepository;
+    private final String resourceName = "Employee";
     
     public EmployeeServiceImpl(Validator validator, EmployeeRepository employeeRepository, ProjectRepository projectRepository) {
         this.validator = validator;
@@ -26,7 +27,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto saveEmployee(CreateEmployeeDto employeeDto) {
+    public ResponseDto saveEmployee(CreateEmployeeDto employeeDto) {
         Set<ConstraintViolation<CreateEmployeeDto>> violations = validator.validate(employeeDto);
 
         if (!violations.isEmpty()) {
@@ -45,8 +46,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             List<Project> projects = getProjects(employeeDto.getProjectIds());
             employee = EmployeeMapper.mapToEmployee(employeeDto, projects);
         }
-        
-        return EmployeeMapper.mapToEmployeeDto(employeeRepository.save(employee));
+
+        Employee dbResponse = employeeRepository.save(employee);
+
+        return new ResponseDto(dbResponse.getId(), resourceName);
     }
 
     @Override
@@ -58,7 +61,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeDto getEmployeeById(Long id) {
         return EmployeeMapper.mapToEmployeeDto(
             employeeRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Employee", "id", id)
+                new ResourceNotFoundException(resourceName, "id", id)
             )
         );
     }
@@ -71,7 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void updateEmployee(Long id, EditEmployeeDto editEmployeeDto) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException("Employee", "id", id)
+            new ResourceNotFoundException(resourceName, "id", id)
         );
 
         Set<ConstraintViolation<EditEmployeeDto>> violations = validator.validate(editEmployeeDto);
@@ -97,7 +100,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void deleteEmployee(Long id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException("Employee", "id", id)
+            new ResourceNotFoundException(resourceName, "id", id)
         );
         
         employeeRepository.delete(employee);

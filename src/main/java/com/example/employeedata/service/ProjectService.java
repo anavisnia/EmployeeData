@@ -5,7 +5,7 @@ import java.util.*;
 import com.example.employeedata.dto.*;
 
 public interface ProjectService {
-    ProjectDto saveProject(CreateProjectDto projectDto);
+    ResponseDto saveProject(CreateProjectDto projectDto);
     List<ProjectDto> getAllProjects();
     ProjectDto getProjectById(Long id);
     ProjectDto updateProject(Long id, EditProjectDto projectDto);

@@ -5,7 +5,7 @@ import java.util.*;
 import com.example.employeedata.dto.*;
 
 public interface EmployeeService {
-    EmployeeDto saveEmployee(CreateEmployeeDto employeeDto);
+    ResponseDto saveEmployee(CreateEmployeeDto employeeDto);
     List<EmployeeDto> getAllEmployees();
     EmployeeDto getEmployeeById(Long id);
     List<EmployeeDto> getEmployeeByProjectId(Long id);
