@@ -29,9 +29,9 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(respBody, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler(CustomValidationException.class)
     public ResponseEntity<Object> handleCustomValidationException(
-        ValidationException ex, WebRequest request) {
+        CustomValidationException ex, WebRequest request) {
 
         Map<String, Object> respBody = new LinkedHashMap<>();
         respBody.put("timeStamp", DateTimeHelpers.getLocalDateTimeNow(dateTimeFormat));

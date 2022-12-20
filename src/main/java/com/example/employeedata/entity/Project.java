@@ -6,10 +6,13 @@ import java.util.*;
 import javax.persistence.*;
 
 import com.example.employeedata.enums.*;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
+
+import lombok.*;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "projects")
 public class Project {
     @Id

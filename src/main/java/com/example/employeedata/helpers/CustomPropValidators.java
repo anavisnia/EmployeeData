@@ -3,7 +3,7 @@ package com.example.employeedata.helpers;
 import java.time.LocalDate;
 
 import com.example.employeedata.enums.*;
-import com.example.employeedata.exception.ValidationException;
+import com.example.employeedata.exception.CustomValidationException;
 
 public final class CustomPropValidators {
     public static final int MIN_EMPLOYEE_AGE = 18;
@@ -12,11 +12,11 @@ public final class CustomPropValidators {
 
     public static void validateBirthDate(LocalDate birthDate, String errResource) {
         if (LocalDate.now().getYear() - birthDate.getYear() < MIN_EMPLOYEE_AGE) {
-            throw new ValidationException(
+            throw new CustomValidationException(
                 errResource, "birth date", birthDate,
                 String.format("%s cannot be younger than %d years old", errResource, MIN_EMPLOYEE_AGE));
         } else if(LocalDate.now().getYear() - birthDate.getYear() > MAX_EMPLOYEE_AGE) {
-            throw new ValidationException(
+            throw new CustomValidationException(
                 errResource, "birth date", birthDate,
                 String.format("%s cannot be older than %d years old", errResource, MAX_EMPLOYEE_AGE));
         }
@@ -25,7 +25,7 @@ public final class CustomPropValidators {
     public static Role validateRole(int role, String errResource) {
         Role[] roleValues = Role.values();
         if (role > (roleValues.length - 1) || role < 0) {
-            throw new ValidationException(
+            throw new CustomValidationException(
                 errResource, "role", role,
                 errResource + "'s role cannot be out of scope");
         }
@@ -36,7 +36,7 @@ public final class CustomPropValidators {
     public static DevLanguage validateDevLang(int devLang, String errResource) {
         DevLanguage[] devLangValues = DevLanguage.values();
         if (devLang > (devLangValues.length - 1) || devLang < 0) {
-            throw new ValidationException(
+            throw new CustomValidationException(
                 errResource, "developer language", devLang,
                 errResource + "'s development language cannot be out of scope");
         }
@@ -46,7 +46,7 @@ public final class CustomPropValidators {
 
     public static void validateTeamSize(int teamSize, String errResource) {
         if(teamSize < 0) {
-            throw new ValidationException(
+            throw new CustomValidationException(
                 errResource, "team size", teamSize,
                 errResource + "'s team size cannot be out of scope");
         }

@@ -4,6 +4,12 @@ import java.time.LocalDate;
 
 import javax.validation.constraints.*;
 
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CreateProjectDto {
     @Pattern(regexp="^[a-zA-Z0-9 \\p{L}]+$", message = "must only consist of letters and numbers")
     @NotEmpty(message = "must not be blank")
@@ -18,49 +24,10 @@ public class CreateProjectDto {
     @Size(min = 3, max = 500)
     private String customer;
 
+    @NotNull(message = "must not be blank")
     private LocalDate terminationDate;
 
     @Min(0)
     private Integer devLanguage;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public Integer getTeamSize() {
-        return teamSize;
-    }
-
-    public void setTeamSize(Integer teamSize) {
-        this.teamSize = teamSize;
-    }
-
-    public String getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(String customer) {
-        this.customer = customer;
-    }
-
-    public LocalDate getTerminationDate() {
-        return terminationDate;
-    }
-
-    public void setTerminationDate(LocalDate terminationDate) {
-        this.terminationDate = terminationDate;
-    }
-
-    public Integer getDevLanguage() {
-        return devLanguage;
-    }
-
-    public void setDevLanguage(Integer devLanguage) {
-        this.devLanguage = devLanguage;
-    }
     
 }
