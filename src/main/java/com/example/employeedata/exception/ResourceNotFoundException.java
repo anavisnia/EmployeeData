@@ -3,6 +3,9 @@ package com.example.employeedata.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import lombok.Getter;
+
+@Getter
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class ResourceNotFoundException extends RuntimeException {
     /**
@@ -21,21 +24,4 @@ public class ResourceNotFoundException extends RuntimeException {
         this.fieldValue = fieldValue;
         this.message = String.format("%s not found with %s : '%s'.", resourceName, fieldName, fieldValue);
     }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public Object getFieldValue() {
-        return fieldValue;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
 }
