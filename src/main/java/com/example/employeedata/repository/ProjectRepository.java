@@ -13,11 +13,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         value = "SELECT * FROM employeedata.projects P WHERE P.termination_date > :terminationDate",
         nativeQuery = true
     )
-    List<Project> findProjectsWithFutureTerminationDate(@Param("terminationDate") LocalDate terminationDate);
+    List<Project> findByFutureTerminationDate(@Param("terminationDate") LocalDate terminationDate);
 
     @Query(
         value = "SELECT * FROM employeedata.projects P WHERE P.termination_date < :terminationDate",
         nativeQuery = true
     )
-    List<Project> findProjectsWithPriorTerminationDate(@Param("terminationDate") LocalDate terminationDate);
+    List<Project> findByPriorTerminationDate(@Param("terminationDate") LocalDate terminationDate);
+
+    @Query(
+        value = "SELECT * FROM employeedata.projects P WHERE P.dev_language = :devLanguage",
+        nativeQuery = true
+    )
+    List<Project> findByDevLanguage(@Param("devLanguage") Integer devLanguage);
 }

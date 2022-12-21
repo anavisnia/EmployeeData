@@ -8,7 +8,8 @@ public interface EmployeeService {
     ResponseDto saveEmployee(CreateEmployeeDto employeeDto);
     List<EmployeeDto> getAllEmployees();
     EmployeeDto getEmployeeById(Long employeeId);
-    List<EmployeeDto> getEmployeeByProjectId(Long projectId);
+    List<EmployeeDto> getEmployeesByProjectId(Long projectId);
+    List<EmployeeDto> getEmployeesByDevLanguage(Integer devLanguage);
     void updateEmployee(Long employeeId, EditEmployeeDto EditEmployeeDto);
     void deleteEmployee(Long employeeId);
 }

@@ -13,5 +13,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>{
         value = "SELECT * FROM employeedata.employees E INNER JOIN employeedata.employee_project EP ON E.id = EP.employee_id WHERE EP.project_id = :projectId",
         nativeQuery = true
     )
-    List<Employee> findAllEmployeesByProjectId(@Param("projectId")Long projectId);
+    List<Employee> findByProjectId(@Param("projectId") Long projectId);
+
+    @Query(
+        value = "SELECT * FROM employeedata.employees E WHERE E.dev_language = :devLanguage",
+        nativeQuery = true
+    )
+    List<Employee> findByDevLanguage(@Param("devLanguage") Integer devLanguage);
 }

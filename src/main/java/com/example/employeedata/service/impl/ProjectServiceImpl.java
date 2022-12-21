@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
 import com.example.employeedata.exception.*;
-import com.example.employeedata.helpers.DateTimeHelpers;
+import com.example.employeedata.helpers.*;
 import com.example.employeedata.mappers.ProjectMapper;
 import com.example.employeedata.repository.*;
 import com.example.employeedata.service.ProjectService;
@@ -57,12 +57,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsWithFutureTerminationDate() {
-        return ProjectMapper.mapToListProjectsDto(projectRepository.findProjectsWithFutureTerminationDate(DateTimeHelpers.getLocalDateNow()));
+        return ProjectMapper.mapToListProjectsDto(projectRepository.findByFutureTerminationDate(DateTimeHelpers.getLocalDateNow()));
     }
 
     @Override
     public List<ProjectDto> getAllProjectsWithPriorTerminationDate() {
-        return ProjectMapper.mapToListProjectsDto(projectRepository.findProjectsWithPriorTerminationDate(DateTimeHelpers.getLocalDateNow()));
+        return ProjectMapper.mapToListProjectsDto(projectRepository.findByPriorTerminationDate(DateTimeHelpers.getLocalDateNow()));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
         );
 
         List<Long> employeeProjectIds = getProjectIds(new ArrayList<Project>(employee.getProjects()));
-        List<Project> projects = projectRepository.findProjectsWithFutureTerminationDate(LocalDate.now());
+        List<Project> projects = projectRepository.findByFutureTerminationDate(LocalDate.now());
 
         projects.removeIf(p -> employeeProjectIds.contains(p.getId()));
 
@@ -92,11 +92,17 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         List<Long> employeeProjectIds = getProjectIds(new ArrayList<Project>(employee.getProjects()));
-        List<Project> projects = projectRepository.findProjectsWithFutureTerminationDate(date);
+        List<Project> projects = projectRepository.findByFutureTerminationDate(date);
 
         projects.removeIf(p -> employeeProjectIds.contains(p.getId()));
 
         return ProjectMapper.mapToListProjectsDto(projects);
+    }
+
+    @Override
+    public List<ProjectDto> getAllProjectsByDevelopmentLanguage(Integer devLanguage) {
+        CustomPropValidators.validateDevLang(devLanguage, resourceName);
+        return ProjectMapper.mapToListProjectsDto(projectRepository.findByDevLanguage(devLanguage));
     }
 
     @Override
@@ -142,7 +148,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @PreRemove
     private void removeProjectsFromEmployees(Long projectId, Project project) {
-        List<Employee> employees = employeeRepository.findAllEmployeesByProjectId(projectId);
+        List<Employee> employees = employeeRepository.findByProjectId(projectId);
         for (Employee employee : employees) {
             employee.getProjects().remove(project);
         }

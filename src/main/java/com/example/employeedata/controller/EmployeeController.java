@@ -34,7 +34,12 @@ public class EmployeeController {
 
     @GetMapping("/project/{id}")
     public ResponseEntity<List<EmployeeDto>> getEmployeesByProjectId(@PathVariable Long id) {
-        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeeByProjectId(id), HttpStatus.OK);
+        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeesByProjectId(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/devLang/{devLanguage}")
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByProjectId(@PathVariable Integer devLanguage) {
+        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeesByDevLanguage(devLanguage), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

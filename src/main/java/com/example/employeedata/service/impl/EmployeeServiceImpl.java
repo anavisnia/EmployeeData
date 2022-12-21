@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
 import com.example.employeedata.exception.*;
+import com.example.employeedata.helpers.CustomPropValidators;
 import com.example.employeedata.mappers.EmployeeMapper;
 import com.example.employeedata.repository.*;
 import com.example.employeedata.service.EmployeeService;
@@ -69,8 +70,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeDto> getEmployeeByProjectId(Long employeeId) {
-        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findAllEmployeesByProjectId(employeeId));
+    public List<EmployeeDto> getEmployeesByProjectId(Long employeeId) {
+        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findByProjectId(employeeId));
+    }
+
+    @Override
+    public List<EmployeeDto> getEmployeesByDevLanguage(Integer devLanguage) {
+        CustomPropValidators.validateDevLang(devLanguage, resourceName);
+        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findByDevLanguage(devLanguage));
     }
 
     @Override
