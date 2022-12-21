@@ -26,9 +26,11 @@ public class CreateEmployeeDto {
     private LocalDate birthDate;
 
     @Min(0)
+    @NotNull(message = "must not be blank")
     private Integer role;
 
     @Min(0)
+    @NotNull(message = "must not be blank")
     private Integer devLanguage;
     
     private List<Long> projectIds = new ArrayList<>();

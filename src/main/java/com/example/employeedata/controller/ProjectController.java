@@ -1,5 +1,6 @@
 package com.example.employeedata.controller;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.http.*;
@@ -23,8 +24,28 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectDto>> allProjects() {
+    public ResponseEntity<List<ProjectDto>> getAllProjects() {
         return new ResponseEntity<List<ProjectDto>>(projectService.getAllProjects(), HttpStatus.OK);
+    }
+
+    @GetMapping("/future")
+    public ResponseEntity<List<ProjectDto>> getAllFutureProjects() {
+        return new ResponseEntity<List<ProjectDto>>(projectService.getAllProjectsWithFutureTerminationDate(), HttpStatus.OK);
+    }
+
+    @GetMapping("/prior")
+    public ResponseEntity<List<ProjectDto>> getAllPriorProjects() {
+        return new ResponseEntity<List<ProjectDto>>(projectService.getAllProjectsWithPriorTerminationDate(), HttpStatus.OK);
+    }
+
+    @GetMapping("/notAssignedTo/{employeeId}")
+    public ResponseEntity<List<ProjectDto>> getAllProjectsNotAssignedToEmployee(@PathVariable Long employeeId) {
+        return new ResponseEntity<List<ProjectDto>>(projectService.getAllProjectsNotAssignedToEmployeeFromCurrentDate(employeeId), HttpStatus.OK);
+    }
+
+    @GetMapping("/notAssignedTo/{employeeId}/{date}")
+    public ResponseEntity<List<ProjectDto>> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(@PathVariable Long employeeId, @PathVariable String date) {
+        return new ResponseEntity<List<ProjectDto>>(projectService.getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(employeeId, LocalDate.parse(date)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

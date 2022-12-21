@@ -28,6 +28,7 @@ public class CreateProjectDto {
     private LocalDate terminationDate;
 
     @Min(0)
+    @NotNull(message = "must not be blank")
     private Integer devLanguage;
     
 }

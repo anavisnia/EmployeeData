@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
-import com.example.employeedata.exception.ResourceNotFoundException;
+import com.example.employeedata.exception.*;
 import com.example.employeedata.mappers.EmployeeMapper;
 import com.example.employeedata.repository.*;
 import com.example.employeedata.service.EmployeeService;
@@ -20,7 +20,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final ProjectRepository projectRepository;
     private final String resourceName = "Employee";
     
-    public EmployeeServiceImpl(Validator validator, EmployeeRepository employeeRepository, ProjectRepository projectRepository) {
+    public EmployeeServiceImpl(Validator validator,
+            EmployeeRepository employeeRepository,
+            ProjectRepository projectRepository) {
         this.validator = validator;
         this.employeeRepository = employeeRepository;
         this.projectRepository = projectRepository;
@@ -58,23 +60,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Long id) {
+    public EmployeeDto getEmployeeById(Long employeeId) {
         return EmployeeMapper.mapToEmployeeDto(
-            employeeRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(resourceName, "id", id)
+            employeeRepository.findById(employeeId).orElseThrow(() ->
+                new ResourceNotFoundException(resourceName, "id", employeeId)
             )
         );
     }
 
     @Override
-    public List<EmployeeDto> getEmployeeByProjectId(Long id) {
-        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findAllEmployeesByProjectId(id));
+    public List<EmployeeDto> getEmployeeByProjectId(Long employeeId) {
+        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findAllEmployeesByProjectId(employeeId));
     }
 
     @Override
-    public void updateEmployee(Long id, EditEmployeeDto editEmployeeDto) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", id)
+    public void updateEmployee(Long employeeId, EditEmployeeDto editEmployeeDto) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
+            new ResourceNotFoundException(resourceName, "id", employeeId)
         );
 
         Set<ConstraintViolation<EditEmployeeDto>> violations = validator.validate(editEmployeeDto);
@@ -98,9 +100,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void deleteEmployee(Long id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", id)
+    public void deleteEmployee(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
+            new ResourceNotFoundException(resourceName, "id", employeeId)
         );
         
         employeeRepository.delete(employee);
@@ -110,11 +112,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Project> projects = new ArrayList<>();
 
         for (Long id : projectIds) {
-            Project project = projectRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Project", "id", id)
-            );
-
-            projects.add(project);
+            if (id != null) {
+                Project project = projectRepository.findById(id).orElseThrow(() ->
+                    new ResourceNotFoundException("Project", "id", id)
+                );
+                projects.add(project);
+            } else {
+                throw new CustomValidationException("Project", "id", id);
+            }
         }
 
         return projects;

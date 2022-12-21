@@ -10,8 +10,8 @@ import com.example.employeedata.entity.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long>{
     @Query(
-        value = "SELECT * FROM employeedata.employees E INNER JOIN employeedata.employee_project EP ON E.id = EP.employee_id WHERE EP.project_id = :id",
+        value = "SELECT * FROM employeedata.employees E INNER JOIN employeedata.employee_project EP ON E.id = EP.employee_id WHERE EP.project_id = :projectId",
         nativeQuery = true
     )
-    List<Employee> findAllEmployeesByProjectId(@Param("id")Long id);
+    List<Employee> findAllEmployeesByProjectId(@Param("projectId")Long projectId);
 }
