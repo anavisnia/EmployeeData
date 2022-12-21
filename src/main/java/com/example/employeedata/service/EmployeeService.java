@@ -10,6 +10,7 @@ public interface EmployeeService {
     EmployeeDto getEmployeeById(Long employeeId);
     List<EmployeeDto> getEmployeesByProjectId(Long projectId);
     List<EmployeeDto> getEmployeesByDevLanguage(Integer devLanguage);
+    List<EmployeeDto> getEmployeesByRole(Integer role);
     void updateEmployee(Long employeeId, EditEmployeeDto EditEmployeeDto);
     void deleteEmployee(Long employeeId);
 }

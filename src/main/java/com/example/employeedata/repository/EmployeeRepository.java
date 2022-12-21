@@ -20,4 +20,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>{
         nativeQuery = true
     )
     List<Employee> findByDevLanguage(@Param("devLanguage") Integer devLanguage);
+
+    @Query(
+        value = "SELECT * FROM employeedata.employees E WHERE E.role = :role",
+        nativeQuery = true
+    )
+    List<Employee> findByRole(@Param("role") Integer role);
 }

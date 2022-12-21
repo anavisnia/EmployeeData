@@ -38,8 +38,13 @@ public class EmployeeController {
     }
 
     @GetMapping("/devLang/{devLanguage}")
-    public ResponseEntity<List<EmployeeDto>> getEmployeesByProjectId(@PathVariable Integer devLanguage) {
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByDevLanguage(@PathVariable Integer devLanguage) {
         return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeesByDevLanguage(devLanguage), HttpStatus.OK);
+    }
+
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByRole(@PathVariable Integer role) {
+        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeesByRole(role), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

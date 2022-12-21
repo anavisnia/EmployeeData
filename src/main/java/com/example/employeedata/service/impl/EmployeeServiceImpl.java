@@ -80,6 +80,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findByDevLanguage(devLanguage));
     }
 
+    
+    @Override
+    public List<EmployeeDto> getEmployeesByRole(Integer role) {
+        CustomPropValidators.validateRole(role, resourceName);
+        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findByRole(role));
+    }
+
     @Override
     public void updateEmployee(Long employeeId, EditEmployeeDto editEmployeeDto) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
