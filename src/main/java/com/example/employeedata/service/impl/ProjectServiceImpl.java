@@ -115,7 +115,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDto updateProject(Long projectId, EditProjectDto projectDto) {
+    public void updateProject(Long projectId, EditProjectDto projectDto) {
         Set<ConstraintViolation<EditProjectDto>> violations = validator.validate(projectDto);
 
         if (!violations.isEmpty()) {
@@ -132,7 +132,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         existingProject = ProjectMapper.mapToProject(existingProject, projectDto);
 
-        return ProjectMapper.mapToProjectDto(projectRepository.save(existingProject));
+        projectRepository.save(existingProject);
     }
 
     @Override
