@@ -34,15 +34,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ResponseDto saveProject(CreateProjectDto projectDto) {
-        Set<ConstraintViolation<CreateProjectDto>> violations = validator.validate(projectDto);
-
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<CreateProjectDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
-        }
+        constraintViolationCheck(projectDto);
 
         Project project = ProjectMapper.mapToProject(projectDto);
         Project dbResponse = projectRepository.save(project);
@@ -87,7 +79,8 @@ public class ProjectServiceImpl implements ProjectService {
         
         LocalDate currentDate = DateTimeHelpers.getLocalDateNow();
 
-        if (date.getYear() < currentDate.getYear() && date.getMonthValue() < currentDate.getMonthValue()) {
+        if (date.getYear() < currentDate.getYear()||
+            (date.getYear() == currentDate.getYear() && date.getMonthValue() < currentDate.getMonthValue())) {
             throw new CustomValidationException("Date", "date", date, "Date cannot be in past time");
         }
 
@@ -116,15 +109,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void updateProject(Long projectId, EditProjectDto projectDto) {
-        Set<ConstraintViolation<EditProjectDto>> violations = validator.validate(projectDto);
-
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<EditProjectDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
-        }
+        constraintViolationCheck(projectDto);
 
         Project existingProject = projectRepository.findById(projectId).orElseThrow(() ->
             new ResourceNotFoundException(resourceName, "id", projectId)
@@ -163,6 +148,18 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return projectIds;
+    }
+
+    private <T> void constraintViolationCheck(T obj) {
+        Set<ConstraintViolation<T>> violations = validator.validate(obj);
+        
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<T> constraintViolation : violations) {
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
+            }
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
+        }
     }
     
 }

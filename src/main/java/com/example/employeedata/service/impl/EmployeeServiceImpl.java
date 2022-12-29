@@ -31,15 +31,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseDto saveEmployee(CreateEmployeeDto employeeDto) {
-        Set<ConstraintViolation<CreateEmployeeDto>> violations = validator.validate(employeeDto);
-
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<CreateEmployeeDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
-        }
+        constraintViolationCheck(employeeDto);
 
         Employee employee = new Employee();
         
@@ -93,15 +85,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             new ResourceNotFoundException(resourceName, "id", employeeId)
         );
 
-        Set<ConstraintViolation<EditEmployeeDto>> violations = validator.validate(editEmployeeDto);
-
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<EditEmployeeDto> constraintViolation : violations) {
-                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
-        }
+        constraintViolationCheck(editEmployeeDto);
 
         if (editEmployeeDto.getProjectIds().isEmpty()) {
             employee = EmployeeMapper.mapToEmployee(employee, editEmployeeDto);
@@ -137,6 +121,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return projects;
+    }
+
+    private <T> void constraintViolationCheck(T obj) {
+        Set<ConstraintViolation<T>> violations = validator.validate(obj);
+        
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<T> constraintViolation : violations) {
+                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
+            }
+            throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
+        }
     }
     
 }
