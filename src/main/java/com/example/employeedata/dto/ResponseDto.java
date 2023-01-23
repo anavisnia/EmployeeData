@@ -8,20 +8,20 @@ import lombok.Setter;
 @Setter
 public class ResponseDto {
     @ApiModelProperty(value = "Entity's id")
-    private Long id;
+    private Object id;
     @ApiModelProperty(value = "Custom response message")
     private String status;
 
-    public ResponseDto(Long id) {
+    public ResponseDto(Object id) {
         this.id = id;
     }
 
-    public ResponseDto(Long id, String instanceName) {
+    public ResponseDto(Object id, String instanceName) {
         this.id = id;
         this.status = instanceName + " created successfully";
     }
 
-    public ResponseDto(Long id, String instanceName, String message) {
+    public ResponseDto(Object id, String instanceName, String message) {
         this.id = id;
         this.status = instanceName + " " + message;
     }

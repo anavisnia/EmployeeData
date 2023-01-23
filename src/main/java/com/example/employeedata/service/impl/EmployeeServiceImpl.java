@@ -41,7 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             List<Project> projects = getProjects(employeeDto.getProjectIds());
             employee = EmployeeMapper.mapToEmployee(employeeDto, projects);
         }
-
+        employee.setModificationDate(new Date());
         Employee dbResponse = employeeRepository.save(employee);
 
         return new ResponseDto(dbResponse.getId(), resourceName);
@@ -94,6 +94,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee = EmployeeMapper.mapToEmployee(employee, editEmployeeDto, projects);
         }
 
+        employee.setModificationDate(new Date());
+        
         employeeRepository.save(employee);
     }
 

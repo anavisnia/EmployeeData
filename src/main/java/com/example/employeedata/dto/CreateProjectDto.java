@@ -18,6 +18,11 @@ public class CreateProjectDto {
     @ApiModelProperty(value = "Project's title")
     private String title;
 
+    @Pattern(regexp="^[a-zA-Z0-9 \\p{L}]+$", message = "must only consist of letters and numbers")
+    @Size(min = 0, max = 1000)
+    @ApiModelProperty(value = "Project's description")
+    private String description;
+
     @Max(100)
     @ApiModelProperty(value = "Project's team size")
     private Integer teamSize;

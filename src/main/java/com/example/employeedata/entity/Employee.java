@@ -36,6 +36,9 @@ public class Employee {
     @Column(nullable = false)
     private DevLanguage devLanguage;
 
+    @Column(nullable = false)
+    private Date modificationDate;
+
     @ManyToMany
     @JoinTable(
         name = "employee_project",

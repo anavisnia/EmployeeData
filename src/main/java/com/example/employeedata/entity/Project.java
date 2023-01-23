@@ -23,6 +23,9 @@ public class Project {
     private String title;
 
     @Column(nullable = true)
+    private String description;
+
+    @Column(nullable = true)
     private Integer teamSize;
 
     @Column(nullable = false)
@@ -34,9 +37,11 @@ public class Project {
     @Column(nullable = false)
     private DevLanguage devLanguage;
 
+    @Column(nullable = false)
+    private Date modificationDate;
+
     @ManyToMany(mappedBy = "projects")
     @JsonBackReference
-    @JsonIgnore
     private Set<Employee> employees = new HashSet<>();
 
     public Long getId() {
@@ -53,6 +58,14 @@ public class Project {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Integer getTeamSize() {
@@ -87,4 +100,11 @@ public class Project {
         this.devLanguage = devLanguage;
     }
 
+    public Date getModificationDate() {
+        return modificationDate;
+    }
+
+    public void setModificationDate(Date modificationDate) {
+        this.modificationDate = modificationDate;
+    }
 }

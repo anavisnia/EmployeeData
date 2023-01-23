@@ -14,3 +14,11 @@ spring:
     mvc:
       pathmatch:
             matching-strategy: ANT_PATH_MATCHER
+    data:
+        elasticsearch:
+            url: localhost:9200
+            repositories:
+                enabled: true
+            #uri: http://${CLUSTER_NAME:localhost}:9200/
+            uri: http://localhost:9200/
+            search: _search

@@ -6,7 +6,7 @@ import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
 import com.example.employeedata.helpers.CustomPropValidators;
 
-public class EmployeeMapper {
+public final class EmployeeMapper {
     public static String errResource = "Employee";
 
     public static Employee mapToEmployee(CreateEmployeeDto employeeDto) {
@@ -18,6 +18,7 @@ public class EmployeeMapper {
         employee.setBirthDate(employeeDto.getBirthDate());
         employee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
         employee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
+        employee.setModificationDate(new Date());
 
         return employee;
     }
@@ -32,6 +33,7 @@ public class EmployeeMapper {
         employee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
         employee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
         employee.setProjects(new HashSet<>(projects));
+        employee.setModificationDate(new Date());
 
         return employee;
     }
@@ -45,6 +47,7 @@ public class EmployeeMapper {
         existingEmployee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
         existingEmployee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
         existingEmployee.setProjects(new HashSet<>());
+        existingEmployee.setModificationDate(new Date());
 
         return existingEmployee;
     }
@@ -58,6 +61,7 @@ public class EmployeeMapper {
         existingEmployee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
         existingEmployee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
         existingEmployee.setProjects(new HashSet<>(projects));
+        existingEmployee.setModificationDate(new Date());
         
         return existingEmployee;
     }

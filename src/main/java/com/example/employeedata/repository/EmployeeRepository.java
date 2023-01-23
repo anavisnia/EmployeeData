@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.*;
 
 import com.example.employeedata.entity.Employee;
 
-public interface EmployeeRepository extends JpaRepository<Employee, Long>{
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(
         value = "SELECT * FROM employeedata.employees E INNER JOIN employeedata.employee_project EP ON E.id = EP.employee_id WHERE EP.project_id = :projectId",
         nativeQuery = true

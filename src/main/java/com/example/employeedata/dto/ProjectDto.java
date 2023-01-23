@@ -12,6 +12,8 @@ import lombok.*;
 public class ProjectDto {
     @ApiModelProperty(value = "Project's title")
     private String title;
+    @ApiModelProperty(value = "Project's description")
+    private String description;
     @ApiModelProperty(value = "Project's team size")
     private Integer teamSize;
     @ApiModelProperty(value = "Project's cutomer name")

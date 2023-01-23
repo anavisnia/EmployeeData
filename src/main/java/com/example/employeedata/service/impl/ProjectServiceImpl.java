@@ -37,6 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
         constraintViolationCheck(projectDto);
 
         Project project = ProjectMapper.mapToProject(projectDto);
+        
         Project dbResponse = projectRepository.save(project);
 
         return new ResponseDto(dbResponse.getId(), resourceName);

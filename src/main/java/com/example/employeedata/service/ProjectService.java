@@ -3,8 +3,11 @@ package com.example.employeedata.service;
 import java.time.*;
 import java.util.*;
 
+import org.springframework.stereotype.Service;
+
 import com.example.employeedata.dto.*;
 
+@Service
 public interface ProjectService {
     ResponseDto saveProject(CreateProjectDto projectDto);
     List<ProjectDto> getAllProjects();
