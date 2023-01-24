@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.example'
-version = '0.0.1-SNAPSHOT'
+//version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
@@ -41,4 +41,40 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.register('getGitBuildInfo') {
+	group 'custom'
+	description 'Displays build information in format of current month, current day and four last symbols of git commit hash'
+	doFirst {
+		def gitFolder = "$projectDir/.git/"
+		def takeFromHash = 4
+		def gitId = ""
+
+		def head = new File(gitFolder + "HEAD").text.split(":") // .git/HEAD
+
+		def isCommit = head.length == 1
+		def headEnd = 0
+		def headStart = 0
+
+		if(isCommit) {
+			gitId = head[0].trim()
+			headEnd = gitId.size()
+			headStart = headEnd - takeFromHash
+		} else {
+			def refHead = new File(gitFolder + head[1].trim()) // .git/refs/heads/master
+			gitId = refHead.text.trim()
+			headEnd = gitId.size()
+			headStart = headEnd - takeFromHash
+		}
+
+		def shortId = gitId.substring(headStart, headEnd)
+		var now = LocalDate.now()
+
+		println "Build inforamtion: ${now.format("MMdd")}${shortId}"
+	}
+}
+
+tasks.bootRun {
+    dependsOn("getGitBuildInfo")
 }
