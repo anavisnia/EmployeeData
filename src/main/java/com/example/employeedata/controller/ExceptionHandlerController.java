@@ -50,6 +50,17 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(respBody, HttpStatus.UNPROCESSABLE_ENTITY);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleInternalServerErrorException(
+        Exception ex) {
+        
+        Map<String, Object> respBody = new LinkedHashMap<>();
+        respBody.put("timeStamp", DateTimeHelpers.getLocalDateTimeNow(dateTimeFormat));
+        respBody.put("message", "Internal Server Error");
+
+        return new ResponseEntity<>(respBody, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
