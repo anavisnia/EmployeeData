@@ -10,7 +10,7 @@ import com.example.employeedata.dto.*;
 public interface EmployeeService {
     ResponseDto saveEmployee(CreateEmployeeDto employeeDto);
     List<EmployeeDto> getAllEmployees();
-    EmployeeDto getEmployeeById(Long employeeId);
+    EmployeeDto getEmployeeById(String employeeId);
     List<EmployeeDto> getEmployeesByProjectId(Long projectId);
     List<EmployeeDto> getEmployeesByDevLanguage(Integer devLanguage);
     List<EmployeeDto> getEmployeesByRole(Integer role);

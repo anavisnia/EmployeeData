@@ -16,7 +16,7 @@ public interface ProjectService {
     List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromCurrentDate(Long employeeId);
     List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(Long employeeId, LocalDate date);
     List<ProjectDto> getAllProjectsByDevelopmentLanguage(Integer devLanguage);
-    ProjectDto getProjectById(Long projectId);
+    ProjectDto getProjectById(String projectId);
     void updateProject(Long projectId, EditProjectDto projectDto);
     void deleteProject(Long projectId);
 }

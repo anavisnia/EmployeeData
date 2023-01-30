@@ -5,6 +5,7 @@ import java.util.stream.*;
 
 import javax.validation.ConstraintViolationException;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.*;
 import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +59,17 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         Map<String, Object> respBody = new LinkedHashMap<>();
         respBody.put("timeStamp", DateTimeHelpers.getLocalDateTimeNow(dateTimeFormat));
         respBody.put("message", "Internal Server Error");
+
+        return new ResponseEntity<>(respBody, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(DataAccessResourceFailureException.class)
+    public ResponseEntity<Object> handleDataAccessException(
+        DataAccessResourceFailureException ex) {
+        
+        Map<String, Object> respBody = new LinkedHashMap<>();
+        respBody.put("timeStamp", DateTimeHelpers.getLocalDateTimeNow(dateTimeFormat));
+        respBody.put("message", "Data Access Resource Failure Error, Initial cause: " + ex.initCause(ex));
 
         return new ResponseEntity<>(respBody, HttpStatus.INTERNAL_SERVER_ERROR);
     }

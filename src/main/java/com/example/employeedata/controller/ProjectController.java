@@ -5,22 +5,28 @@ import java.util.*;
 
 import javax.validation.Valid;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.service.ProjectService;
+import com.example.employeedata.service.ProjectDocService;
 
 import io.swagger.annotations.*;
 
 @Api(tags = "Service to manage projects")
 @RestController
 @RequestMapping("api/projects")
-public class ProjectController {
+public class ProjectController<E> {
     private final ProjectService projectService;
+    private final ProjectDocService projectDocService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(
+        ProjectService projectService,
+        ProjectDocService projectDocService) {
         this.projectService = projectService;
+        this.projectDocService = projectDocService;
     }
     
     @ApiOperation(value = "Creating a project")
@@ -31,8 +37,20 @@ public class ProjectController {
 
     @ApiOperation(value = "Returns a lst of all projects")
     @GetMapping
-    public ResponseEntity<List<ProjectDto>> getAllProjects() {
-        return new ResponseEntity<List<ProjectDto>>(projectService.getAllProjects(), HttpStatus.OK);
+    public ResponseEntity<List<E>> getAllProjects() {
+        List<E> res = null;
+
+        try {
+            res = (List<E>) projectDocService.getAllProjects();
+            
+            if (res == null) {
+                res = (List<E>) projectService.getAllProjects();
+            }
+        } catch (DataAccessResourceFailureException e) {
+            res = (List<E>) projectService.getAllProjects();
+        }
+
+        return new ResponseEntity<List<E>>(res, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Returns a lst of all projects with termination date is later than today")
@@ -109,8 +127,20 @@ public class ProjectController {
                 value = "Project id")
         })
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectDto> getProjectById(@PathVariable Long id) {
-        return new ResponseEntity<ProjectDto>(projectService.getProjectById(id), HttpStatus.OK);
+    public ResponseEntity<E> getProjectById(@PathVariable String id) {
+        E res = null;
+
+        try {
+            res = (E) projectDocService.getProjectById(id);
+
+            if (res == null) {
+                res = (E) projectService.getProjectById(id.toString());
+            }
+        } catch (DataAccessResourceFailureException e) {
+            res = (E) projectService.getProjectById(id.toString());
+        }
+
+        return new ResponseEntity<E>(res, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Update project by id")

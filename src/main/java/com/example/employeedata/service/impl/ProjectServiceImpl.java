@@ -100,9 +100,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDto getProjectById(Long projectId) {
+    public ProjectDto getProjectById(String projectId) {
         return ProjectMapper.mapToProjectDto(
-            projectRepository.findById(projectId).orElseThrow(() ->
+            projectRepository.findById(Long.parseLong(projectId)).orElseThrow(() ->
                 new ResourceNotFoundException(resourceName, "id", projectId)
             )
         );

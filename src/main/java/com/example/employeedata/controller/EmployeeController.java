@@ -4,22 +4,28 @@ import java.util.*;
 
 import javax.validation.Valid;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.service.EmployeeService;
+import com.example.employeedata.service.EmployeeDocService;
 
 import io.swagger.annotations.*;
 
 @Api(tags = "Service to manage employees")
 @RestController
 @RequestMapping("/api/employees")
-public class EmployeeController {
+public class EmployeeController<E> {
     private final EmployeeService employeeService;
+    private final EmployeeDocService employeeDocService;
 
-    public EmployeeController(EmployeeService employeeService) {
+    public EmployeeController(
+        EmployeeService employeeService,
+        EmployeeDocService employeeDocService) {
         this.employeeService = employeeService;
+        this.employeeDocService = employeeDocService;
     }
 
     @ApiOperation(value = "Creating an employee")
@@ -30,8 +36,19 @@ public class EmployeeController {
 
     @ApiOperation(value = "Returns a lst of all employees")
     @GetMapping
-    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
-        return new ResponseEntity<List<EmployeeDto>>(employeeService.getAllEmployees(), HttpStatus.OK);
+    public ResponseEntity<List<E>> getAllEmployees() {
+        List<E> res = null;
+
+        try {
+            res = (List<E>) employeeDocService.getAllEmployees();
+            if (res == null) {
+                res = (List<E>) employeeService.getAllEmployees();
+            }
+        } catch (DataAccessResourceFailureException e) {
+            res = (List<E>) employeeService.getAllEmployees();
+        }
+
+        return new ResponseEntity<List<E>>(res, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employee by id")
@@ -45,8 +62,20 @@ public class EmployeeController {
                 value = "Employee id")
         })
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable Long id) {
-        return new ResponseEntity<EmployeeDto>(employeeService.getEmployeeById(id), HttpStatus.OK);
+    public ResponseEntity<E> getEmployeeById(@PathVariable String id) {
+        E res = null;
+
+        try {
+            res = (E) employeeDocService.getEmployeeById(id);
+
+            if (res == null) {
+                res = (E) employeeService.getEmployeeById(id.toString());
+            }
+        } catch (DataAccessResourceFailureException e) {
+            res = (E) employeeService.getEmployeeById(id.toString());
+        }
+
+        return new ResponseEntity<E>(res, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employee by project id")
