@@ -1,5 +1,8 @@
 package com.example.employeedata.enums;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public enum Role {
     Unknown("Unknown"), //0
     Director("Director"), //1
@@ -30,5 +33,12 @@ public enum Role {
 
     public static final Integer size() {
         return Role.values().length;
+    }
+
+    public static final String[] labels() {
+        return Arrays.stream(Role
+        .values())
+        .map(e -> e.toString())
+        .collect(Collectors.toList()).toArray(new String[Role.size()]);
     }
 }

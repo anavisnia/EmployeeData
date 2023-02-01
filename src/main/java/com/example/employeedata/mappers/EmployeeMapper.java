@@ -1,5 +1,6 @@
 package com.example.employeedata.mappers;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import com.example.employeedata.dto.*;
@@ -89,6 +90,22 @@ public final class EmployeeMapper {
         }
 
         return dtos;
+    }
+
+    public static Employee mapToEmployee(String[] employeeFieldsFromFile, List<Project> projects) {
+        Employee employee = new Employee();
+        
+        employee.setFirstName(CustomPropValidators.normalizeStr(employeeFieldsFromFile[0]));
+        employee.setLastName(CustomPropValidators.normalizeStr(employeeFieldsFromFile[1]));
+        LocalDate employeeDateOfBirth = LocalDate.parse(employeeFieldsFromFile[2]);
+        CustomPropValidators.validateBirthDate(employeeDateOfBirth, errResource);
+        employee.setBirthDate(employeeDateOfBirth);
+        employee.setRole(CustomPropValidators.validateRole(Integer.parseInt(employeeFieldsFromFile[3].replace(".0", "")), errResource));
+        employee.setDevLanguage(CustomPropValidators.validateDevLang(Integer.parseInt(employeeFieldsFromFile[4].replace(".0", "")), errResource));
+        employee.setProjects(new HashSet<>(projects));
+        employee.setModificationDate(new Date());
+
+        return employee;
     }
 
     private static List<Long> getProjectIds(Set<Project> projects) {

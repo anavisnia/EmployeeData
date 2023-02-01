@@ -1,5 +1,8 @@
 package com.example.employeedata.enums;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public enum DevLanguage {
     Unknown("Unknown"), //0
     JavaScript("JavaScript"), //1
@@ -26,5 +29,12 @@ public enum DevLanguage {
 
     public static final Integer size() {
         return DevLanguage.values().length;
+    }
+
+    public static final String[] labels() {
+        return Arrays.stream(DevLanguage
+        .values())
+        .map(e -> e.toString())
+        .collect(Collectors.toList()).toArray(new String[DevLanguage.size()]);
     }
 }

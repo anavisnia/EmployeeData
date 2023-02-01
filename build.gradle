@@ -19,19 +19,30 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// elasticsearch
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 	implementation 'co.elastic.clients:elasticsearch-java:8.5.3'
     implementation 'org.elasticsearch.client:elasticsearch-rest-client:8.5.3'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
 	implementation 'jakarta.json:jakarta.json-api:2.0.1'
 	implementation 'org.json:json:20160810'
+	// elasticsearch
 	implementation 'org.yaml:snakeyaml'
+	//springfox + swagger
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 	implementation 'io.springfox:springfox-bean-validators:3.0.0'
+	//springfox + swagger
+	// to read exel files
+	implementation 'org.apache.commons:commons-collections4:4.1'
+	implementation 'org.apache.poi:poi:3.17'
+	implementation 'org.apache.poi:poi-ooxml:3.17'
+	implementation 'org.apache.poi:poi-ooxml-schemas:3.17'
+	implementation 'org.apache.xmlbeans:xmlbeans:2.6.0'
+	// to read exel files
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'

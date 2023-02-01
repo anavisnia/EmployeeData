@@ -1,6 +1,8 @@
 package com.example.employeedata.helpers;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import com.example.employeedata.enums.*;
 import com.example.employeedata.exception.CustomValidationException;
@@ -44,6 +46,16 @@ public final class CustomPropValidators {
         return devLangValues[devLang];
     }
 
+    public static void validateFileType(String type, String errResource) {
+        List<String> types = Arrays.asList(FileTypes.labels());
+
+        if (types.contains(type)) {
+            return;
+        }
+
+        throw new CustomValidationException(errResource, type + " is not allowed");
+    }
+
     public static void validateTeamSize(int teamSize, String errResource) {
         if(teamSize < 0) {
             throw new CustomValidationException(
@@ -52,7 +64,26 @@ public final class CustomPropValidators {
         }
     }
 
+    public static boolean isMaxReachedForEmptyFields(String[] fields, Integer maxAllowedEmptyFields) {
+        Integer count = 0;
+        for (String string : fields) {
+            if (string == null || (string != null && string.isBlank())) {
+                count++;
+            }
+        }
+
+        if (count > maxAllowedEmptyFields) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static String normalizeStr(String str) {
+        if (str.isBlank()) {
+            throw new CustomValidationException("text", "Text" + " cannot be blank");
+        }
+
         String normalized = str.trim().toLowerCase();
 
         char[] charracters = normalized.toCharArray();
@@ -69,5 +100,17 @@ public final class CustomPropValidators {
         }
 
         return finalStr.toString();
+    }
+
+    public static void isProperFileType(String fileName) {
+        String fileExtension = "";
+        String errorResource = "File type";
+
+        if (fileName.isBlank()) {
+            throw new CustomValidationException(errorResource, fileExtension + " is not allowed");
+        }
+
+        fileExtension = HelperFunctions.getExtensionFromFileName(fileName);
+        validateFileType(fileExtension, errorResource);
     }
 }

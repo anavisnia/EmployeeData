@@ -17,6 +17,11 @@ public class CustomValidationException extends RuntimeException {
     private Object fieldValue;
     private String customMessage;
 
+    public CustomValidationException(String fieldName, String customMessage) {
+        super(String.format("Validation error for %s. %s.", fieldName, customMessage));
+        this.fieldName = fieldName;
+    }
+
     public CustomValidationException(String resourceName, String fieldName, Object fieldValue) {
         super(String.format("Validation error for %s in %s property. Was enterred: '%s'.", resourceName, fieldName, fieldValue));
         this.resourceName = resourceName;

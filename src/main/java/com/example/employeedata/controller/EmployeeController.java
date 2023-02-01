@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.service.EmployeeService;
@@ -32,6 +33,21 @@ public class EmployeeController<E> {
     @PostMapping("/add")
     public ResponseEntity<ResponseDto> saveEmployee(@Valid @RequestBody CreateEmployeeDto employeeDto) {
         return new ResponseEntity<ResponseDto>(employeeService.saveEmployee(employeeDto), HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Creating employees from exel file")
+    @ApiImplicitParams(
+        value = {
+            @ApiImplicitParam(
+                name = "file",
+                required = true,
+                dataType = "file",
+                value = "Exel file of .xls or .xlsx format with employee data")
+        })
+    //for now works only with postman
+    @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
+    public ResponseEntity<ResponseDto> saveEmployeesFromFile(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<ResponseDto>(employeeService.saveEmployeesFromExelFile(file), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Returns a lst of all employees")

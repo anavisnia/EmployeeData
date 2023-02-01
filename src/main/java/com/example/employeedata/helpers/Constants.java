@@ -15,4 +15,6 @@ public final class Constants {
     public static final String CONTENT_TYPE = "Content-type";
     public static final String UTF8_ENCODING = "UTF-8";
     public static final Integer MILLISECONDS = 1000;
+
+    public static final Integer ALLOWED_EMPTY_FILEDS_EMPLOYEE = 1;
 }
