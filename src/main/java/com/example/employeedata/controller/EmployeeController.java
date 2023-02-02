@@ -170,4 +170,11 @@ public class EmployeeController<E> {
         employeeService.deleteEmployee(id);
         return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
     }
+
+    @ApiOperation(value = "Get a list of employees in an Exel file. Generates file into your C:\\Users\\current_user\\Documents folder.")
+    @GetMapping("/generateFile")
+    public ResponseEntity<HttpStatus> getEmployeesInExelFile() {
+        employeeService.generateExelFile();
+        return new ResponseEntity<HttpStatus>(HttpStatus.OK);
+    }
 }

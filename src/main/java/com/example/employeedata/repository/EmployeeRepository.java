@@ -26,4 +26,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
         nativeQuery = true
     )
     List<Employee> findByRole(@Param("role") Integer role);
+
+    @Query(
+        value = "SELECT e.first_name, e.last_name, e.birth_date, e.role, e.dev_language, IFNULL(GROUP_CONCAT(ep.project_id SEPARATOR ', '), '') as projectIds FROM employeedata.employees e LEFT JOIN employeedata.employee_project ep on ep.employee_id = e.id GROUP BY e.id",
+        nativeQuery = true
+    )
+    List<Object[]> findAllEmployeesInclProjects();
 }

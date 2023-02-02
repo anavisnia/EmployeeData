@@ -110,7 +110,7 @@ public final class CustomPropValidators {
             throw new CustomValidationException(errorResource, fileExtension + " is not allowed");
         }
 
-        fileExtension = HelperFunctions.getExtensionFromFileName(fileName);
+        fileExtension = FileHelperFunctions.getExtensionFromFileName(fileName);
         validateFileType(fileExtension, errorResource);
     }
 }

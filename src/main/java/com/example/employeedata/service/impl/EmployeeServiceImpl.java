@@ -1,7 +1,9 @@
 package com.example.employeedata.service.impl;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.validation.*;
 
@@ -16,7 +18,7 @@ import com.example.employeedata.entity.*;
 import com.example.employeedata.enums.FileTypes;
 import com.example.employeedata.exception.*;
 import com.example.employeedata.helpers.*;
-import com.example.employeedata.mappers.EmployeeMapper;
+import com.example.employeedata.mappers.*;
 import com.example.employeedata.repository.*;
 import com.example.employeedata.service.EmployeeService;
 
@@ -60,8 +62,8 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         }
         CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
 
-        File file = HelperFunctions.castMultipartFileToFile(multipartFile);
-        String fileType = HelperFunctions.getExtensionFromFileName(file.getName());
+        File file = FileHelperFunctions.castMultipartFileToFile(multipartFile);
+        String fileType = FileHelperFunctions.getExtensionFromFileName(file.getName());
         Set<Employee> createEmployees = new HashSet<>();
 
         try(FileInputStream fileBytes = new FileInputStream(file);
@@ -98,7 +100,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                     Cell cell = cells.next();
                     String cellValue = "";
 
-                    cellValue = HelperFunctions.getCellValue(cell);
+                    cellValue = FileHelperFunctions.getCellValue(cell);
 
                     employeeData[cellCount] = cellValue;
 
@@ -139,6 +141,17 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     @Override
     public List<EmployeeDto> getAllEmployees() {
         return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findAll());
+    }
+
+    @Override
+    public List<EmployeeFileDto> getAllEmployeesIncludingProjects() {
+        List<Object[]> data = employeeRepository.findAllEmployeesInclProjects();
+        List<EmployeeFileDto> employeeData = data
+            .stream()
+            .map(e -> EmployeeFileMapper.mapToEmployeeFileDto(e))
+            .collect(Collectors.toList());
+
+        return employeeData;
     }
 
     @Override
@@ -196,6 +209,54 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         
         employeeRepository.delete(employee);
     }
+
+    @Override
+    public void generateExelFile() {
+        try(Workbook workBook = new XSSFWorkbook()) {
+            
+            LocalDate date = DateTimeHelpers.getLocalDateNow();
+            Sheet workBookSheet = workBook.createSheet("EmployeeDataFor_" + date.toString());
+
+            workBookSheet.setDefaultColumnWidth(100000);
+            workBookSheet.setDefaultRowHeight((short) 500);
+            
+            Row header = workBookSheet.createRow(0);
+            Cell headerCell = FileHelperFunctions.populateHeaderRow(header, Constants.EMPLOYEE_FILE_HEADERS);
+
+            List<Object[]> data = employeeRepository.findAllEmployeesInclProjects();
+                 
+            if (data.isEmpty()) {
+                throw new ResourceNotFoundException("Employees");
+            }
+
+            List<EmployeeFileDto> employeeData = data
+                .stream()
+                .map(e -> EmployeeFileMapper.mapToEmployeeFileDto(e))
+                .collect(Collectors.toList());
+
+            Row row = null;
+            Cell cell = null;
+
+            for (int i = 1; i <= employeeData.size(); i++) {
+                row = workBookSheet.createRow(i);
+                EmployeeFileDto emplyee = employeeData.get(i-1);
+                for (int j = 0; j < Constants.EMPLOYEE_FILE_HEADERS.length; j++) {
+                    cell = row.createCell(j);
+                    cell.setCellValue(getEmployeeDateAtIndex(j, emplyee));
+                }
+            }
+
+            File currDir = new File(Constants.USER_DOCUMENTS_PATH);
+            String path = currDir.getAbsolutePath();
+            String fileLocation = path + "\\" + workBookSheet.getSheetName() +  ".xlsx";
+            try (FileOutputStream fos = new FileOutputStream(fileLocation)) {
+                workBook.write(fos);
+                workBook.close();
+            }
+        } catch (IOException e) {
+            // will throw Internal Server Error
+        }
+    }
     
     private List<Project> getProjects(List<Long> projectIds) {
         List<Project> projects = new ArrayList<>();
@@ -226,6 +287,35 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             }
             throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
+    }
+
+    private String getEmployeeDateAtIndex(Integer index, EmployeeFileDto employee) {
+        String dataAtIndex = "";
+
+        switch(index) {
+            case 0:
+                dataAtIndex = employee.getFirstName();
+                break;
+            case 1:
+                dataAtIndex = employee.getLastName();
+                break;
+            case 2:
+                dataAtIndex = employee.getBirthDate();
+                break;
+            case 3:
+                dataAtIndex = employee.getRole();
+                break;
+            case 4:
+                dataAtIndex = employee.getDevLanguage();
+                break;
+            case 5:
+                dataAtIndex = employee.getProjectIds().trim();
+                break;
+            default:
+                dataAtIndex = "";
+        }
+
+        return dataAtIndex;
     }
     
 }
