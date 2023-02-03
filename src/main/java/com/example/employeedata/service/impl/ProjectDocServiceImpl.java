@@ -28,7 +28,7 @@ public class ProjectDocServiceImpl implements ProjectDocService {
 
         ProjectDoc dbResponse = projectESRepository.save(projectDoc);
 
-        return new ResponseDto(dbResponse.getId(), resourceName);
+        return new ResponseDto(dbResponse.getId(), resourceName, false);
     }
 
     @Override

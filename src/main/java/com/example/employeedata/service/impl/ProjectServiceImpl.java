@@ -40,7 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
         
         Project dbResponse = projectRepository.save(project);
 
-        return new ResponseDto(dbResponse.getId(), resourceName);
+        return new ResponseDto(dbResponse.getId(), resourceName, false);
     }
 
     @Override

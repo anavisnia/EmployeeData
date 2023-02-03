@@ -52,19 +52,20 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         employee.setModificationDate(new Date());
         Employee dbResponse = employeeRepository.save(employee);
 
-        return new ResponseDto(dbResponse.getId(), resourceName);
+        return new ResponseDto(dbResponse.getId(), resourceName, false);
     }
 
     @Override
     public ResponseDto saveEmployeesFromExelFile(MultipartFile multipartFile) {
         if (multipartFile == null || (multipartFile != null && multipartFile.getOriginalFilename().isBlank()) ) {
-            throw new CustomValidationException("File", "File cannot be null or empty");
+            throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
         CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
 
         File file = FileHelperFunctions.castMultipartFileToFile(multipartFile);
         String fileType = FileHelperFunctions.getExtensionFromFileName(file.getName());
         Set<Employee> createEmployees = new HashSet<>();
+        Set<String[]> failedValidationEntities = new HashSet<>();
 
         try(FileInputStream fileBytes = new FileInputStream(file);
              ) {
@@ -83,14 +84,15 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             }
 
             int rowCount = 0;
+            Row row = null;
+            //to skip first row which contains additional information about cells
+            if (rowCount == 0 && rows != null && rows.hasNext()) {
+                rowCount++;
+                row = rows.next(); // row number is 0
+            }
 
-            while (rows != null && rows.hasNext()) {
-                Row row = rows.next();
-                //to skip first row which contains additional information about cells
-                if (rowCount == 0) {
-                    rowCount++;
-                    continue;
-                }
+            while (rows != null && rows.hasNext() && rowCount == 1) {
+                row = rows.next();
 
                 Iterator<Cell> cells = row.cellIterator();
                 String[] employeeData = new String[6];
@@ -111,31 +113,45 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                 if (employeeData[5] != null) {
                     projects = getProjects(HelperFunctions.getListOfLongValuesFromString(employeeData[5]));
                 }
-
+                
                 if (!CustomPropValidators.isMaxReachedForEmptyFields(employeeData, Constants.ALLOWED_EMPTY_FILEDS_EMPLOYEE)) {
                     createEmployees.add(EmployeeMapper.mapToEmployee(employeeData, projects));
+                } else {
+                    failedValidationEntities.add(employeeData);
                 }
             }
         } catch (IOException e) {
             //will throw Internal Server Error
 
+        } finally {
             //deliting temp file
             if (file.exists()) {
                 file.delete();
             }
         }
-        
-        if (file.exists()) {
-            file.delete();
+
+        ResponseDto response = null;
+
+        if (createEmployees.isEmpty()) {
+            response = new ResponseDto(
+                failedValidationEntities,
+                "Employee/employees",
+                " error. No entities to save into database. If there are entities which did not met requirements, they are represented as an array, otherwise it is null.",
+                true);
         }
 
-        List<Employee> dbResponse = employeeRepository.saveAll(createEmployees);
-        String employeeIds = "";
+        List<Long> dbResponse = employeeRepository.saveAll(createEmployees).stream().filter(Objects::nonNull).map(Employee::getId).collect(Collectors.toList());
 
-        for (Employee employee : dbResponse) {
-            employeeIds += employee.getId().toString() + " ";
+        if (!failedValidationEntities.isEmpty()) {
+            response = new ResponseDto(
+                dbResponse, "Employee/employees created successfully",
+                failedValidationEntities, "These rows conatain errors. Please check"
+            );
+        } else {
+            response = new ResponseDto(dbResponse, "Employee/employees", false);
         }
-        return new ResponseDto(employeeIds.trim(), resourceName);
+
+        return response;
     }
 
     @Override
@@ -212,6 +228,9 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
     @Override
     public void generateExelFile() {
+        File file = new File(Constants.USER_DOCUMENTS_PATH);
+        String fileLocation = "";
+
         try(Workbook workBook = new XSSFWorkbook()) {
             
             LocalDate date = DateTimeHelpers.getLocalDateNow();
@@ -231,7 +250,8 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
             List<EmployeeFileDto> employeeData = data
                 .stream()
-                .map(e -> EmployeeFileMapper.mapToEmployeeFileDto(e))
+                //.map(e -> EmployeeFileMapper.mapToEmployeeFileDto(e))
+                .map(EmployeeFileMapper::mapToEmployeeFileDto)
                 .collect(Collectors.toList());
 
             Row row = null;
@@ -242,23 +262,23 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                 EmployeeFileDto emplyee = employeeData.get(i-1);
                 for (int j = 0; j < Constants.EMPLOYEE_FILE_HEADERS.length; j++) {
                     cell = row.createCell(j);
-                    cell.setCellValue(getEmployeeDateAtIndex(j, emplyee));
+                    cell.setCellValue(getEmployeeDataAtIndex(j, emplyee));
                 }
             }
 
-            File currDir = new File(Constants.USER_DOCUMENTS_PATH);
-            String path = currDir.getAbsolutePath();
-            String fileLocation = path + "\\" + workBookSheet.getSheetName() +  ".xlsx";
+            fileLocation = file.getAbsolutePath() + "\\" + workBookSheet.getSheetName() +  ".xlsx";
             try (FileOutputStream fos = new FileOutputStream(fileLocation)) {
                 workBook.write(fos);
                 workBook.close();
             }
         } catch (IOException e) {
             // will throw Internal Server Error
+        } finally {
+            file.delete();
         }
     }
-    
-    private List<Project> getProjects(List<Long> projectIds) {
+
+    private List<Project> getProjects(Collection<Long> projectIds) {
         List<Project> projects = new ArrayList<>();
 
         if (!projectIds.isEmpty()) {
@@ -289,7 +309,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         }
     }
 
-    private String getEmployeeDateAtIndex(Integer index, EmployeeFileDto employee) {
+    private String getEmployeeDataAtIndex(Integer index, EmployeeFileDto employee) {
         String dataAtIndex = "";
 
         switch(index) {

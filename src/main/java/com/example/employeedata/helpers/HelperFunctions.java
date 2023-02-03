@@ -1,8 +1,7 @@
 package com.example.employeedata.helpers;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.elasticsearch.common.UUIDs;
@@ -12,7 +11,7 @@ public final class HelperFunctions {
         return UUIDs.randomBase64UUID();
     }
 
-    public static List<Long> getListOfLongValuesFromString(String str) {
+    public static Collection<Long> getListOfLongValuesFromString(String str) {
         Set<Long> values = new HashSet<>();
 
         if (!str.isBlank()) {
@@ -23,7 +22,7 @@ public final class HelperFunctions {
             }
         }
 
-        return new ArrayList(values);
+        return values;
     }
 
 }

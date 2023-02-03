@@ -41,7 +41,7 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
 
         EmployeeDoc dbResponse = employeeESRepository.save(employeeDoc);
 
-        return new ResponseDto(dbResponse.getId(), resourceName);
+        return new ResponseDto(dbResponse.getId(), resourceName, false);
     }
 
     @Override
