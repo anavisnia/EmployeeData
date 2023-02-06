@@ -1,9 +1,12 @@
 package com.example.employeedata.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import javax.validation.Valid;
 
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.employeedata.dto.*;
 import com.example.employeedata.service.EmployeeService;
 import com.example.employeedata.service.EmployeeDocService;
+import com.example.employeedata.helpers.Constants;
+import com.example.employeedata.helpers.DateTimeHelpers;
 
 import io.swagger.annotations.*;
 
@@ -171,10 +176,25 @@ public class EmployeeController<E> {
         return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
     }
 
-    @ApiOperation(value = "Get a list of employees in an Exel file. Generates file into your C:\\Users\\current_user\\Documents folder.")
-    @GetMapping("/generateFile")
-    public ResponseEntity<HttpStatus> getEmployeesInExelFile() {
-        employeeService.generateExelFile();
-        return new ResponseEntity<HttpStatus>(HttpStatus.OK);
+    // still generates file to C:\\Users\\current_user\\Documents folder
+    // todo: delete file after it was returned in a response
+    @ApiOperation(value = "Get a list of employees in an Exel file.")
+    @GetMapping("/downloadFile")
+    public ResponseEntity<?> downloadEmployeesInExelFile() {
+        Resource resource = null;
+
+        resource = employeeService.generateExelFile();
+
+        if(resource == null || !resource.exists()) {
+            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+        }
+
+        String contentType = Constants.DOWNLOAD_OCTET_STREAM;
+        String headerValue = Constants.ATTACHMENT_FILENAME + resource.getFilename() + "\"";
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+            .body(resource);
     }
 }

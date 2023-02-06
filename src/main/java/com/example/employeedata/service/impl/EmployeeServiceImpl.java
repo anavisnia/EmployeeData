@@ -1,6 +1,9 @@
 package com.example.employeedata.service.impl;
 
 import java.io.*;
+import org.springframework.core.io.Resource;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -227,14 +230,14 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     }
 
     @Override
-    public void generateExelFile() {
-        File file = new File(Constants.USER_DOCUMENTS_PATH);
+    public Resource generateExelFile() {
         String fileLocation = "";
+        Path generatedFilePath = null;
 
         try(Workbook workBook = new XSSFWorkbook()) {
             
             LocalDate date = DateTimeHelpers.getLocalDateNow();
-            Sheet workBookSheet = workBook.createSheet("EmployeeDataFor_" + date.toString());
+            Sheet workBookSheet = workBook.createSheet(Constants.EMPLOYEE_FILE_NAME + date.toString());
 
             workBookSheet.setDefaultColumnWidth(100000);
             workBookSheet.setDefaultRowHeight((short) 500);
@@ -266,16 +269,18 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                 }
             }
 
-            fileLocation = file.getAbsolutePath() + "\\" + workBookSheet.getSheetName() +  ".xlsx";
+            generatedFilePath = Paths.get(Constants.USER_DOCUMENTS_PATH + "\\" + workBookSheet.getSheetName() +  ".xlsx");
+            fileLocation = generatedFilePath.toAbsolutePath().toString();
+
             try (FileOutputStream fos = new FileOutputStream(fileLocation)) {
                 workBook.write(fos);
                 workBook.close();
             }
         } catch (IOException e) {
             // will throw Internal Server Error
-        } finally {
-            file.delete();
         }
+
+        return FileHelperFunctions.generateUrlResource(generatedFilePath);
     }
 
     private List<Project> getProjects(Collection<Long> projectIds) {
