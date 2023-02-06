@@ -37,9 +37,11 @@ public final class EmployeeFileMapper {
         List<EmployeeFileDto> dtos = new ArrayList<EmployeeFileDto>();
 
         if (!employees.isEmpty()) {
-            for (EmployeeFileDto employee : employees) {
-                dtos.add(mapToEmployeeFileDto(employee));
-            }
+            // for (EmployeeFileDto employee : employees) {
+            //     dtos.add(mapToEmployeeFileDto(employee));
+            // }
+
+            employees.forEach(efd -> dtos.add(mapToEmployeeFileDto(efd)));
         }
 
         return dtos;

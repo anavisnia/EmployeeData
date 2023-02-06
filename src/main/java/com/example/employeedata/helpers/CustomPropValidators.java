@@ -66,8 +66,8 @@ public final class CustomPropValidators {
 
     public static boolean isMaxReachedForEmptyFields(String[] fields, Integer maxAllowedEmptyFields) {
         Integer count = 0;
-        for (String string : fields) {
-            if (string == null || (string != null && string.isBlank())) {
+        for (String field : fields) {
+            if (field == null || (field != null && field.isBlank())) {
                 count++;
             }
         }

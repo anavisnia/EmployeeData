@@ -55,9 +55,11 @@ public class ProjectMapper {
         List<ProjectDto> dtos = new ArrayList<ProjectDto>();
 
         if (!projects.isEmpty()) {
-            for (Project project : projects) {
-                dtos.add(mapToProjectDto(project));
-            }
+            // for (Project project : projects) {
+            //     dtos.add(mapToProjectDto(project));
+            // }
+
+            projects.forEach(p -> dtos.add(mapToProjectDto(p)));
         }
 
         return dtos;

@@ -135,18 +135,24 @@ public class ProjectServiceImpl implements ProjectService {
     @PreRemove
     private void removeProjectsFromEmployees(Long projectId, Project project) {
         List<Employee> employees = employeeRepository.findByProjectId(projectId);
-        for (Employee employee : employees) {
-            employee.getProjects().remove(project);
-        }
+
+        // for (Employee employee : employees) {
+        //     employee.getProjects().remove(project);
+        // }
+
+        employees.stream().forEach(e -> e.getProjects().remove(project));
+        
         employeeRepository.saveAll(employees);
     }
 
     private List<Long> getProjectIds(List<Project> projects) {
         List<Long> projectIds = new ArrayList<>();
 
-        for (Project project : projects) {
-            projectIds.add(project.getId());
-        }
+        // for (Project project : projects) {
+        //     projectIds.add(project.getId());
+        // }
+
+        projects.stream().forEach(p -> projectIds.add(p.getId()));
 
         return projectIds;
     }
@@ -156,9 +162,12 @@ public class ProjectServiceImpl implements ProjectService {
         
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<T> constraintViolation : violations) {
-                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
-            }
+            // for (ConstraintViolation<T> constraintViolation : violations) {
+            //     sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
+            // }
+
+            violations.forEach(cv -> sb.append(cv.getPropertyPath() + " " + cv.getMessage() + ". "));
+
             throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
     }

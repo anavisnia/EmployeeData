@@ -167,7 +167,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         List<Object[]> data = employeeRepository.findAllEmployeesInclProjects();
         List<EmployeeFileDto> employeeData = data
             .stream()
-            .map(e -> EmployeeFileMapper.mapToEmployeeFileDto(e))
+            .map(EmployeeFileMapper::mapToEmployeeFileDto)
             .collect(Collectors.toList());
 
         return employeeData;
@@ -287,16 +287,21 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         List<Project> projects = new ArrayList<>();
 
         if (!projectIds.isEmpty()) {
-            for (Long id : projectIds) {
-                if (id != null) {
-                    Project project = projectRepository.findById(id).orElseThrow(() ->
-                        new ResourceNotFoundException("Project", "id", id)
-                    );
-                    projects.add(project);
-                } else {
-                    throw new CustomValidationException("Project", "id", id);
-                }
-            }
+            // for (Long id : projectIds) {
+            //     if (id != null) {
+            //         Project project = projectRepository.findById(id).orElseThrow(() ->
+            //             new ResourceNotFoundException("Project", "id", id)
+            //         );
+            //         projects.add(project);
+            //     } else {
+            //         throw new CustomValidationException("Project", "id", id);
+            //     }
+            // }
+            projectIds.stream().filter(Objects::nonNull).forEach(
+                id -> projects.add(
+                        projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "id", id))
+                    )
+            );
         }
 
         return projects;
