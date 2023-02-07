@@ -1,6 +1,7 @@
 package com.example.employeedata.helpers;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,12 +57,75 @@ public final class CustomPropValidators {
         throw new CustomValidationException(errResource, type + " is not allowed");
     }
 
-    public static void validateTeamSize(int teamSize, String errResource) {
+    public static Integer validateTeamSize(int teamSize, String errResource) {
         if(teamSize < 0) {
             throw new CustomValidationException(
                 errResource, "team size", teamSize,
                 errResource + "'s team size cannot be out of scope");
         }
+
+        return teamSize;
+    }
+
+    public static boolean isValidEmployeeFile(String[] employee) {
+        try {
+            if (employee[0] == null || employee[0].isBlank()) {
+                return false;
+            } else if (employee[1] == null || employee[1].isBlank()) {
+                return false;
+            } else if (employee[2] == null || employee[2].isBlank() ||
+                    (employee[2] != null && !employee[2].isBlank() && LocalDate.parse(employee[3]).isBefore(LocalDate.now()))
+                ) {
+                return false;
+            } else if (employee[3] == null || employee[3].isBlank() ||
+                    (employee[3] != null && !employee[3].isBlank() && Long.parseLong(employee[3].replace(".0", "")) > (Role.size() - 1)) ||
+                    (employee[3] != null && !employee[3].isBlank() && Long.parseLong(employee[3].replace(".0", "")) < 0)
+                ) {
+                return false;
+            } else if (employee[4] == null || employee[4].isBlank() ||
+                    (employee[4] != null && !employee[4].isBlank() && Long.parseLong(employee[4].replace(".0", "")) > (DevLanguage.size() - 1)) ||
+                    (employee[4] != null && !employee[4].isBlank() && Long.parseLong(employee[4].replace(".0", "")) < 0)
+                ) {
+                return false;
+            }
+        } catch(DateTimeParseException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isValidProjectFile(String[] project) {
+        try {
+            if (project[0] == null || (project[0] != null && project[0].isBlank())) {
+                return false;
+            } else if (project[1] == null || (project[1] != null && project[1].isBlank())) {
+                return false;
+            } else if (project[2] == null || (project[2] != null && project[2].isBlank())) {
+                return false;
+            } else if (project[3] == null || 
+                    (project[3] != null && project[3].isBlank()) ||
+                    (!project[3].isBlank() && Long.parseLong(project[3].replace(".0", "")) < 0) ||
+                    (!project[3].isBlank() && Long.parseLong(project[3].replace(".0", "")) > MAX_PROJECT_TEAM_SIZE)
+                ) {
+                return false;
+            } else if (project[4] == null ||
+                    (project[4] != null && project[4].isBlank()) ||
+                    (project[4] != null && !project[4].isBlank() && Long.parseLong(project[4].replace(".0", "")) > (DevLanguage.size() - 1)) ||
+                    (project[4] != null && !project[4].isBlank() && Long.parseLong(project[4].replace(".0", "")) < 0)
+                ) {
+                return false;
+            } else if (project[5] == null ||
+                    (project[5] != null && project[5].isBlank()) ||
+                    (project[5] != null && !project[5].isBlank() && LocalDate.parse(project[5]).isBefore(LocalDate.now()))
+                ) {
+                return false;
+            }
+        } catch(DateTimeParseException e) {
+            return false;
+        }
+
+        return true;
     }
 
     public static boolean isMaxReachedForEmptyFields(String[] fields, Integer maxAllowedEmptyFields) {
@@ -73,6 +137,21 @@ public final class CustomPropValidators {
         }
 
         if (count > maxAllowedEmptyFields) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean areAllFieldsEmpty(String[] fields) {
+        Integer count = 0;
+        for (String field : fields) {
+            if (field == null || (field != null && field.isBlank())) {
+                count++;
+            }
+        }
+
+        if (count == fields.length) {
             return true;
         }
 
@@ -112,5 +191,13 @@ public final class CustomPropValidators {
 
         fileExtension = FileHelperFunctions.getExtensionFromFileName(fileName);
         validateFileType(fileExtension, errorResource);
+    }
+
+    public static void validateTerminationDate(LocalDate terminationDate, String errResource) {
+        if (!terminationDate.isAfter(LocalDate.now())) {
+            throw new CustomValidationException(
+                errResource, "termiantion date", terminationDate,
+                String.format("%s cannot be before todays date", errResource));
+        }
     }
 }

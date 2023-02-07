@@ -84,10 +84,6 @@ public final class EmployeeMapper {
         List<EmployeeDto> dtos = new ArrayList<EmployeeDto>();
 
         if (!employees.isEmpty()) {
-            // for (Employee employee : employees) {
-            //     dtos.add(mapToEmployeeDto(employee));
-            // }
-
             employees.stream().forEach(e -> dtos.add(mapToEmployeeDto(e)));
         }
 
@@ -114,10 +110,6 @@ public final class EmployeeMapper {
         List<Long> projectIds = new ArrayList<>();
 
         if (!projects.isEmpty()) {
-            // for (Project project : projects) {
-            //     projectIds.add(project.getId());
-            // }
-
             projects.forEach(p -> projectIds.add(p.getId()));
         }
 

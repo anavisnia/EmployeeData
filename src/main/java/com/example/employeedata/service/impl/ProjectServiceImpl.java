@@ -1,18 +1,28 @@
 package com.example.employeedata.service.impl;
 
+import java.io.*;
+import org.springframework.core.io.Resource;
+import java.nio.file.Path;
+import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
 import javax.validation.*;
 
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
+import com.example.employeedata.enums.FileTypes;
 import com.example.employeedata.exception.*;
 import com.example.employeedata.helpers.*;
-import com.example.employeedata.mappers.ProjectMapper;
+import com.example.employeedata.mappers.*;
 import com.example.employeedata.repository.*;
 import com.example.employeedata.service.ProjectService;
 
@@ -41,6 +51,102 @@ public class ProjectServiceImpl implements ProjectService {
         Project dbResponse = projectRepository.save(project);
 
         return new ResponseDto(dbResponse.getId(), resourceName, false);
+    }
+
+    @Override
+    public ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile) {
+        if (multipartFile == null || (multipartFile != null && multipartFile.getOriginalFilename().isBlank()) ) {
+            throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
+        }
+        CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
+
+        File file = FileHelperFunctions.castMultipartFileToFile(multipartFile);
+        String fileType = FileHelperFunctions.getExtensionFromFileName(file.getName());
+        Set<Project> createProjects = new HashSet<>();
+        Set<String[]> failedValidationEntities = new HashSet<>();
+
+        try(FileInputStream fileBytes = new FileInputStream(file);
+             ) {
+            Iterator<Row> rows = null;
+
+            if (FileTypes.Xls.label.equalsIgnoreCase(fileType)) {
+                try (HSSFWorkbook xlsWorkBook = new HSSFWorkbook(fileBytes)) {
+                    HSSFSheet workBookSheet = xlsWorkBook.getSheetAt(0);
+                    rows = workBookSheet.iterator();
+                }
+            } else if(FileTypes.Xlsx.label.equalsIgnoreCase(fileType)) {
+                try (XSSFWorkbook xlsxWorkBook = new XSSFWorkbook(fileBytes)) {
+                    XSSFSheet workBookSheet = xlsxWorkBook.getSheetAt(0);
+                    rows = workBookSheet.iterator();
+                }
+            }
+
+            int rowCount = 0;
+            Row row = null;
+            //to skip first row which contains additional information about cells
+            if (rowCount == 0 && rows != null && rows.hasNext()) {
+                rowCount++;
+                row = rows.next(); // row number is 0
+            }
+
+            while (rows != null && rows.hasNext() && rowCount == 1) {
+                row = rows.next();
+
+                String[] projectData = new String[Constants.PROJECT_FILE_HEADERS.length];
+
+                int cellCount = 0;
+                while (cellCount < projectData.length) {
+                    Cell cell = row.getCell(cellCount);
+
+                    String cellValue = "";
+
+                    cellValue = FileHelperFunctions.getCellValue(cell);
+
+                    projectData[cellCount] = cellValue;
+
+                    cellCount++;
+                }
+
+                if (!CustomPropValidators.areAllFieldsEmpty(projectData)) {
+                    if (CustomPropValidators.isValidProjectFile(projectData)) {
+                        createProjects.add(ProjectMapper.mapToProject(projectData));
+                    } else {
+                        failedValidationEntities.add(projectData);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            //will throw Internal Server Error
+
+        } finally {
+            //deliting temp file
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+
+        ResponseDto response = null;
+
+        List<Long> dbResponse = projectRepository.saveAll(createProjects).stream().filter(Objects::nonNull).map(Project::getId).collect(Collectors.toList());
+
+        if (createProjects.isEmpty() && !failedValidationEntities.isEmpty()) {
+            response = new ResponseDto(
+                failedValidationEntities,
+                "Project/projects",
+                " error. No entities to save into database. If there are entities which did not met requirements, they are represented as an array, otherwise it is null",
+                true);
+        } else if(!failedValidationEntities.isEmpty()) {
+            
+            response = new ResponseDto(
+                dbResponse, "Project/projects created successfully",
+                failedValidationEntities, "These rows conatain errors. Please check"
+            );
+        }
+        else {
+            response = new ResponseDto(dbResponse, "Project/projects", false);
+        }
+
+        return response;
     }
 
     @Override
@@ -132,13 +238,62 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.delete(existingProject);
     }
 
+    @Override
+    public Resource generateExelFile() {
+        String fileLocation = "";
+        Path generatedFilePath = null;
+
+        try(Workbook workBook = new XSSFWorkbook()) {
+            
+            LocalDate date = DateTimeHelpers.getLocalDateNow();
+            Sheet workBookSheet = workBook.createSheet(Constants.PROJECT_FILE_NAME + date.toString());
+
+            workBookSheet.setDefaultColumnWidth(100000);
+            workBookSheet.setDefaultRowHeight((short) 500);
+            
+            Row header = workBookSheet.createRow(0);
+            Cell headerCell = FileHelperFunctions.populateHeaderRow(header, Constants.PROJECT_FILE_HEADERS);
+
+            List<Project> data = projectRepository.findAll();
+                 
+            if (data.isEmpty()) {
+                throw new ResourceNotFoundException("Projects");
+            }
+
+            List<ProjectFileDto> projectsData = data
+                .stream()
+                .map(ProjectFileMapper::mapToProjectFileDto)
+                .collect(Collectors.toList());
+
+            Row row = null;
+            Cell cell = null;
+
+            for (int i = 1; i <= projectsData.size(); i++) {
+                row = workBookSheet.createRow(i);
+                ProjectFileDto project = projectsData.get(i-1);
+                for (int j = 0; j < Constants.PROJECT_FILE_HEADERS.length; j++) {
+                    cell = row.createCell(j);
+                    cell.setCellValue(getProjectDataAtIndex(j, project));
+                }
+            }
+
+            generatedFilePath = Paths.get(Constants.USER_DOCUMENTS_PATH + "\\" + workBookSheet.getSheetName() +  ".xlsx");
+            fileLocation = generatedFilePath.toAbsolutePath().toString();
+
+            try (FileOutputStream fos = new FileOutputStream(fileLocation)) {
+                workBook.write(fos);
+                workBook.close();
+            }
+        } catch (IOException e) {
+            // will throw Internal Server Error
+        }
+
+        return FileHelperFunctions.generateUrlResource(generatedFilePath);
+    }
+
     @PreRemove
     private void removeProjectsFromEmployees(Long projectId, Project project) {
         List<Employee> employees = employeeRepository.findByProjectId(projectId);
-
-        // for (Employee employee : employees) {
-        //     employee.getProjects().remove(project);
-        // }
 
         employees.stream().forEach(e -> e.getProjects().remove(project));
         
@@ -147,10 +302,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     private List<Long> getProjectIds(List<Project> projects) {
         List<Long> projectIds = new ArrayList<>();
-
-        // for (Project project : projects) {
-        //     projectIds.add(project.getId());
-        // }
 
         projects.stream().forEach(p -> projectIds.add(p.getId()));
 
@@ -162,9 +313,6 @@ public class ProjectServiceImpl implements ProjectService {
         
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            // for (ConstraintViolation<T> constraintViolation : violations) {
-            //     sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
-            // }
 
             violations.forEach(cv -> sb.append(cv.getPropertyPath() + " " + cv.getMessage() + ". "));
 
@@ -172,4 +320,32 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
     
+    private String getProjectDataAtIndex(Integer index, ProjectFileDto project) {
+        String dataAtIndex = "";
+
+        switch(index) {
+            case 0:
+                dataAtIndex = project.getTitle();
+                break;
+            case 1:
+                dataAtIndex = project.getDescription();
+                break;
+            case 2:
+                dataAtIndex = project.getCustomer();
+                break;
+            case 3:
+                dataAtIndex = project.getTeamSize();
+                break;
+            case 4:
+                dataAtIndex = project.getDevLanguage();
+                break;
+            case 5:
+                dataAtIndex = project.getTerminationDate();
+                break;
+            default:
+                dataAtIndex = "";
+        }
+
+        return dataAtIndex;
+    }
 }

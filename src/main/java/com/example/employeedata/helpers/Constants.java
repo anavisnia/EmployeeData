@@ -17,11 +17,14 @@ public final class Constants {
     public static final Integer MILLISECONDS = 1000;
 
     public static final Integer ALLOWED_EMPTY_FILEDS_EMPLOYEE = 1;
+    public static final Integer ALLOWED_EMPTY_FILEDS_PROJECT = 0;
 
     public static final String USER_DOCUMENTS_PATH = System.getProperty("user.home") + "/Documents";
-    public static final String[] EMPLOYEE_FILE_HEADERS = {"First name", "Last name", "Birth date", "Role", "Develoepr language", "Project ids"};
+    public static final String[] EMPLOYEE_FILE_HEADERS = {"First name", "Last name", "Birth date", "Role", "Developer language", "Project ids"};
+    public static final String[] PROJECT_FILE_HEADERS = {"Title", "Description", "Customer", "Team size", "Developer language", "Termination date"};
 
     public static final String EMPLOYEE_FILE_NAME = "EmployeeDataFor_";
+    public static final String PROJECT_FILE_NAME = "ProjectDataFor_";
     public static final String DOWNLOAD_OCTET_STREAM = "application/octet-stream";
     public static final String ATTACHMENT_FILENAME = "attachment; filename=\"";
 }

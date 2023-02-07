@@ -3,13 +3,16 @@ package com.example.employeedata.service;
 import java.time.*;
 import java.util.*;
 
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.employeedata.dto.*;
 
 @Service
 public interface ProjectService {
     ResponseDto saveProject(CreateProjectDto projectDto);
+    ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile);
     List<ProjectDto> getAllProjects();
     List<ProjectDto> getAllProjectsWithFutureTerminationDate();
     List<ProjectDto> getAllProjectsWithPriorTerminationDate();
@@ -19,4 +22,5 @@ public interface ProjectService {
     ProjectDto getProjectById(String projectId);
     void updateProject(Long projectId, EditProjectDto projectDto);
     void deleteProject(Long projectId);
+    Resource generateExelFile();
 }

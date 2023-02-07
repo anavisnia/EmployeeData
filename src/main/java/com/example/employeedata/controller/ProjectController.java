@@ -5,11 +5,14 @@ import java.util.*;
 
 import javax.validation.Valid;
 
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.employeedata.dto.*;
+import com.example.employeedata.helpers.Constants;
 import com.example.employeedata.service.ProjectService;
 import com.example.employeedata.service.ProjectDocService;
 
@@ -33,6 +36,21 @@ public class ProjectController<E> {
     @PostMapping("/add")
     public ResponseEntity<ResponseDto> saveProject(@Valid @RequestBody CreateProjectDto projectDto) {
         return new ResponseEntity<ResponseDto>(projectService.saveProject(projectDto), HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Creating project/projects from exel file")
+    @ApiImplicitParams(
+        value = {
+            @ApiImplicitParam(
+                name = "file",
+                required = true,
+                dataType = "file",
+                value = "Exel file of .xls or .xlsx format with project data")
+        })
+    //for now works only with postman
+    @PostMapping(value = "/upload", consumes = { "multipart/form-data" })
+    public ResponseEntity<ResponseDto> saveProjectsFromFile(@RequestParam("file") MultipartFile file) {
+        return new ResponseEntity<ResponseDto>(projectService.saveProjectsFromExelFile(file), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Returns a lst of all projects")
@@ -173,5 +191,27 @@ public class ProjectController<E> {
     public ResponseEntity<HttpStatus> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+    }
+
+    // still generates file to C:\\Users\\current_user\\Documents folder
+    // todo: delete file after it was returned in a response
+    @ApiOperation(value = "Get a list of projects in an Exel file.")
+    @GetMapping("/downloadFile")
+    public ResponseEntity<?> downloadProjectsInExelFile() {
+        Resource resource = null;
+
+        resource = projectService.generateExelFile();
+
+        if(resource == null || !resource.exists()) {
+            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+        }
+
+        String contentType = Constants.DOWNLOAD_OCTET_STREAM;
+        String headerValue = Constants.ATTACHMENT_FILENAME + resource.getFilename() + "\"";
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+            .body(resource);
     }
 }

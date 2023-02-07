@@ -3,7 +3,7 @@ package com.example.employeedata.service.impl;
 import java.io.*;
 import org.springframework.core.io.Resource;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -97,12 +97,12 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             while (rows != null && rows.hasNext() && rowCount == 1) {
                 row = rows.next();
 
-                Iterator<Cell> cells = row.cellIterator();
-                String[] employeeData = new String[6];
+                String[] employeeData = new String[Constants.EMPLOYEE_FILE_HEADERS.length];
 
                 int cellCount = 0;
-                while (cells.hasNext() && cellCount < employeeData.length) {
-                    Cell cell = cells.next();
+                while (cellCount < employeeData.length) {
+                    Cell cell = row.getCell(cellCount);
+
                     String cellValue = "";
 
                     cellValue = FileHelperFunctions.getCellValue(cell);
@@ -116,12 +116,15 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                 if (employeeData[5] != null) {
                     projects = getProjects(HelperFunctions.getListOfLongValuesFromString(employeeData[5]));
                 }
-                
-                if (!CustomPropValidators.isMaxReachedForEmptyFields(employeeData, Constants.ALLOWED_EMPTY_FILEDS_EMPLOYEE)) {
-                    createEmployees.add(EmployeeMapper.mapToEmployee(employeeData, projects));
-                } else {
-                    failedValidationEntities.add(employeeData);
+
+                if (!CustomPropValidators.areAllFieldsEmpty(employeeData)) {
+                    if (CustomPropValidators.isValidEmployeeFile(employeeData)) {
+                        createEmployees.add(EmployeeMapper.mapToEmployee(employeeData, projects));
+                    } else {
+                        failedValidationEntities.add(employeeData);
+                    }
                 }
+                
             }
         } catch (IOException e) {
             //will throw Internal Server Error
@@ -135,17 +138,15 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
         ResponseDto response = null;
 
-        if (createEmployees.isEmpty()) {
+        List<Long> dbResponse = employeeRepository.saveAll(createEmployees).stream().filter(Objects::nonNull).map(Employee::getId).collect(Collectors.toList());
+
+        if (createEmployees.isEmpty() && !failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
                 failedValidationEntities,
                 "Employee/employees",
-                " error. No entities to save into database. If there are entities which did not met requirements, they are represented as an array, otherwise it is null.",
+                " error. No entities to save into database. If there are entities which did not met requirements, they are represented as an array, otherwise it is null",
                 true);
-        }
-
-        List<Long> dbResponse = employeeRepository.saveAll(createEmployees).stream().filter(Objects::nonNull).map(Employee::getId).collect(Collectors.toList());
-
-        if (!failedValidationEntities.isEmpty()) {
+        } else if(!failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
                 dbResponse, "Employee/employees created successfully",
                 failedValidationEntities, "These rows conatain errors. Please check"
@@ -287,16 +288,6 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         List<Project> projects = new ArrayList<>();
 
         if (!projectIds.isEmpty()) {
-            // for (Long id : projectIds) {
-            //     if (id != null) {
-            //         Project project = projectRepository.findById(id).orElseThrow(() ->
-            //             new ResourceNotFoundException("Project", "id", id)
-            //         );
-            //         projects.add(project);
-            //     } else {
-            //         throw new CustomValidationException("Project", "id", id);
-            //     }
-            // }
             projectIds.stream().filter(Objects::nonNull).forEach(
                 id -> projects.add(
                         projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "id", id))
@@ -312,9 +303,9 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<T> constraintViolation : violations) {
-                sb.append(constraintViolation.getPropertyPath() + " " + constraintViolation.getMessage() + ". ");
-            }
+
+            violations.forEach(cv -> sb.append(cv.getPropertyPath() + " " + cv.getMessage() + ". "));
+            
             throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
     }

@@ -1,6 +1,7 @@
 package com.example.employeedata.mappers;
 
 import java.util.*;
+import java.time.*;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.Project;
@@ -55,14 +56,28 @@ public class ProjectMapper {
         List<ProjectDto> dtos = new ArrayList<ProjectDto>();
 
         if (!projects.isEmpty()) {
-            // for (Project project : projects) {
-            //     dtos.add(mapToProjectDto(project));
-            // }
-
             projects.forEach(p -> dtos.add(mapToProjectDto(p)));
         }
 
         return dtos;
+    }
+
+    
+
+    public static Project mapToProject(String[] projectFieldsFromFile) {
+        Project project = new Project();
+        
+        project.setTitle(CustomPropValidators.normalizeStr(projectFieldsFromFile[0]));
+        project.setDescription(CustomPropValidators.normalizeStr(projectFieldsFromFile[1]));
+        project.setCustomer(CustomPropValidators.normalizeStr(projectFieldsFromFile[2]));
+        project.setTeamSize(CustomPropValidators.validateTeamSize(Integer.parseInt(projectFieldsFromFile[3].replace(".0", "")), errResource));
+        project.setDevLanguage(CustomPropValidators.validateDevLang(Integer.parseInt(projectFieldsFromFile[4].replace(".0", "")), errResource));
+        LocalDate terminationDate = LocalDate.parse(projectFieldsFromFile[5]);
+        CustomPropValidators.validateTerminationDate(terminationDate, errResource);
+        project.setTerminationDate(terminationDate);
+        project.setModificationDate(new Date());
+
+        return project;
     }
 
 }

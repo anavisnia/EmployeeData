@@ -17,6 +17,10 @@ public final class FileHelperFunctions {
     public static String getCellValue(Cell cell) {
         String cellValue = "";
 
+        if (cell == null) {
+            return cellValue;
+        }
+
         switch (cell.getCellTypeEnum()) {
             case NUMERIC:
                 cellValue = String.valueOf(cell.getNumericCellValue());
