@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.example.employeedata.enums.*;
 import com.example.employeedata.exception.CustomValidationException;
@@ -69,20 +70,29 @@ public final class CustomPropValidators {
 
     public static boolean isValidEmployeeFile(String[] employee) {
         try {
-            if (employee[0] == null || employee[0].isBlank()) {
+            if (employee[0] == null ||
+                    employee[0] != null && employee[0].isBlank() ||
+                    employee[0] != null && !employee[0].isBlank() && !Pattern.matches(Constants.REGEX_NAME, employee[0])
+                ) {
                 return false;
-            } else if (employee[1] == null || employee[1].isBlank()) {
+            } else if (employee[1] == null ||
+                    (employee[1] != null && employee[1].isBlank()) ||
+                    (employee[1] != null && !employee[1].isBlank() && !Pattern.matches(Constants.REGEX_NAME, employee[1]))
+                ) {
                 return false;
-            } else if (employee[2] == null || employee[2].isBlank() ||
+            } else if (employee[2] == null ||
+                    (employee[2] != null && employee[2].isBlank()) ||
                     (employee[2] != null && !employee[2].isBlank() && LocalDate.parse(employee[3]).isBefore(LocalDate.now()))
                 ) {
                 return false;
-            } else if (employee[3] == null || employee[3].isBlank() ||
+            } else if (employee[3] == null ||
+                    (employee[3] != null && employee[3].isBlank()) ||
                     (employee[3] != null && !employee[3].isBlank() && Long.parseLong(employee[3].replace(".0", "")) > (Role.size() - 1)) ||
                     (employee[3] != null && !employee[3].isBlank() && Long.parseLong(employee[3].replace(".0", "")) < 0)
                 ) {
                 return false;
-            } else if (employee[4] == null || employee[4].isBlank() ||
+            } else if (employee[4] == null ||
+                    (employee[4] != null && employee[4].isBlank()) ||
                     (employee[4] != null && !employee[4].isBlank() && Long.parseLong(employee[4].replace(".0", "")) > (DevLanguage.size() - 1)) ||
                     (employee[4] != null && !employee[4].isBlank() && Long.parseLong(employee[4].replace(".0", "")) < 0)
                 ) {
@@ -97,11 +107,20 @@ public final class CustomPropValidators {
 
     public static boolean isValidProjectFile(String[] project) {
         try {
-            if (project[0] == null || (project[0] != null && project[0].isBlank())) {
+            if (project[0] == null ||
+                    (project[0] != null && project[0].isBlank()) ||
+                    (project[0] != null && !project[0].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_ALL_SYMBOLS, project[0]))
+                ) {
                 return false;
-            } else if (project[1] == null || (project[1] != null && project[1].isBlank())) {
+            } else if (project[1] == null ||
+                    (project[1] != null && project[1].isBlank()) ||
+                    (project[1] != null && !project[1].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_ALL_SYMBOLS, project[1]))
+                ) {
                 return false;
-            } else if (project[2] == null || (project[2] != null && project[2].isBlank())) {
+            } else if (project[2] == null ||
+                    (project[2] != null && project[2].isBlank()) ||
+                    (project[2] != null && !project[2].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_WITHOUT_SYMBOLS, project[2]))
+                ) {
                 return false;
             } else if (project[3] == null || 
                     (project[3] != null && project[3].isBlank()) ||

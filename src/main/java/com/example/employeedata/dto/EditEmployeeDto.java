@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.validation.constraints.*;
 
+import com.example.employeedata.helpers.Constants;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
@@ -12,13 +14,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EditEmployeeDto {
-    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @Pattern(regexp = Constants.REGEX_NAME, message = "must only consist of letters")
     @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 40)
     @ApiModelProperty(value = "Employee's first name")
     private String firstName;
 
-    @Pattern(regexp="^[a-zA-Z\\p{L}]+$", message = "must only consist of letters")
+    @Pattern(regexp = Constants.REGEX_NAME, message = "must only consist of letters")
     @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 100)
     @ApiModelProperty(value = "Employee's last name")
