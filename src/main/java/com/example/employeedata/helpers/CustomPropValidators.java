@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.springframework.data.domain.*;
+
 import com.example.employeedata.enums.*;
 import com.example.employeedata.exception.CustomValidationException;
 
@@ -217,6 +219,36 @@ public final class CustomPropValidators {
             throw new CustomValidationException(
                 errResource, "termiantion date", terminationDate,
                 String.format("%s cannot be before todays date", errResource));
+        }
+    }
+
+    public static Integer checkPageSzie(Integer pageSize) {
+        if (pageSize < 0) {
+           return 0;
+        } else if (pageSize > 500) {
+            return 500;
+        }
+
+        return pageSize;
+    }
+
+    public static String checkSortingQuery(String[] entityFields, String query) {
+        if (!Arrays.asList(entityFields).contains(query)) {
+            return "id"; //default
+        }
+
+        return query;
+    }
+
+    public static Pageable returnPageableWithSorting(Integer pageNumber, Integer pageSize, String query, String isAsc) {
+        Boolean order = Boolean.parseBoolean(isAsc);
+
+        if(isAsc == null || order == null || (isAsc != null && isAsc.isBlank())) {
+            return PageRequest.of(pageNumber, pageSize, Sort.by(query));
+        } else if (order == true) {
+            return PageRequest.of(pageNumber, pageSize, Sort.by(query).ascending());
+        } else {
+            return PageRequest.of(pageNumber, pageSize, Sort.by(query).descending());
         }
     }
 }

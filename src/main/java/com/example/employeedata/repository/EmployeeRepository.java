@@ -3,6 +3,7 @@ package com.example.employeedata.repository;
 import java.util.*;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.*;
 
@@ -32,4 +33,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
         nativeQuery = true
     )
     List<Object[]> findAllEmployeesInclProjects();
+
+    Page<Employee> findAll(Pageable pagable);
 }

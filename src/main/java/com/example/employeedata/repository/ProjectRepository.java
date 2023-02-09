@@ -3,6 +3,7 @@ package com.example.employeedata.repository;
 import java.time.LocalDate;
 import java.util.*;
 
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
@@ -26,4 +27,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         nativeQuery = true
     )
     List<Project> findByDevLanguage(@Param("devLanguage") Integer devLanguage);
+
+    Page<Project> findAll(Pageable pagable);
 }

@@ -14,6 +14,7 @@ public interface ProjectService {
     ResponseDto saveProject(CreateProjectDto projectDto);
     ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile);
     List<ProjectDto> getAllProjects();
+    PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String query, String isAsc);
     List<ProjectDto> getAllProjectsWithFutureTerminationDate();
     List<ProjectDto> getAllProjectsWithPriorTerminationDate();
     List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromCurrentDate(Long employeeId);

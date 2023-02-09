@@ -2,6 +2,8 @@ package com.example.employeedata.service.impl;
 
 import java.io.*;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.*;
+
 import java.nio.file.Path;
 import java.nio.file.*;
 import java.time.LocalDate;
@@ -161,6 +163,28 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     @Override
     public List<EmployeeDto> getAllEmployees() {
         return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findAll());
+    }
+
+    @Override
+    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String query, String isAsc) {
+        pageSize = CustomPropValidators.checkPageSzie(pageSize);
+        
+        query = CustomPropValidators.checkSortingQuery(Constants.EMPLOYEE_FIELDS, query);
+
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, query, isAsc);
+
+        Page<Employee> result = employeeRepository.findAll(paging);
+        
+        if (result.hasContent()) {
+            return new PaginatedResponseDto<EmployeeDto>(
+                result.getContent().stream().map(e -> EmployeeMapper.mapToEmployeeDto(e)).collect(Collectors.toList()),
+                result.getTotalElements(),
+                result.getTotalPages(),
+                pageNumber
+            );
+        } else {
+            throw new ResourceNotFoundException(resourceName + "s");
+        }
     }
 
     @Override

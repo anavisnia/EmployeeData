@@ -11,9 +11,7 @@ import com.example.employeedata.exception.ResourceNotFoundException;
 
 public final class ESearchQuery {
     private final static String resourceName = "search field";
-    private static final String[] EMPLOYEE_FIELDS = {"firstName", "lastName", "role", "devLanguage", "projects"};
-    private static final String[] PROJECT_FIELDS = {"title", "description", "customer", "devLanguage"};
-
+    
     public static String createMultiIndexMatchBody( String[] searchFields, String query) {
         if (!checkExistenceOfFields(searchFields)) {
             throw new ResourceNotFoundException(resourceName,"query fields", searchFields);
@@ -61,8 +59,8 @@ public final class ESearchQuery {
 
     private static Set<String> getExistingFields() {
         Set<String> staticFields = new HashSet<>();
-        Collections.addAll(staticFields, EMPLOYEE_FIELDS);
-        Collections.addAll(staticFields, PROJECT_FIELDS);
+        Collections.addAll(staticFields, Constants.EMPLOYEE_FIELDS);
+        Collections.addAll(staticFields, Constants.PROJECT_FIELDS);
 
         return staticFields;
     }
