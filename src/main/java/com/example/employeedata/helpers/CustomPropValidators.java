@@ -109,17 +109,17 @@ public final class CustomPropValidators {
         try {
             if (project[0] == null ||
                     (project[0] != null && project[0].isBlank()) ||
-                    (project[0] != null && !project[0].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_ALL_SYMBOLS, project[0]))
+                    (project[0] != null && !project[0].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_WITHOUT_SYMBOLS, project[0]))
                 ) {
                 return false;
             } else if (project[1] == null ||
                     (project[1] != null && project[1].isBlank()) ||
-                    (project[1] != null && !project[1].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_ALL_SYMBOLS, project[1]))
+                    (project[1] != null && !project[1].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_WITHOUT_SYMBOLS, project[1]))
                 ) {
                 return false;
             } else if (project[2] == null ||
                     (project[2] != null && project[2].isBlank()) ||
-                    (project[2] != null && !project[2].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_WITHOUT_SYMBOLS, project[2]))
+                    (project[2] != null && !project[2].isBlank() && !Pattern.matches(Constants.REGEX_TEXT_WITH_SYMBOLS, project[2]))
                 ) {
                 return false;
             } else if (project[3] == null || 

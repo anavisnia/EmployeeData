@@ -14,13 +14,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateProjectDto {
-    @Pattern(regexp = Constants.REGEX_TEXT_ALL_SYMBOLS, message = "must only consist of letters and numbers")
+    @Pattern(regexp = Constants.REGEX_TEXT_WITHOUT_SYMBOLS, message = "must only consist of letters and numbers")
     @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 500)
     @ApiModelProperty(value = "Project's title")
     private String title;
 
-    @Pattern(regexp = Constants.REGEX_TEXT_ALL_SYMBOLS, message = "must only consist of letters and numbers")
+    @Pattern(regexp = Constants.REGEX_TEXT_WITHOUT_SYMBOLS, message = "must only consist of letters and numbers")
     @Size(min = 0, max = 1000)
     @ApiModelProperty(value = "Project's description")
     private String description;
@@ -29,7 +29,7 @@ public class CreateProjectDto {
     @ApiModelProperty(value = "Project's team size")
     private Integer teamSize;
 
-    @Pattern(regexp = Constants.REGEX_TEXT_WITHOUT_SYMBOLS, message = "should only consist of letters, numbers or symbols `,`, `.`, `-`, `_`, `|`")
+    @Pattern(regexp = Constants.REGEX_TEXT_WITH_SYMBOLS, message = "should only consist of letters, numbers or symbols `,`, `.`, `-`, `_`, `|`")
     @NotEmpty(message = "must not be blank")
     @Size(min = 3, max = 500)
     @ApiModelProperty(value = "Project's customer name")

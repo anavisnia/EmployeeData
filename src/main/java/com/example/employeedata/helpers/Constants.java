@@ -29,6 +29,6 @@ public final class Constants {
     public static final String ATTACHMENT_FILENAME = "attachment; filename=\"";
 
     public static final String REGEX_NAME = "^[a-zA-Z\\p{L}]+$";
-    public static final String REGEX_TEXT_ALL_SYMBOLS = "^[a-zA-Z0-9 \\p{L}]+$";
-    public static final String REGEX_TEXT_WITHOUT_SYMBOLS = "^[A-Za-z0-9- \\p{L},._-|]+$";
+    public static final String REGEX_TEXT_WITHOUT_SYMBOLS = "^[a-zA-Z0-9 \\p{L}]+$";
+    public static final String REGEX_TEXT_WITH_SYMBOLS = "^[A-Za-z0-9- \\p{L},._-|]+$";
 }
