@@ -98,7 +98,7 @@ public final class CustomPropValidators {
                 ) {
                 return false;
             }
-        } catch(DateTimeParseException e) {
+        } catch(NumberFormatException | DateTimeParseException e) {
             return false;
         }
 
@@ -140,7 +140,7 @@ public final class CustomPropValidators {
                 ) {
                 return false;
             }
-        } catch(DateTimeParseException e) {
+        } catch(NumberFormatException | DateTimeParseException e) {
             return false;
         }
 

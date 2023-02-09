@@ -144,7 +144,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             response = new ResponseDto(
                 failedValidationEntities,
                 "Employee/employees",
-                " error. No entities to save into database. If there are entities which did not met requirements, they are represented as an array, otherwise it is null",
+                " error. No entities to save into database",
                 true);
         } else if(!failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
