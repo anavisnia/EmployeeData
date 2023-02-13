@@ -33,5 +33,7 @@ public final class Constants {
     public static final String REGEX_TEXT_WITH_SYMBOLS = "^[A-Za-z0-9- \\p{L},._-|]+$";
 
     public static final String[] EMPLOYEE_FIELDS = {"id", "firstName", "lastName", "role", "devLanguage", "projects", "birthDate"};
+    public static final String[] EMPLOYEE_DB_FIELDS = {"id", "first_name", "last_name", "role", "dev_language", "birth_date"};
     public static final String[] PROJECT_FIELDS = {"id", "title", "description", "customer", "devLanguage", "terminationDate"};
+    public static final String[] PROJECT_DB_FIELDS = {"id", "title", "description", "customer", "dev_language", "termination_date"};
 }

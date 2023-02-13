@@ -12,7 +12,8 @@ public interface EmployeeService {
     ResponseDto saveEmployee(CreateEmployeeDto employeeDto);
     ResponseDto saveEmployeesFromExelFile(MultipartFile file);
     List<EmployeeDto> getAllEmployees();
-    PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String query, String isAsc);
+    PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String filter, String isAsc);
+    PaginatedResponseDto<EmployeeDto> getAllEmployeesPageableAndFiltered(String query, Integer pageNumber, Integer pageSize, String filter, String isAsc);
     List<EmployeeFileDto> getAllEmployeesIncludingProjects();
     EmployeeDto getEmployeeById(String employeeId);
     List<EmployeeDto> getEmployeesByProjectId(Long projectId);

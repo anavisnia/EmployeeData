@@ -34,5 +34,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     )
     List<Object[]> findAllEmployeesInclProjects();
 
-    Page<Employee> findAll(Pageable pagable);
+    Page<Employee> findAll(Pageable pageable);
+
+    @Query(
+        value = "SELECT * FROM employeedata.employees WHERE regexp_like(first_name, :query, 'i') OR regexp_like(last_name, :query, 'i') OR regexp_like(birth_date, :query, 'i')",
+        nativeQuery = true
+    )
+    Page<Employee> findAllFiltered(@Param("query") String query, Pageable pageable);
 }

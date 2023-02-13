@@ -28,5 +28,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     )
     List<Project> findByDevLanguage(@Param("devLanguage") Integer devLanguage);
 
-    Page<Project> findAll(Pageable pagable);
+    Page<Project> findAll(Pageable pageable);
+
+    @Query(
+        value = "SELECT * FROM employeedata.projects P WHERE regexp_like(P.customer, :query, 'i') OR regexp_like(P.title, :query, 'i') OR regexp_like(P.description, :query, 'i')",
+        nativeQuery = true
+    )
+    Page<Project> findAllFiltered(@Param("query") String query, Pageable pageable);
 }

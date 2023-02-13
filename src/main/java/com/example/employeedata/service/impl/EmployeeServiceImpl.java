@@ -166,14 +166,38 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     }
 
     @Override
-    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String query, String isAsc) {
+    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String filter, String isAsc) {
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
         
-        query = CustomPropValidators.checkSortingQuery(Constants.EMPLOYEE_FIELDS, query);
+        filter = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_FIELDS, filter);
 
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, query, isAsc);
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
 
         Page<Employee> result = employeeRepository.findAll(paging);
+        
+        if (result.hasContent()) {
+            return new PaginatedResponseDto<EmployeeDto>(
+                result.getContent().stream().map(e -> EmployeeMapper.mapToEmployeeDto(e)).collect(Collectors.toList()),
+                result.getTotalElements(),
+                result.getTotalPages(),
+                pageNumber
+            );
+        } else {
+            throw new ResourceNotFoundException(resourceName + "s");
+        }
+    }
+
+    @Override
+    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageableAndFiltered(String searchQuery, Integer pageNumber, Integer pageSize, String filter, String isAsc) {
+        pageSize = CustomPropValidators.checkPageSzie(pageSize);
+        
+        filter = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_DB_FIELDS, filter);
+
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
+
+        searchQuery = "[" + searchQuery + "]";
+
+        Page<Employee> result = employeeRepository.findAllFiltered(searchQuery, paging);
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<EmployeeDto>(

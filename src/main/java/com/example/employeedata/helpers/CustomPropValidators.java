@@ -2,6 +2,7 @@ package com.example.employeedata.helpers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -232,12 +233,12 @@ public final class CustomPropValidators {
         return pageSize;
     }
 
-    public static String checkSortingQuery(String[] entityFields, String query) {
-        if (!Arrays.asList(entityFields).contains(query)) {
+    public static String checkSortingFilter(String[] entityFields, String filter) {
+        if(!Arrays.asList(entityFields).contains(filter)) {
             return "id"; //default
         }
 
-        return query;
+        return filter;
     }
 
     public static Pageable returnPageableWithSorting(Integer pageNumber, Integer pageSize, String query, String isAsc) {

@@ -157,14 +157,38 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String query, String isAsc) {
+    public PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String filter, String isAsc) {
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
         
-        query = CustomPropValidators.checkSortingQuery(Constants.PROJECT_FIELDS, query);
+        filter = CustomPropValidators.checkSortingFilter(Constants.PROJECT_FIELDS, filter);
 
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, query, isAsc);
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
 
         Page<Project> result = projectRepository.findAll(paging);
+        
+        if (result.hasContent()) {
+            return new PaginatedResponseDto<ProjectDto>(
+                result.getContent().stream().map(p -> ProjectMapper.mapToProjectDto(p)).collect(Collectors.toList()),
+                result.getTotalElements(),
+                result.getTotalPages(),
+                pageNumber
+            );
+        } else {
+            throw new ResourceNotFoundException(resourceName + "s");
+        }
+    }
+
+    @Override
+    public PaginatedResponseDto<ProjectDto> getAllProjectsPageableAndFiltered(String searchQuery, Integer pageNumber, Integer pageSize, String filter, String isAsc) {
+        pageSize = CustomPropValidators.checkPageSzie(pageSize);
+        
+        filter = CustomPropValidators.checkSortingFilter(Constants.PROJECT_DB_FIELDS, filter);
+        
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
+        
+        searchQuery = "[" + searchQuery + "]";
+
+        Page<Project> result = projectRepository.findAllFiltered(searchQuery, paging);
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<ProjectDto>(
