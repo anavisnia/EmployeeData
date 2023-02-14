@@ -129,7 +129,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         ResponseDto response = null;
 
-        List<Long> dbResponse = projectRepository.saveAll(createProjects).stream().filter(Objects::nonNull).map(Project::getId).collect(Collectors.toList());
+        List<Long> dbResponse = projectRepository.saveAll(createProjects).stream()
+            .filter(Objects::nonNull).map(Project::getId).collect(Collectors.toList());
 
         if (createProjects.isEmpty() && !failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
@@ -168,7 +169,7 @@ public class ProjectServiceImpl implements ProjectService {
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<ProjectDto>(
-                result.getContent().stream().map(p -> ProjectMapper.mapToProjectDto(p)).collect(Collectors.toList()),
+                result.getContent().stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList()),
                 result.getTotalElements(),
                 result.getTotalPages(),
                 pageNumber
@@ -192,7 +193,7 @@ public class ProjectServiceImpl implements ProjectService {
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<ProjectDto>(
-                result.getContent().stream().map(p -> ProjectMapper.mapToProjectDto(p)).collect(Collectors.toList()),
+                result.getContent().stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList()),
                 result.getTotalElements(),
                 result.getTotalPages(),
                 pageNumber
@@ -349,11 +350,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private List<Long> getProjectIds(List<Project> projects) {
-        List<Long> projectIds = new ArrayList<>();
-
-        projects.stream().forEach(p -> projectIds.add(p.getId()));
-
-        return projectIds;
+        return projects.stream().map(p -> p.getId()).collect(Collectors.toList());
     }
 
     private <T> void constraintViolationCheck(T obj) {

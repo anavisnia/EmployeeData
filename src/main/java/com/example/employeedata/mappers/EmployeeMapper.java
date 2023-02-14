@@ -2,6 +2,7 @@ package com.example.employeedata.mappers;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
@@ -24,7 +25,7 @@ public final class EmployeeMapper {
         return employee;
     }
 
-    public static Employee mapToEmployee(CreateEmployeeDto employeeDto, List<Project> projects) {
+    public static Employee mapToEmployee(CreateEmployeeDto employeeDto, Collection<Project> projects) {
         Employee employee = new Employee();
         
         employee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
@@ -53,7 +54,7 @@ public final class EmployeeMapper {
         return existingEmployee;
     }
 
-    public static Employee mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto, List<Project> projects) {
+    public static Employee mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto, Collection<Project> projects) {
         existingEmployee.setId(existingEmployee.getId());
         existingEmployee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
         existingEmployee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
@@ -80,17 +81,15 @@ public final class EmployeeMapper {
         return dto;
     }
 
-    public static List<EmployeeDto> mapToListEmployeesDto(List<Employee> employees) {
-        List<EmployeeDto> dtos = new ArrayList<EmployeeDto>();
-
+    public static List<EmployeeDto> mapToListEmployeesDto(Collection<Employee> employees) {
         if (!employees.isEmpty()) {
-            employees.stream().forEach(e -> dtos.add(mapToEmployeeDto(e)));
+            return employees.stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.toList());
         }
 
-        return dtos;
+        return new ArrayList<EmployeeDto>();
     }
 
-    public static Employee mapToEmployee(String[] employeeFieldsFromFile, List<Project> projects) {
+    public static Employee mapToEmployee(String[] employeeFieldsFromFile, Collection<Project> projects) {
         Employee employee = new Employee();
         
         employee.setFirstName(CustomPropValidators.normalizeStr(employeeFieldsFromFile[0]));
@@ -106,13 +105,11 @@ public final class EmployeeMapper {
         return employee;
     }
 
-    private static List<Long> getProjectIds(Set<Project> projects) {
-        List<Long> projectIds = new ArrayList<>();
-
+    private static List<Long> getProjectIds(Collection<Project> projects) {
         if (!projects.isEmpty()) {
-            projects.forEach(p -> projectIds.add(p.getId()));
+            return projects.stream().map(Project::getId).collect(Collectors.toList());
         }
 
-        return projectIds;
+        return new ArrayList<Long>();
     }
 }

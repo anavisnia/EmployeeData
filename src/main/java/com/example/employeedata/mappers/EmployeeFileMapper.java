@@ -2,6 +2,7 @@ package com.example.employeedata.mappers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.employeedata.dto.EmployeeFileDto;
 import com.example.employeedata.enums.*;
@@ -34,12 +35,10 @@ public final class EmployeeFileMapper {
     }
     
     public static List<EmployeeFileDto> mapToListEmployeeFileDto(List<EmployeeFileDto> employees) {
-        List<EmployeeFileDto> dtos = new ArrayList<EmployeeFileDto>();
-
         if (!employees.isEmpty()) {
-            employees.forEach(efd -> dtos.add(mapToEmployeeFileDto(efd)));
+            return employees.stream().map(EmployeeFileMapper::mapToEmployeeFileDto).collect(Collectors.toList());
         }
 
-        return dtos;
+        return new ArrayList<EmployeeFileDto>();
     }
 }

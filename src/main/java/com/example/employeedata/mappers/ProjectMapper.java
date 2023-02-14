@@ -1,6 +1,7 @@
 package com.example.employeedata.mappers;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.time.*;
 
 import com.example.employeedata.dto.*;
@@ -53,13 +54,11 @@ public class ProjectMapper {
     }
 
     public static List<ProjectDto> mapToListProjectsDto(List<Project> projects) {
-        List<ProjectDto> dtos = new ArrayList<ProjectDto>();
-
         if (!projects.isEmpty()) {
-            projects.forEach(p -> dtos.add(mapToProjectDto(p)));
+            return projects.stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList());
         }
 
-        return dtos;
+        return new ArrayList<ProjectDto>();
     }
 
     

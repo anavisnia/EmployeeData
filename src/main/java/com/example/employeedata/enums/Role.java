@@ -38,7 +38,7 @@ public enum Role {
     public static final String[] labels() {
         return Arrays.stream(Role
         .values())
-        .map(e -> e.toString())
+        .map(Object::toString)
         .collect(Collectors.toList()).toArray(new String[Role.size()]);
     }
 }

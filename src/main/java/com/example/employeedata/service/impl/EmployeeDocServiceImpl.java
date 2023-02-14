@@ -35,7 +35,7 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
         } else {
             List<String> projectIds = employeeDto.getProjectIds().stream().map(Object::toString).collect(Collectors.toList());
             List<ProjectDoc> projects = StreamSupport.stream(projectESRepository.findAllById(projectIds).spliterator(), false)
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
             employeeDoc = EmployeeDocMapper.mapToEmployeeDoc(employeeDto, projects);
         }
 
@@ -65,7 +65,8 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
             new ResourceNotFoundException(resourceName, "id", employeeId)
         );
         
-        List<ProjectDoc> projects = getProjectDocs(editEmployeeDto.getProjectIds().stream().map(Object::toString).collect(Collectors.toList()));
+        List<ProjectDoc> projects = getProjectDocs(editEmployeeDto.getProjectIds().stream()
+            .map(Object::toString).collect(Collectors.toList()));
 
         employeeESRepository.save(EmployeeDocMapper.mapToEmployeeDoc(employee, editEmployeeDto, projects));
     }

@@ -140,7 +140,8 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
         ResponseDto response = null;
 
-        List<Long> dbResponse = employeeRepository.saveAll(createEmployees).stream().filter(Objects::nonNull).map(Employee::getId).collect(Collectors.toList());
+        List<Long> dbResponse = employeeRepository.saveAll(createEmployees).stream()
+            .filter(Objects::nonNull).map(Employee::getId).collect(Collectors.toList());
 
         if (createEmployees.isEmpty() && !failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
@@ -177,7 +178,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<EmployeeDto>(
-                result.getContent().stream().map(e -> EmployeeMapper.mapToEmployeeDto(e)).collect(Collectors.toList()),
+                result.getContent().stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.toList()),
                 result.getTotalElements(),
                 result.getTotalPages(),
                 pageNumber
@@ -201,7 +202,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<EmployeeDto>(
-                result.getContent().stream().map(e -> EmployeeMapper.mapToEmployeeDto(e)).collect(Collectors.toList()),
+                result.getContent().stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.toList()),
                 result.getTotalElements(),
                 result.getTotalPages(),
                 pageNumber

@@ -34,7 +34,7 @@ public enum DevLanguage {
     public static final String[] labels() {
         return Arrays.stream(DevLanguage
         .values())
-        .map(e -> e.toString())
+        .map(Object::toString)
         .collect(Collectors.toList()).toArray(new String[DevLanguage.size()]);
     }
 }

@@ -2,10 +2,10 @@ package com.example.employeedata.helpers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.*;
 
@@ -152,11 +152,8 @@ public final class CustomPropValidators {
 
     public static boolean isMaxReachedForEmptyFields(String[] fields, Integer maxAllowedEmptyFields) {
         Integer count = 0;
-        for (String field : fields) {
-            if (field == null || (field != null && field.isBlank())) {
-                count++;
-            }
-        }
+        
+        count = (int) Stream.of(fields).filter(field -> field == null || (field != null && field.isBlank())).count();
 
         if (count > maxAllowedEmptyFields) {
             return true;
@@ -167,11 +164,8 @@ public final class CustomPropValidators {
 
     public static boolean areAllFieldsEmpty(String[] fields) {
         Integer count = 0;
-        for (String field : fields) {
-            if (field == null || (field != null && field.isBlank())) {
-                count++;
-            }
-        }
+
+        count = (int) Stream.of(fields).filter(field -> field == null || (field != null && field.isBlank())).count();
 
         if (count == fields.length) {
             return true;
