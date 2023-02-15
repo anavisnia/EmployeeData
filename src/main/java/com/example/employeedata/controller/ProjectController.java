@@ -5,7 +5,7 @@ import java.util.*;
 
 import javax.validation.Valid;
 
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +15,7 @@ import com.example.employeedata.dto.*;
 import com.example.employeedata.helpers.Constants;
 import com.example.employeedata.service.ProjectService;
 import com.example.employeedata.service.ProjectDocService;
+import com.example.employeedata.helpers.DateTimeHelpers;
 
 import io.swagger.annotations.*;
 
@@ -265,21 +266,21 @@ public class ProjectController<E> {
         return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
     }
 
-    // still generates file to C:\\Users\\current_user\\Documents folder
-    // todo: delete file after it was returned in a response
     @ApiOperation(value = "Get a list of projects in an Exel file.")
     @GetMapping("/downloadFile")
     public ResponseEntity<?> downloadProjectsInExelFile() {
-        Resource resource = null;
+        byte[] byteArr = null;
 
-        resource = projectService.generateExelFile();
+        byteArr = projectService.generateExelFile();
 
-        if(resource == null || !resource.exists()) {
+        if(byteArr.length == 0) {
             return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
         }
 
+        ByteArrayResource resource = new ByteArrayResource(byteArr);
+        LocalDate date = DateTimeHelpers.getLocalDateNow();
         String contentType = Constants.DOWNLOAD_OCTET_STREAM;
-        String headerValue = Constants.ATTACHMENT_FILENAME + resource.getFilename() + "\"";
+        String headerValue = Constants.ATTACHMENT_FILENAME + Constants.PROJECT_FILE_NAME + date.toString() + ".xlsx";
 
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(contentType))

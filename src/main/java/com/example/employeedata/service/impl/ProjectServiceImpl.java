@@ -1,11 +1,8 @@
 package com.example.employeedata.service.impl;
 
 import java.io.*;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.*;
 
-import java.nio.file.Path;
-import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,6 +13,7 @@ import javax.validation.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -288,9 +286,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Resource generateExelFile() {
-        String fileLocation = "";
-        Path generatedFilePath = null;
+    public byte[] generateExelFile() {
+        ByteArrayOutputStream bao = new ByteArrayOutputStream();
 
         try(Workbook workBook = new XSSFWorkbook()) {
             
@@ -326,18 +323,17 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
 
-            generatedFilePath = Paths.get(Constants.USER_DOCUMENTS_PATH + "\\" + workBookSheet.getSheetName() +  ".xlsx");
-            fileLocation = generatedFilePath.toAbsolutePath().toString();
-
-            try (FileOutputStream fos = new FileOutputStream(fileLocation)) {
-                workBook.write(fos);
+            try {
+                workBook.write(bao);
                 workBook.close();
+            } finally {
+                bao.close();
             }
         } catch (IOException e) {
             // will throw Internal Server Error
         }
 
-        return FileHelperFunctions.generateUrlResource(generatedFilePath);
+        return bao.toByteArray();
     }
 
     @PreRemove

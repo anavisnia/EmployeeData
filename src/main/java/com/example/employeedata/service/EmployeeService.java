@@ -1,7 +1,6 @@
 package com.example.employeedata.service;
 import java.util.*;
 
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,5 +20,5 @@ public interface EmployeeService {
     List<EmployeeDto> getEmployeesByRole(Integer role);
     void updateEmployee(Long employeeId, EditEmployeeDto EditEmployeeDto);
     void deleteEmployee(Long employeeId);
-    Resource generateExelFile();
+    byte[] generateExelFile();
 }

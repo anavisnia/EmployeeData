@@ -3,7 +3,6 @@ package com.example.employeedata.service;
 import java.time.*;
 import java.util.*;
 
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,5 +23,5 @@ public interface ProjectService {
     ProjectDto getProjectById(String projectId);
     void updateProject(Long projectId, EditProjectDto projectDto);
     void deleteProject(Long projectId);
-    Resource generateExelFile();
+    byte[] generateExelFile();
 }

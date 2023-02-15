@@ -280,9 +280,8 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     }
 
     @Override
-    public Resource generateExelFile() {
-        String fileLocation = "";
-        Path generatedFilePath = null;
+    public byte[] generateExelFile() {
+        ByteArrayOutputStream bao = new ByteArrayOutputStream();
 
         try(Workbook workBook = new XSSFWorkbook()) {
             
@@ -303,7 +302,6 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
             List<EmployeeFileDto> employeeData = data
                 .stream()
-                //.map(e -> EmployeeFileMapper.mapToEmployeeFileDto(e))
                 .map(EmployeeFileMapper::mapToEmployeeFileDto)
                 .collect(Collectors.toList());
 
@@ -319,18 +317,17 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                 }
             }
 
-            generatedFilePath = Paths.get(Constants.USER_DOCUMENTS_PATH + "\\" + workBookSheet.getSheetName() +  ".xlsx");
-            fileLocation = generatedFilePath.toAbsolutePath().toString();
-
-            try (FileOutputStream fos = new FileOutputStream(fileLocation)) {
-                workBook.write(fos);
+            try {
+                workBook.write(bao);
                 workBook.close();
+            } finally {
+                bao.close();
             }
         } catch (IOException e) {
             // will throw Internal Server Error
         }
 
-        return FileHelperFunctions.generateUrlResource(generatedFilePath);
+        return bao.toByteArray();
     }
 
     private List<Project> getProjects(Collection<Long> projectIds) {
