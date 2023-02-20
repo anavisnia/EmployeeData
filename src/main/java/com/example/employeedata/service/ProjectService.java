@@ -13,8 +13,8 @@ public interface ProjectService {
     ResponseDto saveProject(CreateProjectDto projectDto);
     ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile);
     List<ProjectDto> getAllProjects();
-    PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String filter, String isAsc);
-    PaginatedResponseDto<ProjectDto> getAllProjectsPageableAndFiltered(String query, Integer pageNumber, Integer pageSize, String filter, String isAsc);
+    PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String sortBy, String isAsc);
+    PaginatedResponseDto<ProjectDto> getAllProjectsPageableAndFiltered(String filter, Integer pageNumber, Integer pageSize, String sortBy, String isAsc);
     List<ProjectDto> getAllProjectsWithFutureTerminationDate();
     List<ProjectDto> getAllProjectsWithPriorTerminationDate();
     List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromCurrentDate(Long employeeId);

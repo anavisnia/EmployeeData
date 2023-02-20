@@ -37,8 +37,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Page<Employee> findAll(Pageable pageable);
 
     @Query(
-        value = "SELECT * FROM employeedata.employees WHERE regexp_like(first_name, :query, 'i') OR regexp_like(last_name, :query, 'i') OR regexp_like(birth_date, :query, 'i')",
+        value = "SELECT *, (CASE WHEN first_name LIKE :likeQuery THEN 0 WHEN last_name LIKE :likeQuery THEN 2 ELSE 1 END) AS 'relevance' FROM employeedata.employees WHERE regexp_like(first_name, :regexQuery, 'i') OR regexp_like(last_name, :regexQuery, 'i') ORDER BY relevance ASC",
         nativeQuery = true
     )
-    Page<Employee> findAllFiltered(@Param("query") String query, Pageable pageable);
+    Page<Employee> findAllFiltered(@Param("likeQuery") String likeQuery, @Param("regexQuery") String regexQuery, Pageable pageable);
 }

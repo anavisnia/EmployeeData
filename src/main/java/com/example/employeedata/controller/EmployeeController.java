@@ -85,7 +85,7 @@ public class EmployeeController<E> {
                 dataType = "string",
                 value = "Size of entities per page"),
             @ApiImplicitParam(
-                name = "filter",
+                name = "sortBy",
                 required = false,
                 dataType = "string",
                 value = "Entity parameter by which entities will be sorted"),
@@ -99,16 +99,16 @@ public class EmployeeController<E> {
     public ResponseEntity<PaginatedResponseDto<EmployeeDto>> getAllEmployeesPaging(
                 @RequestParam(defaultValue = "0") Integer pageNumber,
                 @RequestParam(defaultValue = "10") Integer pageSize,
-                @RequestParam(defaultValue = "id") String filter,
+                @RequestParam(defaultValue = "first_name") String sortBy,
                 @RequestParam(defaultValue = "") String isAsc) {
-        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPageable(pageNumber, pageSize, filter, isAsc), HttpStatus.OK);
+        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPageable(pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Returns a list of all employees with paging information")
     @ApiImplicitParams(
         value = {
             @ApiImplicitParam(
-                name = "searchQuery",
+                name = "filter",
                 required = true,
                 dataType = "string",
                 value = "Text by which database will retrive similar data"),
@@ -123,7 +123,7 @@ public class EmployeeController<E> {
                 dataType = "string",
                 value = "Size of entities per page"),
             @ApiImplicitParam(
-                name = "filter",
+                name = "sortBy",
                 required = false,
                 dataType = "string",
                 value = "Entity parameter by which entities will be sorted"),
@@ -135,12 +135,12 @@ public class EmployeeController<E> {
         })
     @GetMapping("/filtered/pageable")
     public ResponseEntity<PaginatedResponseDto<EmployeeDto>> getAllEmployeesPagingWithFilter(
-                @RequestParam(defaultValue = "") String searchQuery,
+                @RequestParam(defaultValue = "") String filter,
                 @RequestParam(defaultValue = "0") Integer pageNumber,
                 @RequestParam(defaultValue = "10") Integer pageSize,
-                @RequestParam(defaultValue = "id") String filter,
+                @RequestParam(defaultValue = "customer") String sortBy,
                 @RequestParam(defaultValue = "") String isAsc) {
-        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPageableAndFiltered(searchQuery, pageNumber, pageSize, filter, isAsc), HttpStatus.OK);
+        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPageableAndFiltered(filter, pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employee by id")
@@ -250,10 +250,7 @@ public class EmployeeController<E> {
     @ApiOperation(value = "Get a list of employees in an Exel file.")
     @GetMapping("/downloadFile")
     public ResponseEntity<?> downloadEmployeesInExelFile() {
-        
-        byte[] byteArr = null;
-        
-        byteArr = employeeService.generateExelFile();
+        byte[] byteArr = employeeService.generateExelFile();
         
         if(byteArr.length == 0) {
             return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);

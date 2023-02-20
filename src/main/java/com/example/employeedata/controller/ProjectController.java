@@ -269,9 +269,7 @@ public class ProjectController<E> {
     @ApiOperation(value = "Get a list of projects in an Exel file.")
     @GetMapping("/downloadFile")
     public ResponseEntity<?> downloadProjectsInExelFile() {
-        byte[] byteArr = null;
-
-        byteArr = projectService.generateExelFile();
+        byte[] byteArr = projectService.generateExelFile();
 
         if(byteArr.length == 0) {
             return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);

@@ -1,11 +1,8 @@
 package com.example.employeedata.service.impl;
 
 import java.io.*;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.*;
 
-import java.nio.file.Path;
-import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -167,12 +164,12 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     }
 
     @Override
-    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String filter, String isAsc) {
+    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
         
-        filter = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_FIELDS, filter);
+        sortBy = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_FIELDS, sortBy);
 
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
 
         Page<Employee> result = employeeRepository.findAll(paging);
         
@@ -189,16 +186,14 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     }
 
     @Override
-    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageableAndFiltered(String searchQuery, Integer pageNumber, Integer pageSize, String filter, String isAsc) {
+    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageableAndFiltered(String filter, Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
         
-        filter = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_DB_FIELDS, filter);
+        sortBy = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_DB_FIELDS, sortBy);
 
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
 
-        searchQuery = "[" + searchQuery + "]";
-
-        Page<Employee> result = employeeRepository.findAllFiltered(searchQuery, paging);
+        Page<Employee> result = employeeRepository.findAllFiltered(filter + "%", filter, paging);
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<EmployeeDto>(
@@ -297,7 +292,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             List<Object[]> data = employeeRepository.findAllEmployeesInclProjects();
                  
             if (data.isEmpty()) {
-                throw new ResourceNotFoundException("Employees");
+                throw new ResourceNotFoundException(resourceName + "s");
             }
 
             List<EmployeeFileDto> employeeData = data

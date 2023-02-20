@@ -156,12 +156,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String filter, String isAsc) {
+    public PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
         
-        filter = CustomPropValidators.checkSortingFilter(Constants.PROJECT_FIELDS, filter);
+        sortBy = CustomPropValidators.checkSortingFilter(Constants.PROJECT_FIELDS, sortBy);
 
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
 
         Page<Project> result = projectRepository.findAll(paging);
         
@@ -178,16 +178,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public PaginatedResponseDto<ProjectDto> getAllProjectsPageableAndFiltered(String searchQuery, Integer pageNumber, Integer pageSize, String filter, String isAsc) {
+    public PaginatedResponseDto<ProjectDto> getAllProjectsPageableAndFiltered(String filter, Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
         
-        filter = CustomPropValidators.checkSortingFilter(Constants.PROJECT_DB_FIELDS, filter);
+        sortBy = CustomPropValidators.checkSortingFilter(Constants.PROJECT_DB_FIELDS, sortBy);
         
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, filter, isAsc);
-        
-        searchQuery = "[" + searchQuery + "]";
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
 
-        Page<Project> result = projectRepository.findAllFiltered(searchQuery, paging);
+        Page<Project> result = projectRepository.findAllFiltered(filter + "%", filter, paging);
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<ProjectDto>(
@@ -303,7 +301,7 @@ public class ProjectServiceImpl implements ProjectService {
             List<Project> data = projectRepository.findAll();
                  
             if (data.isEmpty()) {
-                throw new ResourceNotFoundException("Projects");
+                throw new ResourceNotFoundException(resourceName + "s");
             }
 
             List<ProjectFileDto> projectsData = data

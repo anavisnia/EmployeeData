@@ -218,8 +218,8 @@ public final class CustomPropValidators {
     }
 
     public static Integer checkPageSzie(Integer pageSize) {
-        if (pageSize < 0) {
-           return 0;
+        if (pageSize <= 0) {
+           return 10;
         } else if (pageSize > 500) {
             return 500;
         }
@@ -227,12 +227,12 @@ public final class CustomPropValidators {
         return pageSize;
     }
 
-    public static String checkSortingFilter(String[] entityFields, String filter) {
-        if(!Arrays.asList(entityFields).contains(filter)) {
+    public static String checkSortingFilter(String[] entityFields, String sortBy) {
+        if(!Arrays.asList(entityFields).contains(sortBy)) {
             return "id"; //default
         }
 
-        return filter;
+        return sortBy;
     }
 
     public static Pageable returnPageableWithSorting(Integer pageNumber, Integer pageSize, String query, String isAsc) {
