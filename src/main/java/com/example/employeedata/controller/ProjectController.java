@@ -285,4 +285,10 @@ public class ProjectController<E> {
             .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
             .body(resource);
     }
+
+    @ApiOperation(value = "Get a map of projects grouped by development language.")
+    @GetMapping("/byDevLanguage")
+    public ResponseEntity<Map<String, List<ProjectDto>>> getProjectsGroupedByDevLanguage() {
+        return new ResponseEntity<Map<String,List<ProjectDto>>>(projectService.getProjectsGroupedByDevLanguage(), HttpStatus.OK);
+    }
 }

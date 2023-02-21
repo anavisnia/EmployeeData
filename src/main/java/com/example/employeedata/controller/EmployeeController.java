@@ -267,4 +267,16 @@ public class EmployeeController<E> {
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
                 .body(resource);
     }
+
+    @ApiOperation(value = "Get a map of employees grouped by development language.")
+    @GetMapping("/byDevLanguage")
+    public ResponseEntity<Map<String, List<EmployeeDto>>> getEmployeesGroupedByDevLanguage() {
+        return new ResponseEntity<Map<String,List<EmployeeDto>>>(employeeService.getEmployeesGroupedByDevLanguage(), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get a map of employees grouped by role.")
+    @GetMapping("/byRole")
+    public ResponseEntity<Map<String, List<EmployeeDto>>> getEmployeesGroupedByRole() {
+        return new ResponseEntity<Map<String,List<EmployeeDto>>>(employeeService.getEmployeesGroupedByRole(), HttpStatus.OK);
+    }
 }

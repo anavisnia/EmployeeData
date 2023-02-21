@@ -24,4 +24,5 @@ public interface ProjectService {
     void updateProject(Long projectId, EditProjectDto projectDto);
     void deleteProject(Long projectId);
     byte[] generateExelFile();
+    Map<String, List<ProjectDto>> getProjectsGroupedByDevLanguage();
 }

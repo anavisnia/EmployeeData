@@ -20,5 +20,7 @@ public interface EmployeeService {
     List<EmployeeDto> getEmployeesByRole(Integer role);
     void updateEmployee(Long employeeId, EditEmployeeDto EditEmployeeDto);
     void deleteEmployee(Long employeeId);
+    Map<String, List<EmployeeDto>> getEmployeesGroupedByDevLanguage();
+    Map<String, List<EmployeeDto>> getEmployeesGroupedByRole();
     byte[] generateExelFile();
 }

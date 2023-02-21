@@ -334,6 +334,17 @@ public class ProjectServiceImpl implements ProjectService {
         return bao.toByteArray();
     }
 
+    @Override
+    public Map<String, List<ProjectDto>> getProjectsGroupedByDevLanguage() {
+        List<Project> projects = projectRepository.findAll();
+
+        if (projects.isEmpty()) {
+            throw new ResourceNotFoundException(resourceName + "s");
+        }
+
+        return projects.stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.groupingBy(ProjectDto::getDevLanguage));
+    }
+
     @PreRemove
     private void removeProjectsFromEmployees(Long projectId, Project project) {
         List<Employee> employees = employeeRepository.findByProjectId(projectId);

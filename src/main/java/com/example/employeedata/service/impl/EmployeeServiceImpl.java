@@ -325,6 +325,28 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         return bao.toByteArray();
     }
 
+    @Override
+    public Map<String, List<EmployeeDto>> getEmployeesGroupedByDevLanguage() {
+        List<Employee> employees = employeeRepository.findAll();
+
+        if(employees.isEmpty()) {
+            throw new ResourceNotFoundException(resourceName + "s");
+        }
+        
+        return employees.stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.groupingBy(EmployeeDto::getDevLanguage));
+    }
+
+    @Override
+    public Map<String, List<EmployeeDto>> getEmployeesGroupedByRole() {
+        List<Employee> employees = employeeRepository.findAll();
+
+        if(employees.isEmpty()) {
+            throw new ResourceNotFoundException(resourceName + "s");
+        }
+        
+        return employees.stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.groupingBy(EmployeeDto::getRole));
+    }
+
     private List<Project> getProjects(Collection<Long> projectIds) {
         List<Project> projects = new ArrayList<>();
 
