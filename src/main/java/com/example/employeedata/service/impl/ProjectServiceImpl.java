@@ -156,36 +156,24 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public PaginatedResponseDto<ProjectDto> getAllProjectsPageable(Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
+    public PaginatedResponseDto<ProjectDto> getAllProjectsPage(String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc) {
+        pageNumber = pageNumber == null || (pageNumber != null && pageNumber < 0) ? 0 : pageNumber;
+
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
         
-        sortBy = CustomPropValidators.checkSortingFilter(Constants.PROJECT_FIELDS, sortBy);
+        Pageable paging = null;
+        Page<Project> result = null;
+        String sorting = "";
 
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
-
-        Page<Project> result = projectRepository.findAll(paging);
-        
-        if (result.hasContent()) {
-            return new PaginatedResponseDto<ProjectDto>(
-                result.getContent().stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList()),
-                result.getTotalElements(),
-                result.getTotalPages(),
-                pageNumber
-            );
+        if (searchQuery == null || searchQuery != null && searchQuery.isBlank()) {
+            sorting = CustomPropValidators.checkFiledSorting(Constants.PROJECT_DB_FIELDS, sortBy);
+            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+            result = projectRepository.findAll(paging);
         } else {
-            throw new ResourceNotFoundException(resourceName + "s");
+            sorting = CustomPropValidators.checkFiledSorting(Constants.PROJECT_DB_FIELDS, sortBy);
+            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+            result = projectRepository.findAllByQuery(searchQuery + "%", searchQuery, paging);
         }
-    }
-
-    @Override
-    public PaginatedResponseDto<ProjectDto> getAllProjectsPageableAndFiltered(String filter, Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
-        pageSize = CustomPropValidators.checkPageSzie(pageSize);
-        
-        sortBy = CustomPropValidators.checkSortingFilter(Constants.PROJECT_DB_FIELDS, sortBy);
-        
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
-
-        Page<Project> result = projectRepository.findAllFiltered(filter + "%", filter, paging);
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<ProjectDto>(

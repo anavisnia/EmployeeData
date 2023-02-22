@@ -75,41 +75,8 @@ public class EmployeeController<E> {
     @ApiImplicitParams(
         value = {
             @ApiImplicitParam(
-                name = "pageNumber",
+                name = "searchQuery",
                 required = false,
-                dataType = "string",
-                value = "Page number"),
-            @ApiImplicitParam(
-                name = "pageSize",
-                required = false,
-                dataType = "string",
-                value = "Size of entities per page"),
-            @ApiImplicitParam(
-                name = "sortBy",
-                required = false,
-                dataType = "string",
-                value = "Entity parameter by which entities will be sorted"),
-            @ApiImplicitParam(
-                name = "isAsc",
-                required = false,
-                dataType = "string",
-                value = "Is sorting ascending")
-        })
-    @GetMapping("/pageable")
-    public ResponseEntity<PaginatedResponseDto<EmployeeDto>> getAllEmployeesPaging(
-                @RequestParam(defaultValue = "0") Integer pageNumber,
-                @RequestParam(defaultValue = "10") Integer pageSize,
-                @RequestParam(defaultValue = "first_name") String sortBy,
-                @RequestParam(defaultValue = "") String isAsc) {
-        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPageable(pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "Returns a list of all employees with paging information")
-    @ApiImplicitParams(
-        value = {
-            @ApiImplicitParam(
-                name = "filter",
-                required = true,
                 dataType = "string",
                 value = "Text by which database will retrive similar data"),
             @ApiImplicitParam(
@@ -125,7 +92,7 @@ public class EmployeeController<E> {
             @ApiImplicitParam(
                 name = "sortBy",
                 required = false,
-                dataType = "string",
+                dataType = "integer",
                 value = "Entity parameter by which entities will be sorted"),
             @ApiImplicitParam(
                 name = "isAsc",
@@ -133,14 +100,14 @@ public class EmployeeController<E> {
                 dataType = "string",
                 value = "Is sorting ascending")
         })
-    @GetMapping("/filtered/pageable")
-    public ResponseEntity<PaginatedResponseDto<EmployeeDto>> getAllEmployeesPagingWithFilter(
-                @RequestParam(defaultValue = "") String filter,
-                @RequestParam(defaultValue = "0") Integer pageNumber,
-                @RequestParam(defaultValue = "10") Integer pageSize,
-                @RequestParam(defaultValue = "customer") String sortBy,
-                @RequestParam(defaultValue = "") String isAsc) {
-        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPageableAndFiltered(filter, pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
+    @GetMapping("/page")
+    public ResponseEntity<PaginatedResponseDto<EmployeeDto>> getAllEmployeesPage(
+                @RequestParam(required = false) String searchQuery,
+                @RequestParam(required = false) Integer pageNumber,
+                @RequestParam(required = false) Integer pageSize,
+                @RequestParam(required = false) Integer sortBy,
+                @RequestParam(required = false) String isAsc) {
+        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPage(searchQuery, pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employee by id")

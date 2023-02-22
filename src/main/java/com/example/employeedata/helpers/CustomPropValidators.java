@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort.Direction;
 
 import com.example.employeedata.enums.*;
 import com.example.employeedata.exception.CustomValidationException;
@@ -218,7 +219,7 @@ public final class CustomPropValidators {
     }
 
     public static Integer checkPageSzie(Integer pageSize) {
-        if (pageSize <= 0) {
+        if (pageSize == null || (pageSize != null && pageSize <= 0)) {
            return 10;
         } else if (pageSize > 500) {
             return 500;
@@ -227,18 +228,22 @@ public final class CustomPropValidators {
         return pageSize;
     }
 
-    public static String checkSortingFilter(String[] entityFields, String sortBy) {
-        if(!Arrays.asList(entityFields).contains(sortBy)) {
+    public static String checkFiledSorting(String[] entityFields, Integer sortBy) {
+        if(sortBy == null ||
+            sortBy != null && sortBy < 0 ||
+            sortBy != null && sortBy > entityFields.length) {
             return "id"; //default
         }
 
-        return sortBy;
+        return entityFields[sortBy];
     }
 
     public static Pageable returnPageableWithSorting(Integer pageNumber, Integer pageSize, String query, String isAsc) {
         Boolean order = Boolean.parseBoolean(isAsc);
 
-        if(isAsc == null || order == null || (isAsc != null && isAsc.isBlank())) {
+        if(query == null || query != null && query.isBlank()) {
+            return PageRequest.of(pageNumber, pageSize, Sort.by(order == true ? Direction.ASC : Direction.DESC));
+        } else if(isAsc == null || (isAsc != null && isAsc.isBlank())) {
             return PageRequest.of(pageNumber, pageSize, Sort.by(query));
         } else if (order == true) {
             return PageRequest.of(pageNumber, pageSize, Sort.by(query).ascending());

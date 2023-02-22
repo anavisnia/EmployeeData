@@ -164,36 +164,24 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     }
 
     @Override
-    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageable(Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
+    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPage(String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc) {
+        pageNumber = pageNumber == null || (pageNumber != null && pageNumber < 0) ? 0 : pageNumber;
+
         pageSize = CustomPropValidators.checkPageSzie(pageSize);
-        
-        sortBy = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_FIELDS, sortBy);
 
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
+        Pageable paging = null;
+        Page<Employee> result = null;
+        String sorting = "";
 
-        Page<Employee> result = employeeRepository.findAll(paging);
-        
-        if (result.hasContent()) {
-            return new PaginatedResponseDto<EmployeeDto>(
-                result.getContent().stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.toList()),
-                result.getTotalElements(),
-                result.getTotalPages(),
-                pageNumber
-            );
+        if (searchQuery == null || searchQuery != null && searchQuery.isBlank()) {
+            sorting = CustomPropValidators.checkFiledSorting(Constants.EMPLOYEE_FIELDS, sortBy);
+            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+            result = employeeRepository.findAll(paging);
         } else {
-            throw new ResourceNotFoundException(resourceName + "s");
+            sorting = CustomPropValidators.checkFiledSorting(Constants.EMPLOYEE_DB_FIELDS, sortBy);
+            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+            result = employeeRepository.findAllByQuery(searchQuery + "%", searchQuery, paging);
         }
-    }
-
-    @Override
-    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPageableAndFiltered(String filter, Integer pageNumber, Integer pageSize, String sortBy, String isAsc) {
-        pageSize = CustomPropValidators.checkPageSzie(pageSize);
-        
-        sortBy = CustomPropValidators.checkSortingFilter(Constants.EMPLOYEE_DB_FIELDS, sortBy);
-
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sortBy, isAsc);
-
-        Page<Employee> result = employeeRepository.findAllFiltered(filter + "%", filter, paging);
         
         if (result.hasContent()) {
             return new PaginatedResponseDto<EmployeeDto>(

@@ -88,41 +88,8 @@ public class ProjectController<E> {
     @ApiImplicitParams(
         value = {
             @ApiImplicitParam(
-                name = "pageNumber",
-                required = false,
-                dataType = "string",
-                value = "Page number"),
-            @ApiImplicitParam(
-                name = "pageSize",
-                required = false,
-                dataType = "string",
-                value = "Size of entities per page"),
-            @ApiImplicitParam(
-                name = "filter",
-                required = false,
-                dataType = "string",
-                value = "Entity parameter by which entities will be sorted"),
-            @ApiImplicitParam(
-                name = "isAsc",
-                required = false,
-                dataType = "string",
-                value = "Is sorting ascending")
-        })
-    @GetMapping("/pageable")
-    public ResponseEntity<PaginatedResponseDto<ProjectDto>> getAllEmployeesPaging(
-                @RequestParam(defaultValue = "0") Integer pageNumber,
-                @RequestParam(defaultValue = "10") Integer pageSize,
-                @RequestParam(defaultValue = "id") String filter,
-                @RequestParam(defaultValue = "") String isAsc) {
-        return new ResponseEntity<PaginatedResponseDto<ProjectDto>>(projectService.getAllProjectsPageable(pageNumber, pageSize, filter, isAsc), HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "Returns a list of all projects with paging information")
-    @ApiImplicitParams(
-        value = {
-            @ApiImplicitParam(
                 name = "searchQuery",
-                required = true,
+                required = false,
                 dataType = "string",
                 value = "Text by which database will retrive similar data"),
             @ApiImplicitParam(
@@ -136,9 +103,9 @@ public class ProjectController<E> {
                 dataType = "string",
                 value = "Size of entities per page"),
             @ApiImplicitParam(
-                name = "filter",
+                name = "sortBy",
                 required = false,
-                dataType = "string",
+                dataType = "integer",
                 value = "Entity parameter by which entities will be sorted"),
             @ApiImplicitParam(
                 name = "isAsc",
@@ -146,14 +113,14 @@ public class ProjectController<E> {
                 dataType = "string",
                 value = "Is sorting ascending")
         })
-    @GetMapping("/filtered/pageable")
-    public ResponseEntity<PaginatedResponseDto<ProjectDto>> getAllProjectsPagingWithFilter(
-                @RequestParam(defaultValue = "") String searchQuery,
-                @RequestParam(defaultValue = "0") Integer pageNumber,
-                @RequestParam(defaultValue = "10") Integer pageSize,
-                @RequestParam(defaultValue = "id") String filter,
-                @RequestParam(defaultValue = "") String isAsc) {
-        return new ResponseEntity<PaginatedResponseDto<ProjectDto>>(projectService.getAllProjectsPageableAndFiltered(searchQuery, pageNumber, pageSize, filter, isAsc), HttpStatus.OK);
+    @GetMapping("/page")
+    public ResponseEntity<PaginatedResponseDto<ProjectDto>> getAllProjectsPage(
+                @RequestParam(required = false) String searchQuery,
+                @RequestParam(required = false) Integer pageNumber,
+                @RequestParam(required = false) Integer pageSize,
+                @RequestParam(required = false) Integer sortBy,
+                @RequestParam(required = false) String isAsc) {
+        return new ResponseEntity<PaginatedResponseDto<ProjectDto>>(projectService.getAllProjectsPage(searchQuery, pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get projects not assigned to an employee")
