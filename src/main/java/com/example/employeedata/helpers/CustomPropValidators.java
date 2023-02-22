@@ -231,7 +231,7 @@ public final class CustomPropValidators {
     public static String checkFiledSorting(String[] entityFields, Integer sortBy) {
         if(sortBy == null ||
             sortBy != null && sortBy < 0 ||
-            sortBy != null && sortBy > entityFields.length) {
+            sortBy != null && sortBy > entityFields.length - 1) {
             return "id"; //default
         }
 
