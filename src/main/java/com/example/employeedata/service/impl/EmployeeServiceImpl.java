@@ -160,7 +160,10 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
     @Override
     public List<EmployeeDto> getAllEmployees() {
-        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findAll());
+        return employeeRepository.findAll()
+            .stream()
+            .map(EmployeeMapper::mapToEmployeeDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -197,13 +200,10 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
     @Override
     public List<EmployeeFileDto> getAllEmployeesIncludingProjects() {
-        List<Object[]> data = employeeRepository.findAllEmployeesInclProjects();
-        List<EmployeeFileDto> employeeData = data
+        return employeeRepository.findAllEmployeesInclProjects()
             .stream()
             .map(EmployeeFileMapper::mapToEmployeeFileDto)
             .collect(Collectors.toList());
-
-        return employeeData;
     }
 
     @Override
@@ -217,20 +217,29 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
     @Override
     public List<EmployeeDto> getEmployeesByProjectId(Long employeeId) {
-        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findByProjectId(employeeId));
+        return employeeRepository.findByProjectId(employeeId)
+            .stream()
+            .map(EmployeeMapper::mapToEmployeeDto)
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<EmployeeDto> getEmployeesByDevLanguage(Integer devLanguage) {
         CustomPropValidators.validateDevLang(devLanguage, resourceName);
-        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findByDevLanguage(devLanguage));
+        return employeeRepository.findByDevLanguage(devLanguage)
+            .stream()
+            .map(EmployeeMapper::mapToEmployeeDto)
+            .collect(Collectors.toList());
     }
 
     
     @Override
     public List<EmployeeDto> getEmployeesByRole(Integer role) {
         CustomPropValidators.validateRole(role, resourceName);
-        return EmployeeMapper.mapToListEmployeesDto(employeeRepository.findByRole(role));
+        return employeeRepository.findByRole(role)
+            .stream()
+            .map(EmployeeMapper::mapToEmployeeDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -321,7 +330,10 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             throw new ResourceNotFoundException(resourceName + "s");
         }
         
-        return employees.stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.groupingBy(EmployeeDto::getDevLanguage));
+        return employees
+            .stream()
+            .map(EmployeeMapper::mapToEmployeeDto)
+            .collect(Collectors.groupingBy(EmployeeDto::getDevLanguage));
     }
 
     @Override
@@ -332,7 +344,10 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             throw new ResourceNotFoundException(resourceName + "s");
         }
         
-        return employees.stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.groupingBy(EmployeeDto::getRole));
+        return employees
+            .stream()
+            .map(EmployeeMapper::mapToEmployeeDto).
+            collect(Collectors.groupingBy(EmployeeDto::getRole));
     }
 
     private List<Project> getProjects(Collection<Long> projectIds) {

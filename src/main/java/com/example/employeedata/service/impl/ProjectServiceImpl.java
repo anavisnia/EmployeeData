@@ -152,7 +152,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjects() {
-        return ProjectMapper.mapToListProjectsDto(projectRepository.findAll());
+        return projectRepository.findAll()
+            .stream()
+            .map(ProjectMapper::mapToProjectDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -189,12 +192,18 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsWithFutureTerminationDate() {
-        return ProjectMapper.mapToListProjectsDto(projectRepository.findByFutureTerminationDate(DateTimeHelpers.getLocalDateNow()));
+        return projectRepository.findByFutureTerminationDate(DateTimeHelpers.getLocalDateNow())
+            .stream()
+            .map(ProjectMapper::mapToProjectDto)
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<ProjectDto> getAllProjectsWithPriorTerminationDate() {
-        return ProjectMapper.mapToListProjectsDto(projectRepository.findByPriorTerminationDate(DateTimeHelpers.getLocalDateNow()));
+        return projectRepository.findByPriorTerminationDate(DateTimeHelpers.getLocalDateNow())
+            .stream()
+            .map(ProjectMapper::mapToProjectDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -208,7 +217,10 @@ public class ProjectServiceImpl implements ProjectService {
 
         projects.removeIf(p -> employeeProjectIds.contains(p.getId()));
 
-        return ProjectMapper.mapToListProjectsDto(projects);
+        return projects
+            .stream()
+            .map(ProjectMapper::mapToProjectDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -229,13 +241,16 @@ public class ProjectServiceImpl implements ProjectService {
 
         projects.removeIf(p -> employeeProjectIds.contains(p.getId()));
 
-        return ProjectMapper.mapToListProjectsDto(projects);
+        return projects.stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList());
     }
 
     @Override
     public List<ProjectDto> getAllProjectsByDevelopmentLanguage(Integer devLanguage) {
         CustomPropValidators.validateDevLang(devLanguage, resourceName);
-        return ProjectMapper.mapToListProjectsDto(projectRepository.findByDevLanguage(devLanguage));
+        return projectRepository.findByDevLanguage(devLanguage)
+            .stream()
+            .map(ProjectMapper::mapToProjectDto)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -330,20 +345,28 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ResourceNotFoundException(resourceName + "s");
         }
 
-        return projects.stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.groupingBy(ProjectDto::getDevLanguage));
+        return projects
+            .stream()
+            .map(ProjectMapper::mapToProjectDto)
+            .collect(Collectors.groupingBy(ProjectDto::getDevLanguage));
     }
 
     @PreRemove
     private void removeProjectsFromEmployees(Long projectId, Project project) {
         List<Employee> employees = employeeRepository.findByProjectId(projectId);
 
-        employees.stream().forEach(e -> e.getProjects().remove(project));
+        employees
+            .stream()
+            .forEach(e -> e.getProjects().remove(project));
         
         employeeRepository.saveAll(employees);
     }
 
     private List<Long> getProjectIds(List<Project> projects) {
-        return projects.stream().map(p -> p.getId()).collect(Collectors.toList());
+        return projects
+            .stream()
+            .map(p -> p.getId())
+            .collect(Collectors.toList());
     }
 
     private <T> void constraintViolationCheck(T obj) {
