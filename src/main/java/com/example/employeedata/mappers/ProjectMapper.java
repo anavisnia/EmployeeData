@@ -21,13 +21,13 @@ public class ProjectMapper {
         project.setTeamSize(projectDto.getTeamSize());
         project.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
         project.setTerminationDate(projectDto.getTerminationDate());
+        project.setCompletionDate(projectDto.getCompletionDate());
         project.setModificationDate(new Date());
 
         return project;
     }
 
-    public static Project mapToProject(Project existingProject, EditProjectDto projectDto) {
-        existingProject.setId(existingProject.getId());
+    public static void mapToProject(Project existingProject, EditProjectDto projectDto) {
         existingProject.setTitle(projectDto.getTitle());
         existingProject.setDescription(projectDto.getDescription());
         existingProject.setCustomer(projectDto.getCustomer());
@@ -35,9 +35,8 @@ public class ProjectMapper {
         existingProject.setTeamSize(projectDto.getTeamSize());
         existingProject.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
         existingProject.setTerminationDate(projectDto.getTerminationDate());
+        existingProject.setCompletionDate(projectDto.getCompletionDate());
         existingProject.setModificationDate(new Date());
-        
-        return existingProject;
     }
 
     public static ProjectDto mapToProjectDto(Project project) {
@@ -48,20 +47,11 @@ public class ProjectMapper {
         dto.setCustomer(project.getCustomer());
         dto.setTeamSize(project.getTeamSize());
         dto.setTerminationDate(project.getTerminationDate());
+        dto.setCompletionDate(project.getCompletionDate());
         dto.setDevLanguage(project.getDevLanguage().label);
 
         return dto;
     }
-
-    public static List<ProjectDto> mapToListProjectsDto(List<Project> projects) {
-        if (!projects.isEmpty()) {
-            return projects.stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList());
-        }
-
-        return new ArrayList<ProjectDto>();
-    }
-
-    
 
     public static Project mapToProject(String[] projectFieldsFromFile) {
         Project project = new Project();
@@ -74,6 +64,8 @@ public class ProjectMapper {
         LocalDate terminationDate = LocalDate.parse(projectFieldsFromFile[5]);
         CustomPropValidators.validateTerminationDate(terminationDate, errResource);
         project.setTerminationDate(terminationDate);
+        LocalDateTime completionDate = LocalDateTime.parse(projectFieldsFromFile[6]);
+        project.setCompletionDate(completionDate);
         project.setModificationDate(new Date());
 
         return project;

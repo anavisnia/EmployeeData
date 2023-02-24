@@ -20,7 +20,7 @@ public final class EmployeeDocMapper {
         employeeDoc.setBirthDate(employee.getBirthDate());
         employeeDoc.setDevLanguage(employee.getDevLanguage().label);
         employeeDoc.setRole(employee.getRole().label);
-        employeeDoc.setProjects(new ArrayList<ProjectDoc>());
+        employeeDoc.setProjects(new ArrayList<>());
         employeeDoc.setModificationDate(employee.getModificationDate());
 
         return employeeDoc;

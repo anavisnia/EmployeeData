@@ -32,9 +32,9 @@ public enum DevLanguage {
     }
 
     public static final String[] labels() {
-        return Arrays.stream(DevLanguage
-        .values())
+        return Arrays.stream(DevLanguage.values())
         .map(Object::toString)
-        .collect(Collectors.toList()).toArray(new String[DevLanguage.size()]);
+        .collect(Collectors.toList())
+        .toArray(new String[DevLanguage.size()]);
     }
 }

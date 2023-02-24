@@ -36,7 +36,7 @@ public class EmployeeController<E> {
     @ApiOperation(value = "Creating an employee")
     @PostMapping("/add")
     public ResponseEntity<ResponseDto> saveEmployee(@Valid @RequestBody CreateEmployeeDto employeeDto) {
-        return new ResponseEntity<ResponseDto>(employeeService.saveEmployee(employeeDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(employeeService.saveEmployee(employeeDto), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Creating employees from exel file")
@@ -51,13 +51,13 @@ public class EmployeeController<E> {
     //for now works only with postman
     @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
     public ResponseEntity<ResponseDto> saveEmployeesFromFile(@RequestParam("file") MultipartFile file) {
-        return new ResponseEntity<ResponseDto>(employeeService.saveEmployeesFromExelFile(file), HttpStatus.CREATED);
+        return new ResponseEntity<>(employeeService.saveEmployeesFromExelFile(file), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Returns a lst of all employees")
     @GetMapping
     public ResponseEntity<List<E>> getAllEmployees() {
-        List<E> res = null;
+        List<E> res;
 
         try {
             res = (List<E>) employeeDocService.getAllEmployees();
@@ -68,7 +68,7 @@ public class EmployeeController<E> {
             res = (List<E>) employeeService.getAllEmployees();
         }
 
-        return new ResponseEntity<List<E>>(res, HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Returns a list of all employees with paging information")
@@ -76,27 +76,22 @@ public class EmployeeController<E> {
         value = {
             @ApiImplicitParam(
                 name = "searchQuery",
-                required = false,
                 dataType = "string",
-                value = "Text by which database will retrive similar data"),
+                value = "Text by which database will retrieve similar data"),
             @ApiImplicitParam(
                 name = "pageNumber",
-                required = false,
                 dataType = "string",
                 value = "Page number"),
             @ApiImplicitParam(
                 name = "pageSize",
-                required = false,
                 dataType = "string",
                 value = "Size of entities per page"),
             @ApiImplicitParam(
                 name = "sortBy",
-                required = false,
                 dataType = "integer",
                 value = "Entity parameter by which entities will be sorted"),
             @ApiImplicitParam(
                 name = "isAsc",
-                required = false,
                 dataType = "string",
                 value = "Is sorting ascending")
         })
@@ -107,7 +102,7 @@ public class EmployeeController<E> {
                 @RequestParam(required = false) Integer pageSize,
                 @RequestParam(required = false) Integer sortBy,
                 @RequestParam(required = false) String isAsc) {
-        return new ResponseEntity<PaginatedResponseDto<EmployeeDto>>(employeeService.getAllEmployeesPage(searchQuery, pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getAllEmployeesPage(searchQuery, pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employee by id")
@@ -122,19 +117,19 @@ public class EmployeeController<E> {
         })
     @GetMapping("/{id}")
     public ResponseEntity<E> getEmployeeById(@PathVariable String id) {
-        E res = null;
+        E res;
 
         try {
             res = (E) employeeDocService.getEmployeeById(id);
 
             if (res == null) {
-                res = (E) employeeService.getEmployeeById(id.toString());
+                res = (E) employeeService.getEmployeeById(id);
             }
         } catch (DataAccessResourceFailureException e) {
-            res = (E) employeeService.getEmployeeById(id.toString());
+            res = (E) employeeService.getEmployeeById(id);
         }
 
-        return new ResponseEntity<E>(res, HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employee by project id")
@@ -149,7 +144,7 @@ public class EmployeeController<E> {
         })
     @GetMapping("/project/{id}")
     public ResponseEntity<List<EmployeeDto>> getEmployeesByProjectId(@PathVariable Long id) {
-        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeesByProjectId(id), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getEmployeesByProjectId(id), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employees by development language id")
@@ -164,7 +159,7 @@ public class EmployeeController<E> {
         })
     @GetMapping("/devLang/{devLanguage}")
     public ResponseEntity<List<EmployeeDto>> getEmployeesByDevLanguage(@PathVariable Integer devLanguage) {
-        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeesByDevLanguage(devLanguage), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getEmployeesByDevLanguage(devLanguage), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get employees by role id")
@@ -179,7 +174,7 @@ public class EmployeeController<E> {
         })
     @GetMapping("/role/{role}")
     public ResponseEntity<List<EmployeeDto>> getEmployeesByRole(@PathVariable Integer role) {
-        return new ResponseEntity<List<EmployeeDto>>(employeeService.getEmployeesByRole(role), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getEmployeesByRole(role), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Update employee by id")
@@ -195,7 +190,7 @@ public class EmployeeController<E> {
     @PutMapping("/{id}")
     public ResponseEntity<HttpStatus> updateEmployee(@PathVariable Long id, @Valid @RequestBody EditEmployeeDto editEmployeeDto) {
         employeeService.updateEmployee(id, editEmployeeDto);
-        return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ApiOperation(value = "Delete employee by id")
@@ -211,7 +206,7 @@ public class EmployeeController<E> {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
-        return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ApiOperation(value = "Get a list of employees in an Exel file.")
@@ -226,7 +221,7 @@ public class EmployeeController<E> {
         ByteArrayResource resource = new ByteArrayResource(byteArr);
         LocalDate date = DateTimeHelpers.getLocalDateNow();
         String contentType = Constants.DOWNLOAD_OCTET_STREAM;
-        String headerValue = Constants.ATTACHMENT_FILENAME + Constants.EMPLOYEE_FILE_NAME + date.toString() + ".xlsx";
+        String headerValue = Constants.ATTACHMENT_FILENAME + Constants.EMPLOYEE_FILE_NAME + date + ".xlsx";
         
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
@@ -238,12 +233,12 @@ public class EmployeeController<E> {
     @ApiOperation(value = "Get a map of employees grouped by development language.")
     @GetMapping("/byDevLanguage")
     public ResponseEntity<Map<String, List<EmployeeDto>>> getEmployeesGroupedByDevLanguage() {
-        return new ResponseEntity<Map<String,List<EmployeeDto>>>(employeeService.getEmployeesGroupedByDevLanguage(), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getEmployeesGroupedByDevLanguage(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get a map of employees grouped by role.")
     @GetMapping("/byRole")
     public ResponseEntity<Map<String, List<EmployeeDto>>> getEmployeesGroupedByRole() {
-        return new ResponseEntity<Map<String,List<EmployeeDto>>>(employeeService.getEmployeesGroupedByRole(), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.getEmployeesGroupedByRole(), HttpStatus.OK);
     }
 }

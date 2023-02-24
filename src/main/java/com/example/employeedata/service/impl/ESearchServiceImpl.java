@@ -99,7 +99,7 @@ public class ESearchServiceImpl implements ESearchService {
                 }
 
             } catch (IOException | JSONException err) {
-                LOGGER.error("Error occured while connecting to elasticsearch: {}", err.getMessage());
+                LOGGER.error("Error occurred while connecting to elasticsearch: {}", err.getMessage());
                 resultQuery.setNumberOfResults(0);
             }
 

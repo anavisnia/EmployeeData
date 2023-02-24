@@ -1,6 +1,7 @@
 package com.example.employeedata.mappers;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,32 +41,22 @@ public final class EmployeeMapper {
         return employee;
     }
 
-    public static Employee mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto) {
-        existingEmployee.setId(existingEmployee.getId());
+    public static void mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto) {
         existingEmployee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
         existingEmployee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
-        CustomPropValidators.validateBirthDate(existingEmployee.getBirthDate(), errResource);
-        existingEmployee.setBirthDate(existingEmployee.getBirthDate());
         existingEmployee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
         existingEmployee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
         existingEmployee.setProjects(new HashSet<>());
         existingEmployee.setModificationDate(new Date());
-
-        return existingEmployee;
     }
 
-    public static Employee mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto, Collection<Project> projects) {
-        existingEmployee.setId(existingEmployee.getId());
+    public static void mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto, Collection<Project> projects) {
         existingEmployee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
         existingEmployee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
-        CustomPropValidators.validateBirthDate(existingEmployee.getBirthDate(), errResource);
-        existingEmployee.setBirthDate(existingEmployee.getBirthDate());
         existingEmployee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
         existingEmployee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
         existingEmployee.setProjects(new HashSet<>(projects));
         existingEmployee.setModificationDate(new Date());
-        
-        return existingEmployee;
     }
 
     public static EmployeeDto mapToEmployeeDto(Employee employee) {
@@ -79,14 +70,6 @@ public final class EmployeeMapper {
         dto.setProjectIds(getProjectIds(employee.getProjects()));
 
         return dto;
-    }
-
-    public static List<EmployeeDto> mapToListEmployeesDto(Collection<Employee> employees) {
-        if (!employees.isEmpty()) {
-            return employees.stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.toList());
-        }
-
-        return new ArrayList<EmployeeDto>();
     }
 
     public static Employee mapToEmployee(String[] employeeFieldsFromFile, Collection<Project> projects) {
@@ -110,6 +93,6 @@ public final class EmployeeMapper {
             return projects.stream().map(Project::getId).collect(Collectors.toList());
         }
 
-        return new ArrayList<Long>();
+        return new ArrayList<>();
     }
 }

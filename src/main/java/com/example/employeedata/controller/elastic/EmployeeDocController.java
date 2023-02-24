@@ -26,13 +26,13 @@ public class EmployeeDocController {
     @ApiOperation(value = "Get all employees")
     @GetMapping("/all")
     public ResponseEntity<List<EmployeeDoc>> getAllEmployees() {
-        return new ResponseEntity<List<EmployeeDoc>>(employeeDocService.getAllEmployees(), HttpStatus.OK);
+        return new ResponseEntity<>(employeeDocService.getAllEmployees(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Creating an employee")
     @PostMapping("/add")
     public ResponseEntity<ResponseDto> saveEmployee(@Valid @RequestBody CreateEmployeeDto employeeDto) {
-        return new ResponseEntity<ResponseDto>(employeeDocService.saveEmployee(employeeDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(employeeDocService.saveEmployee(employeeDto), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Get employee by id")
@@ -47,7 +47,7 @@ public class EmployeeDocController {
         })
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDoc> getEmployeeById(@PathVariable String id) {
-        return new ResponseEntity<EmployeeDoc>(employeeDocService.getEmployeeById(id), HttpStatus.OK);
+        return new ResponseEntity<>(employeeDocService.getEmployeeById(id), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Update employee by id")
@@ -63,7 +63,7 @@ public class EmployeeDocController {
     @PutMapping("/{id}")
     public ResponseEntity<HttpStatus> updateEmployee(@PathVariable String id, @Valid @RequestBody EditEmployeeDto editEmployeeDto) {
         employeeDocService.updateEmployee(id, editEmployeeDto);
-        return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ApiOperation(value = "Delete employee by id")
@@ -79,6 +79,6 @@ public class EmployeeDocController {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteEmployee(@PathVariable String id) {
         employeeDocService.deleteEmployee(id);
-        return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

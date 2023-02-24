@@ -58,30 +58,17 @@ public final class FileHelperFunctions {
         return file;
     }
 
-    public static Cell populateHeaderRow(Row header, String[] values) {
-        if (values == null || (values != null && values.length == 0) ) {
+    public static void populateHeaderRow(Row header, String[] values) {
+        if (values == null || values.length == 0) {
             throw new CustomValidationException("Exel row", "Exel row representing header cannot be empty");
         }
 
-        Cell headerCell = null;
+        Cell headerCell;
 
-        for(int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             headerCell = header.createCell(i);
             headerCell.setCellValue(values[i]);
         }
 
-        return headerCell;
-    }
-
-    public static Resource generateUrlResource(Path file) {
-        if (file != null) {
-            try {
-                return new UrlResource(file.toUri());
-            } catch (IOException e) {
-                //throws Internal Server Error
-            }
-        }
-         
-        return null;
     }
 }

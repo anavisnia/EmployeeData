@@ -23,9 +23,9 @@ public enum FileTypes {
     }
 
     public static final String[] labels() {
-        return Arrays.stream(FileTypes
-        .values())
+        return Arrays.stream(FileTypes.values())
         .map(Object::toString)
-        .collect(Collectors.toList()).toArray(new String[FileTypes.size()]);
+        .collect(Collectors.toList())
+        .toArray(new String[FileTypes.size()]);
     }
 }

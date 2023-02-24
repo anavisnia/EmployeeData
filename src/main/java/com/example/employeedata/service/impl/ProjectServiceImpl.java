@@ -1,6 +1,8 @@
 package com.example.employeedata.service.impl;
 
 import java.io.*;
+
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDate;
@@ -28,11 +30,11 @@ import com.example.employeedata.service.ProjectService;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
-
     private final Validator validator;
     private final ProjectRepository projectRepository;
     private final EmployeeRepository employeeRepository;
-    private final String resourceName = "Project";
+    private static final String RES_NAME = "Project";
+    private static final String ID = "id";
 
     public ProjectServiceImpl(Validator validator,
             ProjectRepository projectRepository,
@@ -46,16 +48,14 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseDto saveProject(CreateProjectDto projectDto) {
         constraintViolationCheck(projectDto);
 
-        Project project = ProjectMapper.mapToProject(projectDto);
-        
-        Project dbResponse = projectRepository.save(project);
+        Project dbResponse = projectRepository.save(ProjectMapper.mapToProject(projectDto));
 
-        return new ResponseDto(dbResponse.getId(), resourceName, false);
+        return new ResponseDto(dbResponse.getId(), RES_NAME, false);
     }
 
     @Override
     public ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile) {
-        if (multipartFile == null || (multipartFile != null && multipartFile.getOriginalFilename().isBlank()) ) {
+        if (Objects.requireNonNull(multipartFile.getOriginalFilename()).isBlank() ) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
         CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
@@ -65,8 +65,7 @@ public class ProjectServiceImpl implements ProjectService {
         Set<Project> createProjects = new HashSet<>();
         Set<String[]> failedValidationEntities = new HashSet<>();
 
-        try(FileInputStream fileBytes = new FileInputStream(file);
-             ) {
+        try(FileInputStream fileBytes = new FileInputStream(file)) {
             Iterator<Row> rows = null;
 
             if (FileTypes.Xls.label.equalsIgnoreCase(fileType)) {
@@ -82,7 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             int rowCount = 0;
-            Row row = null;
+            Row row;
             //to skip first row which contains additional information about cells
             if (rowCount == 0 && rows != null && rows.hasNext()) {
                 rowCount++;
@@ -98,7 +97,7 @@ public class ProjectServiceImpl implements ProjectService {
                 while (cellCount < projectData.length) {
                     Cell cell = row.getCell(cellCount);
 
-                    String cellValue = "";
+                    String cellValue;
 
                     cellValue = FileHelperFunctions.getCellValue(cell);
 
@@ -119,16 +118,19 @@ public class ProjectServiceImpl implements ProjectService {
             //will throw Internal Server Error
 
         } finally {
-            //deliting temp file
+            //deleting temp file
             if (file.exists()) {
                 file.delete();
             }
         }
 
-        ResponseDto response = null;
+        ResponseDto response;
 
-        List<Long> dbResponse = projectRepository.saveAll(createProjects).stream()
-            .filter(Objects::nonNull).map(Project::getId).collect(Collectors.toList());
+        List<Long> dbResponse = projectRepository.saveAll(createProjects)
+            .stream()
+            .filter(Objects::nonNull)
+            .map(Project::getId)
+            .collect(Collectors.toList());
 
         if (createProjects.isEmpty() && !failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
@@ -140,7 +142,7 @@ public class ProjectServiceImpl implements ProjectService {
             
             response = new ResponseDto(
                 dbResponse, "Project/projects created successfully",
-                failedValidationEntities, "These rows conatain errors. Please check"
+                failedValidationEntities, "These rows contain errors. Please check"
             );
         }
         else {
@@ -159,35 +161,36 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public PaginatedResponseDto<ProjectDto> getAllProjectsPage(String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc) {
-        pageNumber = pageNumber == null || (pageNumber != null && pageNumber < 0) ? 0 : pageNumber;
+    public PaginatedResponseDto<ProjectDto> getAllProjectsPage(
+            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc
+    ) {
+        if (pageNumber == null || pageNumber < 0) {
+            throw new CustomValidationException("pageNumber", "It cannot be null or less than zero");
+        }
 
-        pageSize = CustomPropValidators.checkPageSzie(pageSize);
-        
-        Pageable paging = null;
-        Page<Project> result = null;
-        String sorting = "";
+        pageSize = CustomPropValidators.checkPageSize(pageSize);
 
-        if (searchQuery == null || searchQuery != null && searchQuery.isBlank()) {
-            sorting = CustomPropValidators.checkFiledSorting(Constants.PROJECT_DB_FIELDS, sortBy);
-            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
-            result = projectRepository.findAll(paging);
-        } else {
-            sorting = CustomPropValidators.checkFiledSorting(Constants.PROJECT_DB_FIELDS, sortBy);
-            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+        String[] fields = Strings.isNotBlank(searchQuery) ? Constants.PROJECT_DB_FIELDS : Constants.PROJECT_FIELDS;
+        String sorting = CustomPropValidators.checkFiledSorting(fields, sortBy);
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+        Page<Project> result;
+
+        if (Strings.isNotBlank(searchQuery)) {
             result = projectRepository.findAllByQuery(searchQuery + "%", searchQuery, paging);
+        } else {
+            result = projectRepository.findAll(paging);
         }
         
-        if (result.hasContent()) {
-            return new PaginatedResponseDto<ProjectDto>(
+        if (!result.hasContent()) {
+            return new PaginatedResponseDto<>();
+        }
+
+        return new PaginatedResponseDto<>(
                 result.getContent().stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList()),
                 result.getTotalElements(),
                 result.getTotalPages(),
                 pageNumber
-            );
-        } else {
-            throw new ResourceNotFoundException(resourceName + "s");
-        }
+        );
     }
 
     @Override
@@ -209,10 +212,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromCurrentDate(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", employeeId)
+            new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
 
-        List<Long> employeeProjectIds = getProjectIds(new ArrayList<Project>(employee.getProjects()));
+        List<Long> employeeProjectIds = getProjectIds(new ArrayList<>(employee.getProjects()));
         List<Project> projects = projectRepository.findByFutureTerminationDate(LocalDate.now());
 
         projects.removeIf(p -> employeeProjectIds.contains(p.getId()));
@@ -226,7 +229,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(Long employeeId, LocalDate date) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", employeeId)
+            new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
         
         LocalDate currentDate = DateTimeHelpers.getLocalDateNow();
@@ -236,7 +239,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new CustomValidationException("Date", "date", date, "Date cannot be in past time");
         }
 
-        List<Long> employeeProjectIds = getProjectIds(new ArrayList<Project>(employee.getProjects()));
+        List<Long> employeeProjectIds = getProjectIds(new ArrayList<>(employee.getProjects()));
         List<Project> projects = projectRepository.findByFutureTerminationDate(date);
 
         projects.removeIf(p -> employeeProjectIds.contains(p.getId()));
@@ -246,7 +249,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsByDevelopmentLanguage(Integer devLanguage) {
-        CustomPropValidators.validateDevLang(devLanguage, resourceName);
+        CustomPropValidators.validateDevLang(devLanguage, RES_NAME);
         return projectRepository.findByDevLanguage(devLanguage)
             .stream()
             .map(ProjectMapper::mapToProjectDto)
@@ -257,7 +260,7 @@ public class ProjectServiceImpl implements ProjectService {
     public ProjectDto getProjectById(String projectId) {
         return ProjectMapper.mapToProjectDto(
             projectRepository.findById(Long.parseLong(projectId)).orElseThrow(() ->
-                new ResourceNotFoundException(resourceName, "id", projectId)
+                new ResourceNotFoundException(RES_NAME, ID, projectId)
             )
         );
     }
@@ -267,10 +270,10 @@ public class ProjectServiceImpl implements ProjectService {
         constraintViolationCheck(projectDto);
 
         Project existingProject = projectRepository.findById(projectId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", projectId)
+            new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
 
-        existingProject = ProjectMapper.mapToProject(existingProject, projectDto);
+        ProjectMapper.mapToProject(existingProject, projectDto);
 
         projectRepository.save(existingProject);
     }
@@ -278,7 +281,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void deleteProject(Long projectId) {
         Project existingProject = projectRepository.findById(projectId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", projectId)
+            new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
 
         removeProjectsFromEmployees(projectId, existingProject);
@@ -293,18 +296,18 @@ public class ProjectServiceImpl implements ProjectService {
         try(Workbook workBook = new XSSFWorkbook()) {
             
             LocalDate date = DateTimeHelpers.getLocalDateNow();
-            Sheet workBookSheet = workBook.createSheet(Constants.PROJECT_FILE_NAME + date.toString());
+            Sheet workBookSheet = workBook.createSheet(Constants.PROJECT_FILE_NAME + date);
 
             workBookSheet.setDefaultColumnWidth(100000);
             workBookSheet.setDefaultRowHeight((short) 500);
             
             Row header = workBookSheet.createRow(0);
-            Cell headerCell = FileHelperFunctions.populateHeaderRow(header, Constants.PROJECT_FILE_HEADERS);
+            FileHelperFunctions.populateHeaderRow(header, Constants.PROJECT_FILE_HEADERS);
 
             List<Project> data = projectRepository.findAll();
                  
             if (data.isEmpty()) {
-                throw new ResourceNotFoundException(resourceName + "s");
+                throw new ResourceNotFoundException(RES_NAME + "s");
             }
 
             List<ProjectFileDto> projectsData = data
@@ -312,8 +315,8 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(ProjectFileMapper::mapToProjectFileDto)
                 .collect(Collectors.toList());
 
-            Row row = null;
-            Cell cell = null;
+            Row row;
+            Cell cell;
 
             for (int i = 1; i <= projectsData.size(); i++) {
                 row = workBookSheet.createRow(i);
@@ -339,13 +342,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Map<String, List<ProjectDto>> getProjectsGroupedByDevLanguage() {
-        List<Project> projects = projectRepository.findAll();
-
-        if (projects.isEmpty()) {
-            throw new ResourceNotFoundException(resourceName + "s");
-        }
-
-        return projects
+        return projectRepository.findAll()
             .stream()
             .map(ProjectMapper::mapToProjectDto)
             .collect(Collectors.groupingBy(ProjectDto::getDevLanguage));
@@ -365,7 +362,7 @@ public class ProjectServiceImpl implements ProjectService {
     private List<Long> getProjectIds(List<Project> projects) {
         return projects
             .stream()
-            .map(p -> p.getId())
+            .map(Project::getId)
             .collect(Collectors.toList());
     }
 
@@ -382,7 +379,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
     
     private String getProjectDataAtIndex(Integer index, ProjectFileDto project) {
-        String dataAtIndex = "";
+        String dataAtIndex;
 
         switch(index) {
             case 0:

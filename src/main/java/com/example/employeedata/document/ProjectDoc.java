@@ -1,6 +1,7 @@
 package com.example.employeedata.document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.springframework.data.elasticsearch.annotations.*;
@@ -32,6 +33,9 @@ public class ProjectDoc {
 
     @Field(type = FieldType.Date)
     private LocalDate terminationDate;
+
+    @Field(type = FieldType.Date)
+    private LocalDateTime completionDate;
 
     @Field(type = FieldType.Text)
     private String devLanguage;

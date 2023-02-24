@@ -12,7 +12,7 @@ public class ProjectFileDto {
     private String title;
     @ApiModelProperty(value = "Project's description")
     private String description;
-    @ApiModelProperty(value = "Project's cutomer name")
+    @ApiModelProperty(value = "Project's customer name")
     private String customer;
     @ApiModelProperty(value = "Project's team size")
     private String teamSize;
@@ -20,4 +20,6 @@ public class ProjectFileDto {
     private String devLanguage;
     @ApiModelProperty(value = "Project's termination date")
     private String terminationDate;
+    @ApiModelProperty(value = "Project's completion date")
+    private String completionDate;
 }

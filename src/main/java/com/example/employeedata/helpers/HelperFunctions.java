@@ -15,10 +15,11 @@ public final class HelperFunctions {
     public static Collection<Long> getListOfLongValuesFromString(String str) {
         if (!str.isBlank()) {
             return Stream.of(str.trim().split(", "))
-                .map(string -> Long.parseLong(string.replace(".0", ""))).collect(Collectors.toSet());
+                .map(string -> Long.parseLong(string.replace(".0", "")))
+                .collect(Collectors.toSet());
         }
 
-        return new HashSet<Long>();
+        return new HashSet<>();
     }
 
 }

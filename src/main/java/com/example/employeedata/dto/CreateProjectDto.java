@@ -1,6 +1,7 @@
 package com.example.employeedata.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.*;
 
@@ -38,6 +39,9 @@ public class CreateProjectDto {
     @NotNull(message = "must not be blank")
     @ApiModelProperty(value = "Project's termination date")
     private LocalDate terminationDate;
+
+    @ApiModelProperty(value = "Project's completion date")
+    private LocalDateTime completionDate;
 
     @Min(0)
     @NotNull(message = "must not be blank")

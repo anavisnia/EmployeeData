@@ -16,7 +16,7 @@ public class ResponseDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    class SuccessResponse {
+    static class SuccessResponse {
         @ApiModelProperty(value = "Entity")
         private Object sucessObject;
         @ApiModelProperty(value = "Custom response message")
@@ -26,7 +26,7 @@ public class ResponseDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    class FailedResponse {
+    static class FailedResponse {
         @ApiModelProperty(value = "Entity")
         private Object failObject;
         @ApiModelProperty(value = "Custom response message")

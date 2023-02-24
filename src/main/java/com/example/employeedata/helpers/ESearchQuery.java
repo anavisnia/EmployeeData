@@ -50,11 +50,7 @@ public final class ESearchQuery {
     private static boolean checkExistenceOfFields(String[] fields) {
         Set<String> staticFields = getExistingFields();
 
-        if (staticFields.containsAll(Arrays.asList(fields))) {
-            return true;
-        }
-
-        return false;
+        return staticFields.containsAll(Arrays.asList(fields));
     }
 
     private static Set<String> getExistingFields() {

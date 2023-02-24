@@ -19,7 +19,8 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
 
     private final EmployeeESRepository employeeESRepository;
     private final ProjectESRepository projectESRepository;
-    private final String resourceName = "EmployeeDoc";
+    private static final String RES_NAME = "EmployeeDoc";
+    private static final String ID = "id";
 
     public EmployeeDocServiceImpl(EmployeeESRepository employeeESRepository, ProjectESRepository projectESRepository) {
         this.employeeESRepository = employeeESRepository;
@@ -28,30 +29,28 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
 
     @Override
     public ResponseDto saveEmployee(CreateEmployeeDto employeeDto) {
-        EmployeeDoc employeeDoc = new EmployeeDoc();
+        EmployeeDoc employeeDoc;
 
         if (employeeDto.getProjectIds().isEmpty()) {
             employeeDoc = EmployeeDocMapper.mapToEmployeeDoc(employeeDto);
         } else {
             List<String> projectIds = employeeDto.getProjectIds().stream().map(Object::toString).collect(Collectors.toList());
-            List<ProjectDoc> projects = StreamSupport.stream(projectESRepository.findAllById(projectIds).spliterator(), false)
+            List<ProjectDoc> projects = StreamSupport
+                .stream(projectESRepository.findAllById(projectIds).spliterator(), false)
                 .collect(Collectors.toList());
             employeeDoc = EmployeeDocMapper.mapToEmployeeDoc(employeeDto, projects);
         }
 
         EmployeeDoc dbResponse = employeeESRepository.save(employeeDoc);
 
-        return new ResponseDto(dbResponse.getId(), resourceName, false);
+        return new ResponseDto(dbResponse.getId(), RES_NAME, false);
     }
 
     @Override
     public List<EmployeeDoc> getAllEmployees() {
-        Iterable<EmployeeDoc> employees = employeeESRepository.findAll();
-
-        List<EmployeeDoc> empl = StreamSupport.stream(employees.spliterator(), false)
+        return StreamSupport
+            .stream(employeeESRepository.findAll().spliterator(), false)
             .collect(Collectors.toList());
-
-        return empl;
     }
 
     @Override
@@ -62,11 +61,13 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
     @Override
     public void updateEmployee(String employeeId, EditEmployeeDto editEmployeeDto) {
         EmployeeDoc employee = employeeESRepository.findById(employeeId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", employeeId)
+            new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
         
-        List<ProjectDoc> projects = getProjectDocs(editEmployeeDto.getProjectIds().stream()
-            .map(Object::toString).collect(Collectors.toList()));
+        List<ProjectDoc> projects = getProjectDocs(editEmployeeDto.getProjectIds()
+            .stream()
+            .map(Object::toString)
+            .collect(Collectors.toList()));
 
         employeeESRepository.save(EmployeeDocMapper.mapToEmployeeDoc(employee, editEmployeeDto, projects));
     }
@@ -74,7 +75,7 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
     @Override
     public void deleteEmployee(String employeeId) {
         EmployeeDoc employee = employeeESRepository.findById(employeeId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", employeeId)
+            new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
 
         employeeESRepository.delete(employee);
@@ -82,7 +83,8 @@ public class EmployeeDocServiceImpl implements EmployeeDocService {
 
 
     private List<ProjectDoc> getProjectDocs(List<String> projectIds) {
-        return StreamSupport.stream(projectESRepository.findAllById(projectIds).spliterator(), false)
+        return StreamSupport.
+            stream(projectESRepository.findAllById(projectIds).spliterator(), false)
             .collect(Collectors.toList());
     }
 }

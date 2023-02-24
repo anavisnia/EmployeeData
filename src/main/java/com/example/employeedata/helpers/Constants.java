@@ -3,7 +3,6 @@ package com.example.employeedata.helpers;
 public final class Constants {
     public static final String EMPLOYEE = "employee";
     public static final String PROJECT = "project";
-    public static final String ENTITY_MODIFICATION_DATE = "modificationDate";
     public static final String SEARCH_QUERY_FIELDS = "/query_fields";
     public static final String QUERY = "query";
     public static final String HITS = "hits";
@@ -16,12 +15,9 @@ public final class Constants {
     public static final String UTF8_ENCODING = "UTF-8";
     public static final Integer MILLISECONDS = 1000;
 
-    public static final Integer ALLOWED_EMPTY_FILEDS_EMPLOYEE = 1;
-    public static final Integer ALLOWED_EMPTY_FILEDS_PROJECT = 0;
 
-    public static final String USER_DOCUMENTS_PATH = System.getProperty("user.home") + "/Documents";
     public static final String[] EMPLOYEE_FILE_HEADERS = {"First name", "Last name", "Birth date", "Role", "Developer language", "Project ids"};
-    public static final String[] PROJECT_FILE_HEADERS = {"Title", "Description", "Customer", "Team size", "Developer language", "Termination date"};
+    public static final String[] PROJECT_FILE_HEADERS = {"Title", "Description", "Customer", "Team size", "Developer language", "Termination date", "Completion date"};
 
     public static final String EMPLOYEE_FILE_NAME = "EmployeeDataFor_";
     public static final String PROJECT_FILE_NAME = "ProjectDataFor_";
@@ -34,6 +30,6 @@ public final class Constants {
 
     public static final String[] EMPLOYEE_FIELDS = {"id", "firstName", "lastName", "role", "devLanguage", "projects", "birthDate"};
     public static final String[] EMPLOYEE_DB_FIELDS = {"id", "first_name", "last_name", "role", "dev_language", "birth_date"};
-    public static final String[] PROJECT_FIELDS = {"id", "title", "description", "customer", "devLanguage", "terminationDate"};
-    public static final String[] PROJECT_DB_FIELDS = {"id", "title", "description", "customer", "dev_language", "termination_date"};
+    public static final String[] PROJECT_FIELDS = {"id", "title", "description", "customer", "devLanguage", "terminationDate", "completionDate"};
+    public static final String[] PROJECT_DB_FIELDS = {"id", "title", "description", "customer", "dev_language", "termination_date", "completion_date"};
 }

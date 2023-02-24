@@ -14,6 +14,7 @@ public final class ProjectFileMapper {
         projectFileDto.setTeamSize(project.getTeamSize().toString());
         projectFileDto.setDevLanguage(DevLanguage.values()[project.getDevLanguage().ordinal()].label);
         projectFileDto.setTerminationDate(project.getTerminationDate().toString());
+        projectFileDto.setCompletionDate(project.getCompletionDate().toString());
 
         return projectFileDto;
     }

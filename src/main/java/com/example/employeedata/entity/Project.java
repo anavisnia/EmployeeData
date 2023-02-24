@@ -19,22 +19,25 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "title")
     private String title;
 
-    @Column(nullable = true)
+    @Column(name = "description")
     private String description;
 
-    @Column(nullable = true)
+    @Column(name = "teamSize")
     private Integer teamSize;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "customer")
     private String customer;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "terminationDate")
     private LocalDate terminationDate;
 
-    @Column(nullable = false)
+    @Column(name = "completionDate")
+    private LocalDateTime completionDate;
+
+    @Column(nullable = false, name = "devLanguage")
     private DevLanguage devLanguage;
 
     @Column(nullable = false)
@@ -90,6 +93,14 @@ public class Project {
 
     public void setTerminationDate(LocalDate terminationDate) {
         this.terminationDate = terminationDate;
+    }
+
+    public LocalDateTime getCompletionDate() {
+        return completionDate;
+    }
+
+    public void setCompletionDate(LocalDateTime completionDate) {
+        this.completionDate = completionDate;
     }
 
     public DevLanguage getDevLanguage() {

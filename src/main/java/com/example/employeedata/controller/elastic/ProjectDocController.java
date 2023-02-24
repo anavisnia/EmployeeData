@@ -28,13 +28,13 @@ public class ProjectDocController {
     @ApiOperation(value = "Get all projects")
     @GetMapping("/all")
     public ResponseEntity<List<ProjectDoc>> getAllProjects() {
-        return new ResponseEntity<List<ProjectDoc>>(projectDocService.getAllProjects(), HttpStatus.OK);
+        return new ResponseEntity<>(projectDocService.getAllProjects(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Creating a project")
     @PostMapping("/add")
     public ResponseEntity<ResponseDto> saveProject(@Valid @RequestBody CreateProjectDto projectDto) {
-        return new ResponseEntity<ResponseDto>(projectDocService.saveProject(projectDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(projectDocService.saveProject(projectDto), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Get project by id")
@@ -49,7 +49,7 @@ public class ProjectDocController {
         })
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDoc> getProjectById(@PathVariable String id) {
-        return new ResponseEntity<ProjectDoc>(projectDocService.getProjectById(id), HttpStatus.OK);
+        return new ResponseEntity<>(projectDocService.getProjectById(id), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Update project by id")
@@ -65,7 +65,7 @@ public class ProjectDocController {
     @PutMapping("/{id}")
     public ResponseEntity<HttpStatus> updateProject(@PathVariable String id, @Valid @RequestBody EditProjectDto editProjectDto) {
         projectDocService.updateProject(id, editProjectDto);
-        return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ApiOperation(value = "Delete project by id")
@@ -81,6 +81,6 @@ public class ProjectDocController {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteProject(@PathVariable String id) {
         projectDocService.deleteProject(id);
-        return new ResponseEntity<HttpStatus>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

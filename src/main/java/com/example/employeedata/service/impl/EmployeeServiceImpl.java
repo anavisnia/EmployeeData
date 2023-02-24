@@ -1,6 +1,8 @@
 package com.example.employeedata.service.impl;
 
 import java.io.*;
+
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDate;
@@ -25,11 +27,12 @@ import com.example.employeedata.repository.*;
 import com.example.employeedata.service.EmployeeService;
 
 @Service
-public class EmployeeServiceImpl<E> implements EmployeeService {
+public class EmployeeServiceImpl implements EmployeeService {
     private final Validator validator;
     private final EmployeeRepository employeeRepository;
     private final ProjectRepository projectRepository;
-    private final String resourceName = "Employee";
+    private static final String RES_NAME = "Employee";
+    private static final String ID = "id";
     
     public EmployeeServiceImpl(Validator validator,
             EmployeeRepository employeeRepository,
@@ -43,7 +46,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     public ResponseDto saveEmployee(CreateEmployeeDto employeeDto) {
         constraintViolationCheck(employeeDto);
 
-        Employee employee = new Employee();
+        Employee employee;
         
         if (employeeDto.getProjectIds().isEmpty()) {
             employee = EmployeeMapper.mapToEmployee(employeeDto);
@@ -54,14 +57,15 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         employee.setModificationDate(new Date());
         Employee dbResponse = employeeRepository.save(employee);
 
-        return new ResponseDto(dbResponse.getId(), resourceName, false);
+        return new ResponseDto(dbResponse.getId(), RES_NAME, false);
     }
 
     @Override
     public ResponseDto saveEmployeesFromExelFile(MultipartFile multipartFile) {
-        if (multipartFile == null || (multipartFile != null && multipartFile.getOriginalFilename().isBlank()) ) {
+        if (Objects.requireNonNull(multipartFile.getOriginalFilename()).isBlank()) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
+
         CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
 
         File file = FileHelperFunctions.castMultipartFileToFile(multipartFile);
@@ -69,8 +73,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         Set<Employee> createEmployees = new HashSet<>();
         Set<String[]> failedValidationEntities = new HashSet<>();
 
-        try(FileInputStream fileBytes = new FileInputStream(file);
-             ) {
+        try(FileInputStream fileBytes = new FileInputStream(file)) {
             Iterator<Row> rows = null;
 
             if (FileTypes.Xls.label.equalsIgnoreCase(fileType)) {
@@ -86,7 +89,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             }
 
             int rowCount = 0;
-            Row row = null;
+            Row row;
             //to skip first row which contains additional information about cells
             if (rowCount == 0 && rows != null && rows.hasNext()) {
                 rowCount++;
@@ -102,7 +105,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                 while (cellCount < employeeData.length) {
                     Cell cell = row.getCell(cellCount);
 
-                    String cellValue = "";
+                    String cellValue;
 
                     cellValue = FileHelperFunctions.getCellValue(cell);
 
@@ -123,22 +126,23 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                         failedValidationEntities.add(employeeData);
                     }
                 }
-                
             }
         } catch (IOException e) {
             //will throw Internal Server Error
-
         } finally {
-            //deliting temp file
+            //deleting temp file
             if (file.exists()) {
                 file.delete();
             }
         }
 
-        ResponseDto response = null;
+        ResponseDto response;
 
-        List<Long> dbResponse = employeeRepository.saveAll(createEmployees).stream()
-            .filter(Objects::nonNull).map(Employee::getId).collect(Collectors.toList());
+        List<Long> dbResponse = employeeRepository.saveAll(createEmployees)
+            .stream()
+            .filter(Objects::nonNull)
+            .map(Employee::getId)
+            .collect(Collectors.toList());
 
         if (createEmployees.isEmpty() && !failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
@@ -149,7 +153,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         } else if(!failedValidationEntities.isEmpty()) {
             response = new ResponseDto(
                 dbResponse, "Employee/employees created successfully",
-                failedValidationEntities, "These rows conatain errors. Please check"
+                failedValidationEntities, "These rows contain errors. Please check"
             );
         } else {
             response = new ResponseDto(dbResponse, "Employee/employees", false);
@@ -167,35 +171,36 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     }
 
     @Override
-    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPage(String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc) {
-        pageNumber = pageNumber == null || (pageNumber != null && pageNumber < 0) ? 0 : pageNumber;
+    public PaginatedResponseDto<EmployeeDto> getAllEmployeesPage(
+            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc
+    ) {
+        if (pageNumber == null || pageNumber < 0) {
+            throw new CustomValidationException("pageNumber", "It cannot be null or less than zero");
+        }
 
-        pageSize = CustomPropValidators.checkPageSzie(pageSize);
+        pageSize = CustomPropValidators.checkPageSize(pageSize);
 
-        Pageable paging = null;
-        Page<Employee> result = null;
-        String sorting = "";
+        String[] fields = Strings.isNotBlank(searchQuery) ? Constants.EMPLOYEE_DB_FIELDS : Constants.EMPLOYEE_FIELDS;
+        String sorting = CustomPropValidators.checkFiledSorting(fields, sortBy);
+        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+        Page<Employee> result;
 
-        if (searchQuery == null || searchQuery != null && searchQuery.isBlank()) {
-            sorting = CustomPropValidators.checkFiledSorting(Constants.EMPLOYEE_FIELDS, sortBy);
-            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
-            result = employeeRepository.findAll(paging);
-        } else {
-            sorting = CustomPropValidators.checkFiledSorting(Constants.EMPLOYEE_DB_FIELDS, sortBy);
-            paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+        if (Strings.isNotBlank(searchQuery)) {
             result = employeeRepository.findAllByQuery(searchQuery + "%", searchQuery, paging);
+        } else {
+            result = employeeRepository.findAll(paging);
         }
         
-        if (result.hasContent()) {
-            return new PaginatedResponseDto<EmployeeDto>(
+        if (!result.hasContent()) {
+            return new PaginatedResponseDto<>();
+        }
+
+        return new PaginatedResponseDto<>(
                 result.getContent().stream().map(EmployeeMapper::mapToEmployeeDto).collect(Collectors.toList()),
                 result.getTotalElements(),
                 result.getTotalPages(),
                 pageNumber
-            );
-        } else {
-            throw new ResourceNotFoundException(resourceName + "s");
-        }
+        );
     }
 
     @Override
@@ -210,7 +215,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     public EmployeeDto getEmployeeById(String employeeId) {
         return EmployeeMapper.mapToEmployeeDto(
             employeeRepository.findById(Long.parseLong(employeeId)).orElseThrow(() ->
-                new ResourceNotFoundException(resourceName, "id", employeeId)
+                new ResourceNotFoundException(RES_NAME, ID, employeeId)
             )
         );
     }
@@ -225,7 +230,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
     @Override
     public List<EmployeeDto> getEmployeesByDevLanguage(Integer devLanguage) {
-        CustomPropValidators.validateDevLang(devLanguage, resourceName);
+        CustomPropValidators.validateDevLang(devLanguage, RES_NAME);
         return employeeRepository.findByDevLanguage(devLanguage)
             .stream()
             .map(EmployeeMapper::mapToEmployeeDto)
@@ -235,7 +240,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     
     @Override
     public List<EmployeeDto> getEmployeesByRole(Integer role) {
-        CustomPropValidators.validateRole(role, resourceName);
+        CustomPropValidators.validateRole(role, RES_NAME);
         return employeeRepository.findByRole(role)
             .stream()
             .map(EmployeeMapper::mapToEmployeeDto)
@@ -245,16 +250,16 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     @Override
     public void updateEmployee(Long employeeId, EditEmployeeDto editEmployeeDto) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", employeeId)
+            new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
 
         constraintViolationCheck(editEmployeeDto);
 
         if (editEmployeeDto.getProjectIds().isEmpty()) {
-            employee = EmployeeMapper.mapToEmployee(employee, editEmployeeDto);
+            EmployeeMapper.mapToEmployee(employee, editEmployeeDto);
         } else {
             List<Project> projects = getProjects(editEmployeeDto.getProjectIds());
-            employee = EmployeeMapper.mapToEmployee(employee, editEmployeeDto, projects);
+            EmployeeMapper.mapToEmployee(employee, editEmployeeDto, projects);
         }
 
         employee.setModificationDate(new Date());
@@ -265,7 +270,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
     @Override
     public void deleteEmployee(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", employeeId)
+            new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
         
         employeeRepository.delete(employee);
@@ -278,18 +283,18 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         try(Workbook workBook = new XSSFWorkbook()) {
             
             LocalDate date = DateTimeHelpers.getLocalDateNow();
-            Sheet workBookSheet = workBook.createSheet(Constants.EMPLOYEE_FILE_NAME + date.toString());
+            Sheet workBookSheet = workBook.createSheet(Constants.EMPLOYEE_FILE_NAME + date);
 
-            workBookSheet.setDefaultColumnWidth(100000);
+            workBookSheet.setDefaultColumnWidth(500);
             workBookSheet.setDefaultRowHeight((short) 500);
             
             Row header = workBookSheet.createRow(0);
-            Cell headerCell = FileHelperFunctions.populateHeaderRow(header, Constants.EMPLOYEE_FILE_HEADERS);
+            FileHelperFunctions.populateHeaderRow(header, Constants.EMPLOYEE_FILE_HEADERS);
 
             List<Object[]> data = employeeRepository.findAllEmployeesInclProjects();
                  
             if (data.isEmpty()) {
-                throw new ResourceNotFoundException(resourceName + "s");
+                throw new ResourceNotFoundException(RES_NAME + "s");
             }
 
             List<EmployeeFileDto> employeeData = data
@@ -297,15 +302,15 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
                 .map(EmployeeFileMapper::mapToEmployeeFileDto)
                 .collect(Collectors.toList());
 
-            Row row = null;
-            Cell cell = null;
+            Row row;
+            Cell cell;
 
             for (int i = 1; i <= employeeData.size(); i++) {
                 row = workBookSheet.createRow(i);
-                EmployeeFileDto emplyee = employeeData.get(i-1);
+                EmployeeFileDto employee = employeeData.get(i-1);
                 for (int j = 0; j < Constants.EMPLOYEE_FILE_HEADERS.length; j++) {
                     cell = row.createCell(j);
-                    cell.setCellValue(getEmployeeDataAtIndex(j, emplyee));
+                    cell.setCellValue(getEmployeeDataAtIndex(j, employee));
                 }
             }
 
@@ -324,13 +329,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
     @Override
     public Map<String, List<EmployeeDto>> getEmployeesGroupedByDevLanguage() {
-        List<Employee> employees = employeeRepository.findAll();
-
-        if(employees.isEmpty()) {
-            throw new ResourceNotFoundException(resourceName + "s");
-        }
-        
-        return employees
+        return employeeRepository.findAll()
             .stream()
             .map(EmployeeMapper::mapToEmployeeDto)
             .collect(Collectors.groupingBy(EmployeeDto::getDevLanguage));
@@ -338,16 +337,10 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
 
     @Override
     public Map<String, List<EmployeeDto>> getEmployeesGroupedByRole() {
-        List<Employee> employees = employeeRepository.findAll();
-
-        if(employees.isEmpty()) {
-            throw new ResourceNotFoundException(resourceName + "s");
-        }
-        
-        return employees
+        return employeeRepository.findAll()
             .stream()
-            .map(EmployeeMapper::mapToEmployeeDto).
-            collect(Collectors.groupingBy(EmployeeDto::getRole));
+            .map(EmployeeMapper::mapToEmployeeDto)
+            .collect(Collectors.groupingBy(EmployeeDto::getRole));
     }
 
     private List<Project> getProjects(Collection<Long> projectIds) {
@@ -356,7 +349,7 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
         if (!projectIds.isEmpty()) {
             projectIds.stream().filter(Objects::nonNull).forEach(
                 id -> projects.add(
-                        projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", "id", id))
+                        projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project", ID, id))
                     )
             );
         }
@@ -371,13 +364,13 @@ public class EmployeeServiceImpl<E> implements EmployeeService {
             StringBuilder sb = new StringBuilder();
 
             violations.forEach(cv -> sb.append(cv.getPropertyPath() + " " + cv.getMessage() + ". "));
-            
+
             throw new ConstraintViolationException("Error occurred: " + sb.toString().trim(), violations);
         }
     }
 
     private String getEmployeeDataAtIndex(Integer index, EmployeeFileDto employee) {
-        String dataAtIndex = "";
+        String dataAtIndex;
 
         switch(index) {
             case 0:

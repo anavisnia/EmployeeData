@@ -16,7 +16,8 @@ import com.example.employeedata.service.ProjectDocService;
 public class ProjectDocServiceImpl implements ProjectDocService {
 
     private final ProjectESRepository projectESRepository;
-    private final String resourceName = "ProjectDoc";
+    private static final String RES_NAME = "ProjectDoc";
+    private static final String ID = "id";
 
     public ProjectDocServiceImpl(ProjectESRepository projectESRepository) {
         this.projectESRepository = projectESRepository;
@@ -28,26 +29,27 @@ public class ProjectDocServiceImpl implements ProjectDocService {
 
         ProjectDoc dbResponse = projectESRepository.save(projectDoc);
 
-        return new ResponseDto(dbResponse.getId(), resourceName, false);
+        return new ResponseDto(dbResponse.getId(), RES_NAME, false);
     }
 
     @Override
     public List<ProjectDoc> getAllProjects() {
-        return StreamSupport.stream(projectESRepository.findAll().spliterator(), false)
+        return StreamSupport.stream(projectESRepository.findAll()
+            .spliterator(), false)
             .collect(Collectors.toList());
     }
 
     @Override
     public ProjectDoc getProjectById(String projectId) {
         return projectESRepository.findById(projectId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", projectId)
+            new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
     }
 
     @Override
     public void updateProject(String projectId, EditProjectDto editProjectDto) {
         ProjectDoc project = projectESRepository.findById(projectId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", projectId)
+            new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
 
         projectESRepository.save(ProjectDocMapper.mapToProjectDoc(project, editProjectDto));
@@ -56,7 +58,7 @@ public class ProjectDocServiceImpl implements ProjectDocService {
     @Override
     public void deleteProject(String projectId) {
         ProjectDoc project = projectESRepository.findById(projectId).orElseThrow(() ->
-            new ResourceNotFoundException(resourceName, "id", projectId)
+            new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
 
         projectESRepository.delete(project);

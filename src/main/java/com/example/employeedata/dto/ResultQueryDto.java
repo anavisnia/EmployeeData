@@ -15,6 +15,6 @@ public class ResultQueryDto {
     private Float tookTime;
     @ApiModelProperty(value = "Number of result found by a provided query")
     private Integer numberOfResults;
-    @ApiModelProperty(value = "String replesentation of found entities")
+    @ApiModelProperty(value = "String representation of found entities")
     private String elements;
 }
