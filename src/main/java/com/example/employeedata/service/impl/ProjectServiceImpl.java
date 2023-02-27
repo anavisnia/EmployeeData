@@ -313,7 +313,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             List<ProjectFileDto> projectsData = data
                 .stream()
-                .map(ProjectFileMapper::mapToProjectFileDto)
+                .map(p -> ProjectFileMapper.mapToProjectFileDto(p, zoneId))
                 .collect(Collectors.toList());
 
             Row row;
