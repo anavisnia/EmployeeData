@@ -35,8 +35,8 @@ public class ProjectController<E> {
     
     @ApiOperation(value = "Creating a project")
     @PostMapping("/add")
-    public ResponseEntity<ResponseDto> saveProject(@Valid @RequestBody CreateProjectDto projectDto) {
-        return new ResponseEntity<>(projectService.saveProject(projectDto), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> saveProject(@Valid @RequestBody CreateProjectDto projectDto, @RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.saveProject(projectDto, zoneId), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Creating project/projects from exel file")
@@ -46,27 +46,32 @@ public class ProjectController<E> {
                 name = "file",
                 required = true,
                 dataType = "file",
-                value = "Exel file of .xls or .xlsx format with project data")
+                value = "Exel file of .xls or .xlsx format with project data"),
+            @ApiImplicitParam(
+                name = "zoneId",
+                required = true,
+                dataType = "string",
+                value = "Date time zone string representation")
         })
     //for now works only with postman
     @PostMapping(value = "/upload", consumes = { "multipart/form-data" })
-    public ResponseEntity<ResponseDto> saveProjectsFromFile(@RequestParam("file") MultipartFile file) {
-        return new ResponseEntity<>(projectService.saveProjectsFromExelFile(file), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> saveProjectsFromFile(@RequestParam("file") MultipartFile file, @RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.saveProjectsFromExelFile(file ,zoneId), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Returns a lst of all projects")
     @GetMapping
-    public ResponseEntity<List<E>> getAllProjects() {
+    public ResponseEntity<List<E>> getAllProjects(@RequestParam String zoneId) {
         List<E> res;
 
         try {
             res = (List<E>) projectDocService.getAllProjects();
             
             if (res == null) {
-                res = (List<E>) projectService.getAllProjects();
+                res = (List<E>) projectService.getAllProjects(zoneId);
             }
         } catch (DataAccessResourceFailureException e) {
-            res = (List<E>) projectService.getAllProjects();
+            res = (List<E>) projectService.getAllProjects(zoneId);
         }
 
         return new ResponseEntity<>(res, HttpStatus.OK);
@@ -74,14 +79,14 @@ public class ProjectController<E> {
 
     @ApiOperation(value = "Returns a lst of all projects with termination date is later than today")
     @GetMapping("/future")
-    public ResponseEntity<List<ProjectDto>> getAllFutureProjects() {
-        return new ResponseEntity<>(projectService.getAllProjectsWithFutureTerminationDate(), HttpStatus.OK);
+    public ResponseEntity<List<ProjectDto>> getAllFutureProjects(@RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.getAllProjectsWithFutureTerminationDate(zoneId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Returns a lst of all projects with termination date is prior to today")
     @GetMapping("/prior")
-    public ResponseEntity<List<ProjectDto>> getAllPriorProjects() {
-        return new ResponseEntity<>(projectService.getAllProjectsWithPriorTerminationDate(), HttpStatus.OK);
+    public ResponseEntity<List<ProjectDto>> getAllPriorProjects(@RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.getAllProjectsWithPriorTerminationDate(zoneId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Returns a list of all projects with paging information")
@@ -114,8 +119,9 @@ public class ProjectController<E> {
                 @RequestParam(required = false) Integer pageNumber,
                 @RequestParam(required = false) Integer pageSize,
                 @RequestParam(required = false) Integer sortBy,
-                @RequestParam(required = false) String isAsc) {
-        return new ResponseEntity<>(projectService.getAllProjectsPage(searchQuery, pageNumber, pageSize, sortBy, isAsc), HttpStatus.OK);
+                @RequestParam(required = false) String isAsc,
+                @RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.getAllProjectsPage(searchQuery, pageNumber, pageSize, sortBy, isAsc, zoneId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get projects not assigned to an employee")
@@ -129,8 +135,8 @@ public class ProjectController<E> {
                 value = "Employee id")
         })
     @GetMapping("/notAssignedTo/{employeeId}")
-    public ResponseEntity<List<ProjectDto>> getAllProjectsNotAssignedToEmployee(@PathVariable Long employeeId) {
-        return new ResponseEntity<>(projectService.getAllProjectsNotAssignedToEmployeeFromCurrentDate(employeeId), HttpStatus.OK);
+    public ResponseEntity<List<ProjectDto>> getAllProjectsNotAssignedToEmployee(@PathVariable Long employeeId, @RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.getAllProjectsNotAssignedToEmployeeFromCurrentDate(employeeId, zoneId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get projects not assigned to an employee")
@@ -150,8 +156,8 @@ public class ProjectController<E> {
             value = "Custom provided date")
         })
     @GetMapping("/notAssignedTo/{employeeId}/{date}")
-    public ResponseEntity<List<ProjectDto>> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(@PathVariable Long employeeId, @PathVariable String date) {
-        return new ResponseEntity<>(projectService.getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(employeeId, LocalDate.parse(date)), HttpStatus.OK);
+    public ResponseEntity<List<ProjectDto>> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(@PathVariable Long employeeId, @PathVariable String date, @RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(employeeId, LocalDate.parse(date), zoneId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get projects by development language id")
@@ -165,8 +171,8 @@ public class ProjectController<E> {
                 value = "Development language id")
         })
     @GetMapping("devLang/{devLanguage}")
-    public ResponseEntity<List<ProjectDto>> getAllProjectsByDevelopmentLanguage(@PathVariable Integer devLanguage) {
-        return new ResponseEntity<>(projectService.getAllProjectsByDevelopmentLanguage(devLanguage), HttpStatus.OK);
+    public ResponseEntity<List<ProjectDto>> getAllProjectsByDevelopmentLanguage(@PathVariable Integer devLanguage, @RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.getAllProjectsByDevelopmentLanguage(devLanguage, zoneId), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get project by id")
@@ -180,17 +186,17 @@ public class ProjectController<E> {
                 value = "Project id")
         })
     @GetMapping("/{id}")
-    public ResponseEntity<E> getProjectById(@PathVariable String id) {
+    public ResponseEntity<E> getProjectById(@PathVariable String id, @RequestParam String zoneId) {
         E res;
 
         try {
             res = (E) projectDocService.getProjectById(id);
 
             if (res == null) {
-                res = (E) projectService.getProjectById(id);
+                res = (E) projectService.getProjectById(id, zoneId);
             }
         } catch (DataAccessResourceFailureException e) {
-            res = (E) projectService.getProjectById(id);
+            res = (E) projectService.getProjectById(id, zoneId);
         }
 
         return new ResponseEntity<>(res, HttpStatus.OK);
@@ -207,8 +213,8 @@ public class ProjectController<E> {
                 value = "Project id")
         })
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateProject(@PathVariable Long id, @Valid @RequestBody EditProjectDto projectDto) {
-        projectService.updateProject(id, projectDto);
+    public ResponseEntity<HttpStatus> updateProject(@PathVariable Long id, @Valid @RequestBody EditProjectDto projectDto, @RequestParam String zoneId) {
+        projectService.updateProject(id, projectDto, zoneId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -230,8 +236,8 @@ public class ProjectController<E> {
 
     @ApiOperation(value = "Get a list of projects in an Exel file.")
     @GetMapping("/downloadFile")
-    public ResponseEntity<?> downloadProjectsInExelFile() {
-        byte[] byteArr = projectService.generateExelFile();
+    public ResponseEntity<?> downloadProjectsInExelFile(@RequestParam String zoneId) {
+        byte[] byteArr = projectService.generateExelFile(zoneId);
 
         if(byteArr.length == 0) {
             return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
@@ -250,7 +256,7 @@ public class ProjectController<E> {
 
     @ApiOperation(value = "Get a map of projects grouped by development language.")
     @GetMapping("/byDevLanguage")
-    public ResponseEntity<Map<String, List<ProjectDto>>> getProjectsGroupedByDevLanguage() {
-        return new ResponseEntity<>(projectService.getProjectsGroupedByDevLanguage(), HttpStatus.OK);
+    public ResponseEntity<Map<String, List<ProjectDto>>> getProjectsGroupedByDevLanguage(@RequestParam String zoneId) {
+        return new ResponseEntity<>(projectService.getProjectsGroupedByDevLanguage(zoneId), HttpStatus.OK);
     }
 }

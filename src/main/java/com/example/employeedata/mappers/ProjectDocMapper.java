@@ -17,7 +17,7 @@ public final class ProjectDocMapper {
         projectDoc.setDescription(projectDto.getDescription());
         projectDoc.setCustomer(projectDto.getCustomer());
         projectDoc.setTeamSize(projectDto.getTeamSize());
-        projectDoc.setTerminationDate(projectDto.getTerminationDate());
+        projectDoc.setTerminationDate(projectDto.getTerminationDate().toLocalDate());
         projectDoc.setCompletionDate(projectDto.getCompletionDate());
         projectDoc.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource).label);
         projectDoc.setModificationDate(new Date());
@@ -31,7 +31,7 @@ public final class ProjectDocMapper {
         existingProject.setDescription(editProjectDto.getDescription());
         existingProject.setCustomer(editProjectDto.getCustomer());
         existingProject.setTeamSize(editProjectDto.getTeamSize());
-        existingProject.setTerminationDate(editProjectDto.getTerminationDate());
+        existingProject.setTerminationDate(editProjectDto.getTerminationDate().toLocalDate());
         existingProject.setCompletionDate(editProjectDto.getCompletionDate());
         existingProject.setDevLanguage(CustomPropValidators.validateDevLang(editProjectDto.getDevLanguage(), errResource).label);
         existingProject.setModificationDate(new Date());

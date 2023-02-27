@@ -45,16 +45,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ResponseDto saveProject(CreateProjectDto projectDto) {
+    public ResponseDto saveProject(CreateProjectDto projectDto, String zoneId) {
         constraintViolationCheck(projectDto);
 
-        Project dbResponse = projectRepository.save(ProjectMapper.mapToProject(projectDto));
+        Project dbResponse = projectRepository.save(ProjectMapper.mapToProject(projectDto, zoneId));
 
         return new ResponseDto(dbResponse.getId(), RES_NAME, false);
     }
 
     @Override
-    public ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile) {
+    public ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile, String zoneId) {
         if (Objects.requireNonNull(multipartFile.getOriginalFilename()).isBlank() ) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
@@ -108,7 +108,7 @@ public class ProjectServiceImpl implements ProjectService {
 
                 if (!CustomPropValidators.areAllFieldsEmpty(projectData)) {
                     if (CustomPropValidators.isValidProjectFile(projectData)) {
-                        createProjects.add(ProjectMapper.mapToProject(projectData));
+                        createProjects.add(ProjectMapper.mapToProject(projectData, zoneId));
                     } else {
                         failedValidationEntities.add(projectData);
                     }
@@ -153,16 +153,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectDto> getAllProjects() {
+    public List<ProjectDto> getAllProjects(String zoneId) {
         return projectRepository.findAll()
             .stream()
-            .map(ProjectMapper::mapToProjectDto)
+            .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
             .collect(Collectors.toList());
     }
 
     @Override
     public PaginatedResponseDto<ProjectDto> getAllProjectsPage(
-            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc
+            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
     ) {
         if (pageNumber == null || pageNumber < 0) {
             throw new CustomValidationException("pageNumber", "It cannot be null or less than zero");
@@ -186,7 +186,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return new PaginatedResponseDto<>(
-                result.getContent().stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList()),
+                result.getContent().stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList()),
                 result.getTotalElements(),
                 result.getTotalPages(),
                 pageNumber
@@ -194,23 +194,23 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectDto> getAllProjectsWithFutureTerminationDate() {
+    public List<ProjectDto> getAllProjectsWithFutureTerminationDate(String zoneId) {
         return projectRepository.findByFutureTerminationDate(DateTimeHelpers.getLocalDateNow())
             .stream()
-            .map(ProjectMapper::mapToProjectDto)
+            .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProjectDto> getAllProjectsWithPriorTerminationDate() {
+    public List<ProjectDto> getAllProjectsWithPriorTerminationDate(String zoneId) {
         return projectRepository.findByPriorTerminationDate(DateTimeHelpers.getLocalDateNow())
             .stream()
-            .map(ProjectMapper::mapToProjectDto)
+            .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromCurrentDate(Long employeeId) {
+    public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromCurrentDate(Long employeeId, String zoneId) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
@@ -222,12 +222,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projects
             .stream()
-            .map(ProjectMapper::mapToProjectDto)
+            .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(Long employeeId, LocalDate date) {
+    public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(Long employeeId, LocalDate date, String zoneId) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
@@ -244,36 +244,37 @@ public class ProjectServiceImpl implements ProjectService {
 
         projects.removeIf(p -> employeeProjectIds.contains(p.getId()));
 
-        return projects.stream().map(ProjectMapper::mapToProjectDto).collect(Collectors.toList());
+        return projects.stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProjectDto> getAllProjectsByDevelopmentLanguage(Integer devLanguage) {
+    public List<ProjectDto> getAllProjectsByDevelopmentLanguage(Integer devLanguage, String zoneId) {
         CustomPropValidators.validateDevLang(devLanguage, RES_NAME);
         return projectRepository.findByDevLanguage(devLanguage)
             .stream()
-            .map(ProjectMapper::mapToProjectDto)
+            .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
             .collect(Collectors.toList());
     }
 
     @Override
-    public ProjectDto getProjectById(String projectId) {
+    public ProjectDto getProjectById(String projectId, String zoneId) {
         return ProjectMapper.mapToProjectDto(
             projectRepository.findById(Long.parseLong(projectId)).orElseThrow(() ->
                 new ResourceNotFoundException(RES_NAME, ID, projectId)
-            )
+            ),
+            zoneId
         );
     }
 
     @Override
-    public void updateProject(Long projectId, EditProjectDto projectDto) {
+    public void updateProject(Long projectId, EditProjectDto projectDto, String zoneId) {
         constraintViolationCheck(projectDto);
 
         Project existingProject = projectRepository.findById(projectId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
 
-        ProjectMapper.mapToProject(existingProject, projectDto);
+        ProjectMapper.mapToProject(existingProject, projectDto, zoneId);
 
         projectRepository.save(existingProject);
     }
@@ -290,7 +291,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public byte[] generateExelFile() {
+    public byte[] generateExelFile(String zoneId) {
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
 
         try(Workbook workBook = new XSSFWorkbook()) {
@@ -341,10 +342,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Map<String, List<ProjectDto>> getProjectsGroupedByDevLanguage() {
+    public Map<String, List<ProjectDto>> getProjectsGroupedByDevLanguage(String zoneId) {
         return projectRepository.findAll()
             .stream()
-            .map(ProjectMapper::mapToProjectDto)
+            .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
             .collect(Collectors.groupingBy(ProjectDto::getDevLanguage));
     }
 

@@ -32,16 +32,16 @@ public class Project {
     private String customer;
 
     @Column(nullable = false, name = "terminationDate")
-    private LocalDate terminationDate;
+    private ZonedDateTime terminationDate;
 
     @Column(name = "completionDate")
-    private LocalDateTime completionDate;
+    private ZonedDateTime completionDate;
 
     @Column(nullable = false, name = "devLanguage")
     private DevLanguage devLanguage;
 
     @Column(nullable = false)
-    private Date modificationDate;
+    private ZonedDateTime modificationDate;
 
     @ManyToMany(mappedBy = "projects")
     @JsonBackReference
@@ -87,19 +87,19 @@ public class Project {
         this.customer = customer;
     }
 
-    public LocalDate getTerminationDate() {
+    public ZonedDateTime getTerminationDate() {
         return terminationDate;
     }
 
-    public void setTerminationDate(LocalDate terminationDate) {
+    public void setTerminationDate(ZonedDateTime terminationDate) {
         this.terminationDate = terminationDate;
     }
 
-    public LocalDateTime getCompletionDate() {
+    public ZonedDateTime getCompletionDate() {
         return completionDate;
     }
 
-    public void setCompletionDate(LocalDateTime completionDate) {
+    public void setCompletionDate(ZonedDateTime completionDate) {
         this.completionDate = completionDate;
     }
 
@@ -111,11 +111,11 @@ public class Project {
         this.devLanguage = devLanguage;
     }
 
-    public Date getModificationDate() {
+    public ZonedDateTime getModificationDate() {
         return modificationDate;
     }
 
-    public void setModificationDate(Date modificationDate) {
+    public void setModificationDate(ZonedDateTime modificationDate) {
         this.modificationDate = modificationDate;
     }
 }

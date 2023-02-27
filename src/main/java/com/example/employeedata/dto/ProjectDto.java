@@ -20,7 +20,7 @@ public class ProjectDto {
     @ApiModelProperty(value = "Project's customer name")
     private String customer;
     @ApiModelProperty(value = "Project's termination date")
-    private LocalDate terminationDate;
+    private LocalDateTime terminationDate;
     @ApiModelProperty(value = "Project's completion date")
     private LocalDateTime completionDate;
     @ApiModelProperty(value = "Project's development language")

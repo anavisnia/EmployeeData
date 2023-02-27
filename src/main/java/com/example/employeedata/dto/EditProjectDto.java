@@ -21,7 +21,7 @@ public class EditProjectDto {
     @ApiModelProperty(value = "Project's title")
     private String title;
 
-    @Pattern(regexp = Constants.REGEX_TEXT_WITHOUT_SYMBOLS, message = "must only consist of letters and numbers")
+    @Pattern(regexp = Constants.REGEX_TEXT_WITH_SYMBOLS, message = "must only consist of letters and numbers")
     @Size(min = 0, max = 1000)
     @ApiModelProperty(value = "Project's description")
     private String description;
@@ -38,7 +38,7 @@ public class EditProjectDto {
 
     @NotNull(message = "must not be blank")
     @ApiModelProperty(value = "Project's termination date")
-    private LocalDate terminationDate;
+    private LocalDateTime terminationDate;
 
     @ApiModelProperty(value = "Project's completion date")
     private LocalDateTime completionDate;
