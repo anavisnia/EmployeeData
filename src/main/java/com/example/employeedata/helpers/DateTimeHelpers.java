@@ -1,11 +1,10 @@
 package com.example.employeedata.helpers;
 
-import java.text.Format;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Formatter;
 
 public class DateTimeHelpers {
+    public static DateTimeFormatter ZONE_FORMATTER = DateTimeFormatter.ofPattern(Constants.ZONE_DATE_TIME_FORMAT);
     public static LocalDateTime getLocalDateTimeNow() {
         return LocalDateTime.now();
     }
@@ -32,5 +31,14 @@ public class DateTimeHelpers {
 
     public static LocalDateTime GetLDTFromZDT(ZonedDateTime zdt, String zoneId) {
         return zdt.withZoneSameInstant(ZoneId.of(zoneId)).toLocalDateTime();
+    }
+
+    public static ZonedDateTime GetFormattedZDTFromString(String dateTime, String zoneId) {
+        return ZonedDateTime.parse(dateTime.trim().concat(" " + zoneId), ZONE_FORMATTER);
+    }
+
+    public static ZonedDateTime GetFormattedZDTFromLDTNow(String zoneId) {
+        String zdt = LocalDateTime.now().atZone(ZoneId.of(zoneId)).format(ZONE_FORMATTER);
+        return ZonedDateTime.parse(zdt, ZONE_FORMATTER);
     }
 }

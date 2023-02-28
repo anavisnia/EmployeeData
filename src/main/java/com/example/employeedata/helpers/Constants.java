@@ -26,10 +26,13 @@ public final class Constants {
 
     public static final String REGEX_NAME = "^[a-zA-Z\\p{L}]+$";
     public static final String REGEX_TEXT_WITHOUT_SYMBOLS = "^[a-zA-Z0-9 \\p{L}]+$";
-    public static final String REGEX_TEXT_WITH_SYMBOLS = "^[A-Za-z0-9- \\p{L},._-|]+$";
+    public static final String REGEX_TEXT_WITH_SYMBOLS = "^[A-Za-z0-9- \\p{L},._#-|]+$";
 
     public static final String[] EMPLOYEE_FIELDS = {"id", "firstName", "lastName", "role", "devLanguage", "projects", "birthDate"};
     public static final String[] EMPLOYEE_DB_FIELDS = {"id", "first_name", "last_name", "role", "dev_language", "birth_date"};
     public static final String[] PROJECT_FIELDS = {"id", "title", "description", "customer", "devLanguage", "terminationDate", "completionDate"};
     public static final String[] PROJECT_DB_FIELDS = {"id", "title", "description", "customer", "dev_language", "termination_date", "completion_date"};
+
+    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String ZONE_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss VV";
 }

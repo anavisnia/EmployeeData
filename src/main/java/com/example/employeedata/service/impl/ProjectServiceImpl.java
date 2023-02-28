@@ -107,7 +107,7 @@ public class ProjectServiceImpl implements ProjectService {
                 }
 
                 if (!CustomPropValidators.areAllFieldsEmpty(projectData)) {
-                    if (CustomPropValidators.isValidProjectFile(projectData)) {
+                    if (CustomPropValidators.isValidProjectFile(projectData, zoneId)) {
                         createProjects.add(ProjectMapper.mapToProject(projectData, zoneId));
                     } else {
                         failedValidationEntities.add(projectData);
@@ -400,6 +400,9 @@ public class ProjectServiceImpl implements ProjectService {
                 break;
             case 5:
                 dataAtIndex = project.getTerminationDate();
+                break;
+            case 6:
+                dataAtIndex = project.getCompletionDate();
                 break;
             default:
                 dataAtIndex = "";

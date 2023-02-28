@@ -1,10 +1,8 @@
 package com.example.employeedata.mappers;
 
-import java.util.*;
-import java.time.*;
-
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.Project;
+import com.example.employeedata.enums.DevLanguage;
 import com.example.employeedata.helpers.CustomPropValidators;
 import com.example.employeedata.helpers.DateTimeHelpers;
 import org.apache.logging.log4j.util.Strings;
@@ -57,18 +55,16 @@ public class ProjectMapper {
     public static Project mapToProject(String[] projectFieldsFromFile, String zoneId) {
         Project project = new Project();
         
-        project.setTitle(CustomPropValidators.normalizeStr(projectFieldsFromFile[0]));
-        project.setDescription(CustomPropValidators.normalizeStr(projectFieldsFromFile[1]));
-        project.setCustomer(CustomPropValidators.normalizeStr(projectFieldsFromFile[2]));
-        project.setTeamSize(CustomPropValidators.validateTeamSize(Integer.parseInt(projectFieldsFromFile[3].replace(".0", "")), errResource));
-        project.setDevLanguage(CustomPropValidators.validateDevLang(Integer.parseInt(projectFieldsFromFile[4].replace(".0", "")), errResource));
-        LocalDateTime terminationDate = LocalDateTime.parse(projectFieldsFromFile[5]);
-        //CustomPropValidators.validateTerminationDate(terminationDate, errResource);
-        project.setTerminationDate(DateTimeHelpers.GetZDTFromLDT(terminationDate, zoneId));
-        String completionDateField = projectFieldsFromFile[6];
-        if (Strings.isNotBlank(completionDateField)) {
-            LocalDateTime completionDate = LocalDateTime.parse(projectFieldsFromFile[6]);
-            project.setCompletionDate(DateTimeHelpers.GetZDTFromLDT(completionDate, zoneId));
+        project.setTitle(projectFieldsFromFile[0].trim());
+        project.setDescription(Strings.isNotBlank(projectFieldsFromFile[1]) ? projectFieldsFromFile[1].trim() : null);
+        project.setCustomer(projectFieldsFromFile[2].trim());
+        project.setTeamSize(Strings.isNotBlank(projectFieldsFromFile[3]) ? CustomPropValidators.validateTeamSize(Integer.parseInt(projectFieldsFromFile[3].trim().replace(".0", "")), errResource) : null);
+        project.setDevLanguage(DevLanguage.values()[Integer.parseInt(projectFieldsFromFile[4].trim().replace(".0", ""))]);
+        project.setTerminationDate(DateTimeHelpers.GetFormattedZDTFromString(projectFieldsFromFile[5].trim(), zoneId));
+        if (Strings.isNotBlank(projectFieldsFromFile[6])) {
+            project.setCompletionDate(DateTimeHelpers.GetFormattedZDTFromString(projectFieldsFromFile[6].trim(), zoneId));
+        } else {
+            project.setCompletionDate(null);
         }
         project.setModificationDate(DateTimeHelpers.GetZDTFromLDTNow(zoneId));
 

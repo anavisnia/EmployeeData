@@ -55,7 +55,7 @@ public class ProjectController<E> {
         })
     //for now works only with postman
     @PostMapping(value = "/upload", consumes = { "multipart/form-data" })
-    public ResponseEntity<ResponseDto> saveProjectsFromFile(@RequestParam("file") MultipartFile file, @RequestParam String zoneId) {
+    public ResponseEntity<ResponseDto> saveProjectsFromFile(@RequestParam("file") MultipartFile file, @RequestParam("zoneId") String zoneId) {
         return new ResponseEntity<>(projectService.saveProjectsFromExelFile(file ,zoneId), HttpStatus.CREATED);
     }
 

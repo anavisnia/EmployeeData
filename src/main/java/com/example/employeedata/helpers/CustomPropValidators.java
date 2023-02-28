@@ -1,5 +1,6 @@
 package com.example.employeedata.helpers;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Direction;
 
@@ -76,32 +78,27 @@ public final class CustomPropValidators {
 
     public static boolean isValidEmployeeFile(String[] employee) {
         try {
-            if (employee[0] == null ||
-                    employee[0].isBlank() ||
+            if (Strings.isBlank(employee[0]) ||
                     !Pattern.matches(Constants.REGEX_NAME, employee[0])
-                ) {
+            ) {
                 return false;
-            } else if (employee[1] == null ||
-                    employee[1].isBlank() ||
+            } else if (Strings.isBlank(employee[1]) ||
                     !Pattern.matches(Constants.REGEX_NAME, employee[1])
-                ) {
+            ) {
                 return false;
-            } else if (employee[2] == null ||
-                    employee[2].isBlank() ||
+            } else if (Strings.isBlank(employee[2]) ||
                     LocalDate.parse(employee[2]).isAfter(LocalDate.now())
-                ) {
+            ) {
                 return false;
-            } else if (employee[3] == null ||
-                    employee[3].isBlank() ||
+            } else if (Strings.isBlank(employee[3]) ||
                     Long.parseLong(employee[3].replace(".0", "")) > (Role.size() - 1) ||
                     Long.parseLong(employee[3].replace(".0", "")) < 0
-                ) {
+            ) {
                 return false;
-            } else if (employee[4] == null ||
-                    employee[4].isBlank() ||
+            } else if (Strings.isBlank(employee[4]) ||
                     Long.parseLong(employee[4].replace(".0", "")) > (DevLanguage.size() - 1) ||
                     Long.parseLong(employee[4].replace(".0", "")) < 0
-                ) {
+            ) {
                 return false;
             }
         } catch (NumberFormatException | DateTimeParseException e) {
@@ -117,42 +114,46 @@ public final class CustomPropValidators {
         return true;
     }
 
-    public static boolean isValidProjectFile(String[] project) {
+    public static boolean isValidProjectFile(String[] project, String zoneId) {
         try {
-            if (project[0] == null ||
-                    project[0].isBlank() ||
+            if (Strings.isBlank(project[0]) ||
                     !Pattern.matches(Constants.REGEX_TEXT_WITHOUT_SYMBOLS, project[0])
-                ) {
+            ) {
                 return false;
-            } else if (project[1] == null ||
-                    project[1].isBlank() ||
-                    !Pattern.matches(Constants.REGEX_TEXT_WITHOUT_SYMBOLS, project[1])
-                ) {
+            } else if (Strings.isNotBlank(project[1]) &&
+                    !Pattern.matches(Constants.REGEX_TEXT_WITH_SYMBOLS, project[1])
+            ) {
                 return false;
-            } else if (project[2] == null ||
-                    project[2].isBlank() ||
+            } else if (Strings.isBlank(project[2]) ||
                     !Pattern.matches(Constants.REGEX_TEXT_WITH_SYMBOLS, project[2])
-                ) {
+            ) {
                 return false;
-            } else if (project[3] == null || 
-                    project[3].isBlank() ||
-                    Long.parseLong(project[3].replace(".0", "")) < 0 ||
-                    Long.parseLong(project[3].replace(".0", "")) > MAX_PROJECT_TEAM_SIZE
-                ) {
+            } else if ((Strings.isNotBlank(project[3]) &&
+                    Long.parseLong(project[3].trim().replace(".0", "")) < 0)
+                    ||
+                    (Strings.isNotBlank(project[3]) &&
+                    Long.parseLong(project[3].trim().replace(".0", "")) > MAX_PROJECT_TEAM_SIZE)
+            ) {
                 return false;
-            } else if (project[4] == null ||
-                    project[4].isBlank() ||
-                    Long.parseLong(project[4].replace(".0", "")) > (DevLanguage.size() - 1) ||
-                    Long.parseLong(project[4].replace(".0", "")) < 0
-                ) {
+            } else if (Strings.isBlank(project[4]) ||
+                    Long.parseLong(project[4].trim().replace(".0", "")) > (DevLanguage.size() - 1) ||
+                    Long.parseLong(project[4].trim().replace(".0", "")) < 0
+            ) {
                 return false;
-            } else if (project[5] == null ||
-                    project[5].isBlank() ||
-                    LocalDate.parse(project[5]).isAfter(LocalDate.now())
-                ) {
+            } else if (Strings.isBlank(project[5]) ||
+                    DateTimeHelpers.GetFormattedZDTFromString(project[5], zoneId)
+                        .isBefore(DateTimeHelpers.GetFormattedZDTFromLDTNow(zoneId))
+            ) {
+                return false;
+            } else if (Strings.isNotBlank(project[6]) &&
+                DateTimeHelpers.GetFormattedZDTFromString(project[6], zoneId)
+                    .isAfter(DateTimeHelpers.GetFormattedZDTFromString(project[5], zoneId)) ||
+                DateTimeHelpers.GetFormattedZDTFromString(project[6], zoneId)
+                    .isAfter(DateTimeHelpers.GetFormattedZDTFromLDTNow(zoneId))
+            ) {
                 return false;
             }
-        } catch (NumberFormatException | DateTimeParseException e) {
+        } catch (NumberFormatException | DateTimeException e) {
             return false;
         }
 
