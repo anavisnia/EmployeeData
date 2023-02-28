@@ -149,11 +149,11 @@ public class ProjectController<E> {
                 paramType = "path",
                 value = "Employee id"),
             @ApiImplicitParam(
-            name = "date",
-            required = true,
-            dataType = "string",
-            paramType = "path",
-            value = "Custom provided date")
+                name = "date",
+                required = true,
+                dataType = "string",
+                paramType = "path",
+                value = "Custom provided date")
         })
     @GetMapping("/notAssignedTo/{employeeId}/{date}")
     public ResponseEntity<List<ProjectDto>> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(@PathVariable Long employeeId, @PathVariable String date, @RequestParam String zoneId) {
@@ -258,5 +258,20 @@ public class ProjectController<E> {
     @GetMapping("/byDevLanguage")
     public ResponseEntity<Map<String, List<ProjectDto>>> getProjectsGroupedByDevLanguage(@RequestParam String zoneId) {
         return new ResponseEntity<>(projectService.getProjectsGroupedByDevLanguage(zoneId), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Get a map of time zones")
+    @ApiImplicitParams(
+        value = {
+            @ApiImplicitParam(
+                name = "isRegionSort",
+                dataType = "string",
+                required = true,
+                paramType = "path",
+                value = "Boolean value if map should be sorted by region represented by string")
+        })
+    @GetMapping("/timeZones")
+    public ResponseEntity<Map<String, String>> getZoneIdsWithOffset(@RequestParam String isRegionSort) {
+        return new ResponseEntity<>(projectService.getZoneIdsWithOffset(isRegionSort), HttpStatus.OK);
     }
 }

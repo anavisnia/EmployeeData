@@ -5,7 +5,7 @@ import java.io.*;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.*;
 
-import java.time.LocalDate;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -347,6 +347,43 @@ public class ProjectServiceImpl implements ProjectService {
             .stream()
             .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
             .collect(Collectors.groupingBy(ProjectDto::getDevLanguage));
+    }
+
+    @Override
+    public Map<String, String> getZoneIdsWithOffset(String isRegionSort) {
+        Map<String, String> zoneIdsWithOffset = new HashMap<>();
+        Set<String> zoneIds = ZoneId.getAvailableZoneIds();
+        LocalDateTime ldt = DateTimeHelpers.getLocalDateTimeNow();
+
+        for (String zoneId : zoneIds) {
+            ZoneId zId = ZoneId.of(zoneId);
+
+            ZonedDateTime zdt = DateTimeHelpers.GetZDTFromLDT(ldt, zoneId);
+
+            ZoneOffset zo = zdt.getOffset();
+
+            String offset = zo.getId().replaceAll("Z", "+00:00");
+
+            zoneIdsWithOffset.put(zId.toString(), offset);
+        }
+
+        Map<String, String> sorted = new LinkedHashMap<>();
+
+        if (Boolean.parseBoolean(isRegionSort)) {
+            zoneIdsWithOffset
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEachOrdered(e -> sorted.put(e.getKey(), e.getValue()));
+        } else {
+            zoneIdsWithOffset
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, String>comparingByValue().reversed())
+                .forEachOrdered(e -> sorted.put(e.getKey(), e.getValue()));
+        }
+
+        return sorted;
     }
 
     @PreRemove

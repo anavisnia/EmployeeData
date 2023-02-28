@@ -24,4 +24,5 @@ public interface ProjectService {
     void deleteProject(Long projectId);
     byte[] generateExelFile(String zoneId);
     Map<String, List<ProjectDto>> getProjectsGroupedByDevLanguage(String zoneId);
+    Map<String, String> getZoneIdsWithOffset(String isRegionSort);
 }
