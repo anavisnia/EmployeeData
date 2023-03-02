@@ -129,15 +129,15 @@ public final class CustomPropValidators {
             ) {
                 return false;
             } else if ((Strings.isNotBlank(project[3]) &&
-                    Long.parseLong(project[3].trim().replace(".0", "")) < 0)
+                    Long.parseLong(project[3].replace(".0", "")) < 0)
                     ||
                     (Strings.isNotBlank(project[3]) &&
-                    Long.parseLong(project[3].trim().replace(".0", "")) > MAX_PROJECT_TEAM_SIZE)
+                    Long.parseLong(project[3].replace(".0", "")) > MAX_PROJECT_TEAM_SIZE)
             ) {
                 return false;
             } else if (Strings.isBlank(project[4]) ||
-                    Long.parseLong(project[4].trim().replace(".0", "")) > (DevLanguage.size() - 1) ||
-                    Long.parseLong(project[4].trim().replace(".0", "")) < 0
+                    Long.parseLong(project[4].replace(".0", "")) > (DevLanguage.size() - 1) ||
+                    Long.parseLong(project[4].replace(".0", "")) < 0
             ) {
                 return false;
             } else if (Strings.isBlank(project[5]) ||

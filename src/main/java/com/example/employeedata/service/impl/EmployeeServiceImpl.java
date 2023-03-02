@@ -107,7 +107,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                     cellValue = FileHelperFunctions.getCellValue(cell);
 
-                    employeeData[cellCount] = cellValue;
+                    employeeData[cellCount] = cellValue.trim();
 
                     cellCount++;
                 }

@@ -99,7 +99,7 @@ public class ProjectServiceImpl implements ProjectService {
 
                     cellValue = FileHelperFunctions.getCellValue(cell);
 
-                    projectData[cellCount] = cellValue;
+                    projectData[cellCount] = cellValue.trim();
 
                     cellCount++;
                 }
