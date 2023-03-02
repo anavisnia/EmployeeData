@@ -88,15 +88,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
             }
 
-            int rowCount = 0;
-            Row row;
             //to skip first row which contains additional information about cells
-            if (rowCount == 0 && rows != null && rows.hasNext()) {
-                rowCount++;
+            Row row;
+            if (rows != null && rows.hasNext()) {
                 row = rows.next(); // row number is 0
             }
 
-            while (rows != null && rows.hasNext() && rowCount == 1) {
+            while (rows != null && rows.hasNext()) {
                 row = rows.next();
 
                 String[] employeeData = new String[Constants.EMPLOYEE_FILE_HEADERS.length];
