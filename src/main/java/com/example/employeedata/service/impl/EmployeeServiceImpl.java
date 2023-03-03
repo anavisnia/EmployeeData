@@ -62,10 +62,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public ResponseDto saveEmployeesFromExelFile(MultipartFile multipartFile) {
-        if (Objects.requireNonNull(multipartFile.getOriginalFilename()).isBlank()) {
+        if (multipartFile == null || Strings.isNotBlank(multipartFile.getOriginalFilename()) || multipartFile.isEmpty()) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
-
         CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
 
         File file = FileHelperFunctions.castMultipartFileToFile(multipartFile);

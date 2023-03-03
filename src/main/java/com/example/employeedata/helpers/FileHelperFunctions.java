@@ -3,12 +3,9 @@ package com.example.employeedata.helpers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.employeedata.exception.CustomValidationException;
@@ -33,7 +30,6 @@ public final class FileHelperFunctions {
                 break;
             default:
                 cellValue = "";
-                break;
         }
 
         return cellValue.trim();
@@ -52,7 +48,7 @@ public final class FileHelperFunctions {
             fos.write(multipartFile.getBytes());
             fos.close();
         } catch (IllegalStateException | IOException e) {
-            throw new CustomValidationException("File", "File cast error");
+            throw new CustomValidationException("File", "File cast error for file " + multipartFile.getOriginalFilename());
         }
 
         return file;

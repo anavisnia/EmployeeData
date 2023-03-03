@@ -55,7 +55,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile, String zoneId) {
-        if (Objects.requireNonNull(multipartFile.getOriginalFilename()).isBlank() ) {
+        if (multipartFile == null || Strings.isNotBlank(multipartFile.getOriginalFilename()) || multipartFile.isEmpty()) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
         CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
@@ -388,9 +388,7 @@ public class ProjectServiceImpl implements ProjectService {
     private void removeProjectsFromEmployees(Long projectId, Project project) {
         List<Employee> employees = employeeRepository.findByProjectId(projectId);
 
-        employees
-            .stream()
-            .forEach(e -> e.getProjects().remove(project));
+        employees.forEach(e -> e.getProjects().remove(project));
         
         employeeRepository.saveAll(employees);
     }
