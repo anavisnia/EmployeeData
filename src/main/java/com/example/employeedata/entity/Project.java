@@ -10,9 +10,11 @@ import com.fasterxml.jackson.annotation.*;
 
 import lombok.*;
 
-@Entity
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "projects")
 public class Project {
     @Id
@@ -45,77 +47,8 @@ public class Project {
 
     @ManyToMany(mappedBy = "projects")
     @JsonBackReference
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private Set<Employee> employees = new HashSet<>();
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getTeamSize() {
-        return teamSize;
-    }
-
-    public void setTeamSize(Integer teamSize) {
-        this.teamSize = teamSize;
-    }
-
-    public String getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(String customer) {
-        this.customer = customer;
-    }
-
-    public ZonedDateTime getTerminationDate() {
-        return terminationDate;
-    }
-
-    public void setTerminationDate(ZonedDateTime terminationDate) {
-        this.terminationDate = terminationDate;
-    }
-
-    public ZonedDateTime getCompletionDate() {
-        return completionDate;
-    }
-
-    public void setCompletionDate(ZonedDateTime completionDate) {
-        this.completionDate = completionDate;
-    }
-
-    public DevLanguage getDevLanguage() {
-        return devLanguage;
-    }
-
-    public void setDevLanguage(DevLanguage devLanguage) {
-        this.devLanguage = devLanguage;
-    }
-
-    public ZonedDateTime getModificationDate() {
-        return modificationDate;
-    }
-
-    public void setModificationDate(ZonedDateTime modificationDate) {
-        this.modificationDate = modificationDate;
-    }
 }
