@@ -42,12 +42,14 @@ dependencies {
 	implementation 'org.apache.poi:poi-ooxml:3.17'
 	implementation 'org.apache.poi:poi-ooxml-schemas:3.17'
 	implementation 'org.apache.xmlbeans:xmlbeans:2.6.0'
-	// to read exel files
+    // to read exel files
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation(platform('org.junit:junit-bom:5.9.2'))
+	testImplementation('org.junit.jupiter:junit-jupiter')
 }
 
 tasks.named('test') {

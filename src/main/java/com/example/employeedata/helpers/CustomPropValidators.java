@@ -148,6 +148,7 @@ public final class CustomPropValidators {
             } else if (Strings.isNotBlank(project[6]) &&
                 DateTimeHelpers.GetFormattedZDTFromString(project[6], zoneId)
                     .isAfter(DateTimeHelpers.GetFormattedZDTFromString(project[5], zoneId)) ||
+                Strings.isNotBlank(project[6]) &&
                 DateTimeHelpers.GetFormattedZDTFromString(project[6], zoneId)
                     .isAfter(DateTimeHelpers.GetFormattedZDTFromLDTNow(zoneId))
             ) {

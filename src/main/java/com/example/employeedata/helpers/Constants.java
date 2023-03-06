@@ -27,6 +27,7 @@ public final class Constants {
     public static final String REGEX_NAME = "^[a-zA-Z\\p{L}]+$";
     public static final String REGEX_TEXT_WITHOUT_SYMBOLS = "^[a-zA-Z0-9 \\p{L}]+$";
     public static final String REGEX_TEXT_WITH_SYMBOLS = "^[A-Za-z0-9- \\p{L},._#-|]+$";
+    public static final String REGEX_DATE_WITH_OFFSET = "^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)'T'(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d{1,9})?(?:Z|[+-][01]\\d:[0-5]\\d)$";
 
     public static final String[] EMPLOYEE_FIELDS = {"id", "firstName", "lastName", "role", "devLanguage", "projects", "birthDate"};
     public static final String[] EMPLOYEE_DB_FIELDS = {"id", "first_name", "last_name", "role", "dev_language", "birth_date"};
@@ -34,5 +35,6 @@ public final class Constants {
     public static final String[] PROJECT_DB_FIELDS = {"id", "title", "description", "customer", "dev_language", "termination_date", "completion_date"};
 
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String ZONE_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss VV";
+    public static final String ZONE_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+    public static final String ZONE_DATE_TIME_STRING_FORMAT = "yyyy-MM-dd HH:mm:ss VV";
 }

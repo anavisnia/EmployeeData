@@ -45,17 +45,17 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ResponseDto saveProject(CreateProjectDto projectDto, String zoneId) {
+    public ResponseDto saveProject(CreateProjectDto projectDto) {
         constraintViolationCheck(projectDto);
 
-        Project dbResponse = projectRepository.save(ProjectMapper.mapToProject(projectDto, zoneId));
+        Project dbResponse = projectRepository.save(ProjectMapper.mapToProject(projectDto));
 
         return new ResponseDto(dbResponse.getId(), RES_NAME, false);
     }
 
     @Override
     public ResponseDto saveProjectsFromExelFile(MultipartFile multipartFile, String zoneId) {
-        if (multipartFile == null || Strings.isNotBlank(multipartFile.getOriginalFilename()) || multipartFile.isEmpty()) {
+        if (multipartFile == null || Strings.isBlank(multipartFile.getOriginalFilename()) || multipartFile.isEmpty()) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
         CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
@@ -265,14 +265,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void updateProject(Long projectId, EditProjectDto projectDto, String zoneId) {
+    public void updateProject(Long projectId, EditProjectDto projectDto) {
         constraintViolationCheck(projectDto);
 
         Project existingProject = projectRepository.findById(projectId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
 
-        ProjectMapper.mapToProject(existingProject, projectDto, zoneId);
+        ProjectMapper.mapToProject(existingProject, projectDto);
 
         projectRepository.save(existingProject);
     }

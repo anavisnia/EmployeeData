@@ -1,6 +1,6 @@
 package com.example.employeedata.dto;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import javax.validation.constraints.*;
 
@@ -8,6 +8,7 @@ import com.example.employeedata.helpers.Constants;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Setter
@@ -37,10 +38,12 @@ public class CreateProjectDto {
 
     @NotNull(message = "must not be blank")
     @ApiModelProperty(value = "Project's termination date")
-    private LocalDateTime terminationDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private ZonedDateTime terminationDate;
 
     @ApiModelProperty(value = "Project's completion date")
-    private LocalDateTime completionDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private ZonedDateTime completionDate;
 
     @Min(0)
     @NotNull(message = "must not be blank")

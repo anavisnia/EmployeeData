@@ -35,8 +35,8 @@ public class ProjectController<E> {
     
     @ApiOperation(value = "Creating a project")
     @PostMapping("/add")
-    public ResponseEntity<ResponseDto> saveProject(@Valid @RequestBody CreateProjectDto projectDto, @RequestParam String zoneId) {
-        return new ResponseEntity<>(projectService.saveProject(projectDto, zoneId), HttpStatus.CREATED);
+    public ResponseEntity<ResponseDto> saveProject(@Valid @RequestBody CreateProjectDto projectDto) {
+        return new ResponseEntity<>(projectService.saveProject(projectDto), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Creating project/projects from exel file")
@@ -213,8 +213,8 @@ public class ProjectController<E> {
                 value = "Project id")
         })
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> updateProject(@PathVariable Long id, @Valid @RequestBody EditProjectDto projectDto, @RequestParam String zoneId) {
-        projectService.updateProject(id, projectDto, zoneId);
+    public ResponseEntity<HttpStatus> updateProject(@PathVariable Long id, @Valid @RequestBody EditProjectDto projectDto) {
+        projectService.updateProject(id, projectDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

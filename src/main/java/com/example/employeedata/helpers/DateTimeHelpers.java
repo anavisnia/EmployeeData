@@ -4,7 +4,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class DateTimeHelpers {
-    public static DateTimeFormatter ZONE_FORMATTER = DateTimeFormatter.ofPattern(Constants.ZONE_DATE_TIME_FORMAT);
+    public static DateTimeFormatter ZONE_FORMATTER = DateTimeFormatter.ofPattern(Constants.ZONE_DATE_TIME_STRING_FORMAT);
     public static LocalDateTime getLocalDateTimeNow() {
         return LocalDateTime.now();
     }

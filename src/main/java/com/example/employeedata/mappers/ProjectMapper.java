@@ -10,7 +10,7 @@ import org.apache.logging.log4j.util.Strings;
 public class ProjectMapper {
     public static final String errResource = "Project";
 
-    public static Project mapToProject(CreateProjectDto projectDto, String zoneId) {
+    public static Project mapToProject(CreateProjectDto projectDto) {
         Project project = new Project();
 
         project.setTitle(projectDto.getTitle());
@@ -19,23 +19,23 @@ public class ProjectMapper {
         CustomPropValidators.validateTeamSize(projectDto.getTeamSize(), errResource);
         project.setTeamSize(projectDto.getTeamSize());
         project.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
-        project.setTerminationDate(DateTimeHelpers.GetZDTFromLDT(projectDto.getTerminationDate(), zoneId));
-        project.setCompletionDate(projectDto.getCompletionDate() == null ? null : DateTimeHelpers.GetZDTFromLDT(projectDto.getCompletionDate(), zoneId));
-        project.setModificationDate(DateTimeHelpers.GetZDTFromLDTNow(zoneId));
+        project.setTerminationDate(projectDto.getTerminationDate());
+        project.setCompletionDate(projectDto.getCompletionDate() == null ? null : projectDto.getCompletionDate());
+        project.setModificationDate(DateTimeHelpers.GetZDTFromLDTNow(projectDto.getTerminationDate().getZone().toString()));
 
         return project;
     }
 
-    public static void mapToProject(Project existingProject, EditProjectDto projectDto, String zoneId) {
+    public static void mapToProject(Project existingProject, EditProjectDto projectDto) {
         existingProject.setTitle(projectDto.getTitle());
         existingProject.setDescription(projectDto.getDescription());
         existingProject.setCustomer(projectDto.getCustomer());
         CustomPropValidators.validateTeamSize(projectDto.getTeamSize(), errResource);
         existingProject.setTeamSize(projectDto.getTeamSize());
         existingProject.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
-        existingProject.setTerminationDate(DateTimeHelpers.GetZDTFromLDT(projectDto.getTerminationDate(), zoneId));
-        existingProject.setCompletionDate(projectDto.getCompletionDate() == null ? null : DateTimeHelpers.GetZDTFromLDT(projectDto.getCompletionDate(), zoneId));
-        existingProject.setModificationDate(DateTimeHelpers.GetZDTFromLDTNow(zoneId));
+        existingProject.setTerminationDate(projectDto.getTerminationDate());
+        existingProject.setCompletionDate(projectDto.getCompletionDate() == null ? null : projectDto.getCompletionDate());
+        existingProject.setModificationDate(DateTimeHelpers.GetZDTFromLDTNow(projectDto.getTerminationDate().getZone().toString()));
     }
 
     public static ProjectDto mapToProjectDto(Project project, String zoneId) {
