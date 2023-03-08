@@ -5,6 +5,7 @@ import java.io.*;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.*;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.employeedata.dto.*;
@@ -43,6 +45,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     public ResponseDto saveEmployee(CreateEmployeeDto employeeDto) {
         constraintViolationCheck(employeeDto);
 
@@ -245,6 +248,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     public void updateEmployee(Long employeeId, EditEmployeeDto editEmployeeDto) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, employeeId)

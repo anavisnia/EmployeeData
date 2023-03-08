@@ -5,6 +5,7 @@ import java.io.*;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.*;
 
+import java.sql.SQLException;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.employeedata.dto.*;
@@ -45,6 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     public ResponseDto saveProject(CreateProjectDto projectDto) {
         constraintViolationCheck(projectDto);
 
@@ -265,6 +268,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     public void updateProject(Long projectId, EditProjectDto projectDto) {
         constraintViolationCheck(projectDto);
 
@@ -385,6 +389,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @PreRemove
+    @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     private void removeProjectsFromEmployees(Long projectId, Project project) {
         List<Employee> employees = employeeRepository.findByProjectId(projectId);
 
