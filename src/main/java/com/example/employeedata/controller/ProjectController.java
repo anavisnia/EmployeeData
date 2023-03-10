@@ -267,7 +267,7 @@ public class ProjectController<E> {
                 name = "isRegionSort",
                 dataType = "string",
                 required = true,
-                paramType = "path",
+                paramType = "query",
                 value = "Boolean value if map should be sorted by region represented by string")
         })
     @GetMapping("/timeZones")

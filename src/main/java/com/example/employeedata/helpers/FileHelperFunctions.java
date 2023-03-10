@@ -3,7 +3,10 @@ package com.example.employeedata.helpers;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
+import com.example.employeedata.enums.FileTypes;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,5 +69,27 @@ public final class FileHelperFunctions {
             headerCell.setCellValue(values[i]);
         }
 
+    }
+
+    public static void validateFileType(String type, String errResource) {
+        List<String> types = Arrays.asList(FileTypes.labels());
+
+        if (types.contains(type)) {
+            return;
+        }
+
+        throw new CustomValidationException(errResource, type + " is not allowed");
+    }
+
+    public static void isProperFileType(String fileName) {
+        String fileExtension = "";
+        String errorResource = "File type";
+
+        if (fileName.isBlank()) {
+            throw new CustomValidationException(errorResource, fileExtension + " is not allowed");
+        }
+
+        fileExtension = FileHelperFunctions.getExtensionFromFileName(fileName);
+        validateFileType(fileExtension, errorResource);
     }
 }

@@ -4,42 +4,10 @@ import java.util.*;
 
 import com.example.employeedata.document.*;
 import com.example.employeedata.dto.*;
-import com.example.employeedata.entity.Employee;
-import com.example.employeedata.helpers.CustomPropValidators;
-import com.example.employeedata.helpers.HelperFunctions;
+import com.example.employeedata.helpers.*;
 
 public final class EmployeeDocMapper {
     public static String errResource = "Employee Doc";
-
-    public static EmployeeDoc mapToEmployeeDoc(Employee employee) {
-        EmployeeDoc employeeDoc = new EmployeeDoc();
-        
-        employeeDoc.setId(employee.getId().toString());
-        employeeDoc.setFirstName(employee.getFirstName());
-        employeeDoc.setLastName(employee.getLastName());
-        employeeDoc.setBirthDate(employee.getBirthDate());
-        employeeDoc.setDevLanguage(employee.getDevLanguage().label);
-        employeeDoc.setRole(employee.getRole().label);
-        employeeDoc.setProjects(new ArrayList<>());
-        employeeDoc.setModificationDate(employee.getModificationDate());
-
-        return employeeDoc;
-    }
-
-    public static EmployeeDoc mapToEmployeeDoc(Employee employee, List<ProjectDoc> projects) {
-        EmployeeDoc employeeDoc = new EmployeeDoc();
-        
-        employeeDoc.setId(employee.getId().toString());
-        employeeDoc.setFirstName(employee.getFirstName());
-        employeeDoc.setLastName(employee.getLastName());
-        employeeDoc.setBirthDate(employee.getBirthDate());
-        employeeDoc.setDevLanguage(employee.getDevLanguage().label);
-        employeeDoc.setRole(employee.getRole().label);
-        employeeDoc.setProjects(projects);
-        employeeDoc.setModificationDate(employee.getModificationDate());
-
-        return employeeDoc;
-    }
 
     public static EmployeeDoc mapToEmployeeDoc(CreateEmployeeDto createEmployeeDto) {
         EmployeeDoc employeeDoc = new EmployeeDoc();

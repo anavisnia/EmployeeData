@@ -68,7 +68,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (multipartFile == null || Strings.isBlank(multipartFile.getOriginalFilename()) || multipartFile.isEmpty()) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
-        CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
+
+        FileHelperFunctions.isProperFileType(multipartFile.getOriginalFilename());
 
         File file = FileHelperFunctions.castMultipartFileToFile(multipartFile);
         String fileType = FileHelperFunctions.getExtensionFromFileName(file.getName());
@@ -178,11 +179,11 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new CustomValidationException("pageNumber", "It cannot be null or less than zero");
         }
 
-        pageSize = CustomPropValidators.checkPageSize(pageSize);
+        pageSize = HelperFunctions.checkPageSize(pageSize);
 
         String[] fields = Strings.isNotBlank(searchQuery) ? Constants.EMPLOYEE_DB_FIELDS : Constants.EMPLOYEE_FIELDS;
-        String sorting = CustomPropValidators.checkFiledSorting(fields, sortBy);
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+        String sorting = HelperFunctions.checkFieldSorting(fields, sortBy);
+        Pageable paging = HelperFunctions.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
         Page<Employee> result;
 
         if (Strings.isNotBlank(searchQuery)) {
@@ -294,24 +295,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 
             List<Object[]> data = employeeRepository.findAllEmployeesInclProjects();
                  
-            if (data.isEmpty()) {
-                throw new ResourceNotFoundException(RES_NAME + "s");
-            }
+            if (!data.isEmpty()) {
+                List<EmployeeFileDto> employeeData = data
+                        .stream()
+                        .map(EmployeeFileMapper::mapToEmployeeFileDto)
+                        .collect(Collectors.toList());
 
-            List<EmployeeFileDto> employeeData = data
-                .stream()
-                .map(EmployeeFileMapper::mapToEmployeeFileDto)
-                .collect(Collectors.toList());
+                Row row;
+                Cell cell;
 
-            Row row;
-            Cell cell;
-
-            for (int i = 1; i <= employeeData.size(); i++) {
-                row = workBookSheet.createRow(i);
-                EmployeeFileDto employee = employeeData.get(i-1);
-                for (int j = 0; j < Constants.EMPLOYEE_FILE_HEADERS.length; j++) {
-                    cell = row.createCell(j);
-                    cell.setCellValue(getEmployeeDataAtIndex(j, employee));
+                for (int i = 1; i <= employeeData.size(); i++) {
+                    row = workBookSheet.createRow(i);
+                    EmployeeFileDto employee = employeeData.get(i-1);
+                    for (int j = 0; j < Constants.EMPLOYEE_FILE_HEADERS.length; j++) {
+                        cell = row.createCell(j);
+                        cell.setCellValue(getEmployeeDataAtIndex(j, employee));
+                    }
                 }
             }
 

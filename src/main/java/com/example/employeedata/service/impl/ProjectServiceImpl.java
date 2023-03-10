@@ -51,6 +51,8 @@ public class ProjectServiceImpl implements ProjectService {
     public ResponseDto saveProject(CreateProjectDto projectDto) {
         constraintViolationCheck(projectDto);
 
+        DateTimeHelpers.validateZoneId(projectDto.getTerminationDate().getZone().getId());
+
         Project dbResponse = projectRepository.save(ProjectMapper.mapToProject(projectDto));
 
         return new ResponseDto(dbResponse.getId(), RES_NAME, false);
@@ -61,7 +63,9 @@ public class ProjectServiceImpl implements ProjectService {
         if (multipartFile == null || Strings.isBlank(multipartFile.getOriginalFilename()) || multipartFile.isEmpty()) {
             throw new CustomValidationException("File", "File and/or file name cannot be null or empty");
         }
-        CustomPropValidators.isProperFileType(multipartFile.getOriginalFilename());
+        FileHelperFunctions.isProperFileType(multipartFile.getOriginalFilename());
+
+        DateTimeHelpers.validateZoneId(zoneId);
 
         File file = FileHelperFunctions.castMultipartFileToFile(multipartFile);
         String fileType = FileHelperFunctions.getExtensionFromFileName(file.getName());
@@ -155,6 +159,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjects(String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         return projectRepository.findAll()
             .stream()
             .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
@@ -165,15 +171,17 @@ public class ProjectServiceImpl implements ProjectService {
     public PaginatedResponseDto<ProjectDto> getAllProjectsPage(
             String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
     ) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         if (pageNumber == null || pageNumber < 0) {
             throw new CustomValidationException("pageNumber", "It cannot be null or less than zero");
         }
 
-        pageSize = CustomPropValidators.checkPageSize(pageSize);
+        pageSize = HelperFunctions.checkPageSize(pageSize);
 
         String[] fields = Strings.isNotBlank(searchQuery) ? Constants.PROJECT_DB_FIELDS : Constants.PROJECT_FIELDS;
-        String sorting = CustomPropValidators.checkFiledSorting(fields, sortBy);
-        Pageable paging = CustomPropValidators.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
+        String sorting = HelperFunctions.checkFieldSorting(fields, sortBy);
+        Pageable paging = HelperFunctions.returnPageableWithSorting(pageNumber, pageSize, sorting, isAsc);
         Page<Project> result;
 
         if (Strings.isNotBlank(searchQuery)) {
@@ -196,6 +204,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsWithFutureTerminationDate(String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         return projectRepository.findByFutureTerminationDate(DateTimeHelpers.getLocalDateNow())
             .stream()
             .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
@@ -204,6 +214,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsWithPriorTerminationDate(String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         return projectRepository.findByPriorTerminationDate(DateTimeHelpers.getLocalDateNow())
             .stream()
             .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
@@ -212,6 +224,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromCurrentDate(Long employeeId, String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
@@ -229,6 +243,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsNotAssignedToEmployeeFromFutureCustomDate(Long employeeId, LocalDate date, String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, employeeId)
         );
@@ -250,7 +266,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectDto> getAllProjectsByDevelopmentLanguage(Integer devLanguage, String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
         CustomPropValidators.validateDevLang(devLanguage, RES_NAME);
+
         return projectRepository.findByDevLanguage(devLanguage)
             .stream()
             .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
@@ -259,6 +277,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDto getProjectById(String projectId, String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         return ProjectMapper.mapToProjectDto(
             projectRepository.findById(Long.parseLong(projectId)).orElseThrow(() ->
                 new ResourceNotFoundException(RES_NAME, ID, projectId)
@@ -275,6 +295,8 @@ public class ProjectServiceImpl implements ProjectService {
         Project existingProject = projectRepository.findById(projectId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, projectId)
         );
+
+        DateTimeHelpers.validateZoneId(projectDto.getTerminationDate().getZone().getId());
 
         ProjectMapper.mapToProject(existingProject, projectDto);
 
@@ -294,6 +316,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public byte[] generateExelFile(String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         ByteArrayOutputStream bao = new ByteArrayOutputStream();
 
         try(Workbook workBook = new XSSFWorkbook()) {
@@ -309,24 +333,22 @@ public class ProjectServiceImpl implements ProjectService {
 
             List<Project> data = projectRepository.findAll();
                  
-            if (data.isEmpty()) {
-                throw new ResourceNotFoundException(RES_NAME + "s");
-            }
+            if (!data.isEmpty()) {
+                List<ProjectFileDto> projectsData = data
+                        .stream()
+                        .map(p -> ProjectFileMapper.mapToProjectFileDto(p, zoneId))
+                        .collect(Collectors.toList());
 
-            List<ProjectFileDto> projectsData = data
-                .stream()
-                .map(p -> ProjectFileMapper.mapToProjectFileDto(p, zoneId))
-                .collect(Collectors.toList());
+                Row row;
+                Cell cell;
 
-            Row row;
-            Cell cell;
-
-            for (int i = 1; i <= projectsData.size(); i++) {
-                row = workBookSheet.createRow(i);
-                ProjectFileDto project = projectsData.get(i-1);
-                for (int j = 0; j < Constants.PROJECT_FILE_HEADERS.length; j++) {
-                    cell = row.createCell(j);
-                    cell.setCellValue(getProjectDataAtIndex(j, project));
+                for (int i = 1; i <= projectsData.size(); i++) {
+                    row = workBookSheet.createRow(i);
+                    ProjectFileDto project = projectsData.get(i-1);
+                    for (int j = 0; j < Constants.PROJECT_FILE_HEADERS.length; j++) {
+                        cell = row.createCell(j);
+                        cell.setCellValue(getProjectDataAtIndex(j, project));
+                    }
                 }
             }
 
@@ -345,6 +367,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Map<String, List<ProjectDto>> getProjectsGroupedByDevLanguage(String zoneId) {
+        DateTimeHelpers.validateZoneId(zoneId);
+
         return projectRepository.findAll()
             .stream()
             .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
@@ -360,7 +384,7 @@ public class ProjectServiceImpl implements ProjectService {
         for (String zoneId : zoneIds) {
             ZoneId zId = ZoneId.of(zoneId);
 
-            ZonedDateTime zdt = DateTimeHelpers.GetZDTFromLDT(ldt, zoneId);
+            ZonedDateTime zdt = DateTimeHelpers.getZDTFromLDT(ldt, zoneId);
 
             ZoneOffset zo = zdt.getOffset();
 
