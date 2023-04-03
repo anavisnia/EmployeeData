@@ -129,6 +129,22 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
 
+        List<Project> checkForDuplicates = new ArrayList<>();
+
+        for (Project proj : createProjects) {
+            Project project = projectRepository.findByTitleCustomerDevLang(proj.getTitle() ,proj.getCustomer(), proj.getDevLanguage().ordinal())
+                    .orElse(null);
+            if (project != null) {
+                checkForDuplicates.add(proj);
+            }
+        }
+
+        if (!checkForDuplicates.isEmpty()) {
+            checkForDuplicates.forEach(createProjects::remove);
+            checkForDuplicates.forEach(project -> project.setTitle("duplicate project: " + project.getTitle()));
+            failedValidationEntities.addAll(checkForDuplicates.stream().map(ProjectMapper::mapToProjectArr).collect(Collectors.toList()));
+        }
+
         ResponseDto response;
 
         List<Long> dbResponse = projectRepository.saveAll(createProjects)

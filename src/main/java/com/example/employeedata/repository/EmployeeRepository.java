@@ -1,5 +1,6 @@
 package com.example.employeedata.repository;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -41,4 +42,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
         nativeQuery = true
     )
     Page<Employee> findAllByQuery(@Param("likeQuery") String likeQuery, @Param("regexQuery") String regexQuery, Pageable pageable);
+
+    @Query(
+            value = "SELECT * FROM employeedata.employees E WHERE E.first_name = :fName AND E.last_name = :lName AND E.birth_date = :birthDate",
+            nativeQuery = true
+    )
+    Optional<Employee> findByFullNameAndBirthDate(@Param("fName") String fName, @Param("lName") String lName, @Param("birthDate") LocalDate birthDate);
 }

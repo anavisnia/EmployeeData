@@ -35,4 +35,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         nativeQuery = true
     )
     Page<Project> findAllByQuery(@Param("likeQuery") String likeQuery, @Param("regexQuery") String regexQuery, Pageable pageable);
+
+    @Query(
+            value = "SELECT * FROM employeedata.projects P WHERE P.title = :title AND P.customer = :customer AND P.dev_language = :devLanguage",
+            nativeQuery = true
+    )
+    Optional<Project> findByTitleCustomerDevLang(@Param("title") String title, @Param("customer") String customer, @Param("devLanguage") Integer devLanguage);
 }

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
 import com.example.employeedata.helpers.CustomPropValidators;
+import org.apache.logging.log4j.util.Strings;
 
 public final class EmployeeMapper {
     public static String errResource = "Employee";
@@ -93,5 +94,18 @@ public final class EmployeeMapper {
         }
 
         return new ArrayList<>();
+    }
+
+    public static String[] mapToEmployeeArr(Employee employee) {
+        String[] employeeArr = {
+                Strings.isBlank(employee.getFirstName()) ? "" : employee.getFirstName(),
+                Strings.isBlank(employee.getLastName()) ? "" : employee.getLastName(),
+                Strings.isBlank(employee.getBirthDate().toString()) ? "" : employee.getBirthDate().toString(),
+                Strings.isBlank(employee.getRole().label.toString()) ? "" : employee.getRole().label.toString(),
+                Strings.isBlank(employee.getDevLanguage().label.toString()) ? "" : employee.getDevLanguage().label.toString(),
+                employee.getProjects().isEmpty() ? "" : getProjectIds(employee.getProjects()).toString()
+        };
+
+        return employeeArr;
     }
 }

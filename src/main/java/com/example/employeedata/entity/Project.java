@@ -1,14 +1,14 @@
 package com.example.employeedata.entity;
 
-import java.time.*;
-import java.util.*;
+import com.example.employeedata.enums.DevLanguage;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-
-import com.example.employeedata.enums.*;
-import com.fasterxml.jackson.annotation.*;
-
-import lombok.*;
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 @Getter
 @Setter
@@ -16,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "projects")
-public class Project {
+public class Project implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,4 +51,24 @@ public class Project {
     @Setter(AccessLevel.NONE)
     private Set<Employee> employees = new HashSet<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
+
+        Project project = (Project) o;
+        return Objects.equals(getTitle(), project.getTitle()) &&
+                Objects.equals(getCustomer(), project.getCustomer()) &&
+                Objects.equals(getDevLanguage(), project.getDevLanguage());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

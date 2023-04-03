@@ -137,6 +137,22 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
 
+        List<Employee> checkForDuplicates = new ArrayList<>();
+
+        for (Employee empl : createEmployees) {
+            Employee employee = employeeRepository.findByFullNameAndBirthDate(empl.getFirstName() ,empl.getLastName(), empl.getBirthDate())
+                    .orElse(null);
+            if (employee != null) {
+                checkForDuplicates.add(empl);
+            }
+        }
+
+        if (!checkForDuplicates.isEmpty()) {
+            checkForDuplicates.forEach(createEmployees::remove);
+            checkForDuplicates.forEach(employee -> employee.setFirstName("duplicate employee: " + employee.getFirstName()));
+            failedValidationEntities.addAll(checkForDuplicates.stream().map(EmployeeMapper::mapToEmployeeArr).collect(Collectors.toList()));
+        }
+
         ResponseDto response;
 
         List<Long> dbResponse = employeeRepository.saveAll(createEmployees)

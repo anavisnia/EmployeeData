@@ -1,6 +1,5 @@
 package com.example.employeedata.entity;
 
-import java.time.*;
 import java.util.*;
 
 import javax.persistence.*;
@@ -9,6 +8,10 @@ import com.example.employeedata.enums.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.*;
+import org.hibernate.Hibernate;
+
+import java.io.Serializable;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -16,7 +19,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "employees")
-public class Employee {
+public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,4 +51,24 @@ public class Employee {
     @JsonManagedReference
     private Set<Project> projects = new HashSet<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
+
+        Employee employee = (Employee) o;
+        return Objects.equals(getFirstName(), employee.getFirstName()) &&
+                Objects.equals(getLastName(), employee.getLastName()) &&
+                Objects.equals(getBirthDate(), employee.getBirthDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

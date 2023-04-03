@@ -71,4 +71,16 @@ public class ProjectMapper {
         return project;
     }
 
+    public static String[] mapToProjectArr(Project project) {
+        String[] projectArr = {
+                Strings.isBlank(project.getTitle()) ? "" : project.getTitle(),
+                Strings.isBlank(project.getDescription()) ? "" : project.getDescription(),
+                Strings.isBlank(project.getCustomer()) ? "" : project.getCustomer(),
+                Strings.isBlank(project.getTeamSize().toString()) ? "" : project.getTeamSize().toString(),
+                Strings.isBlank(project.getDevLanguage().label.toString()) ? "" : project.getDevLanguage().label.toString(),
+                Strings.isBlank(project.getTerminationDate().toString()) ? "" : project.getTerminationDate().toString()
+        };
+
+        return projectArr;
+    }
 }
