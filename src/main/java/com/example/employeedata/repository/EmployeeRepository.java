@@ -12,25 +12,40 @@ import com.example.employeedata.entity.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(
-        value = "SELECT * FROM employeedata.employees E INNER JOIN employeedata.employee_project EP ON E.id = EP.employee_id WHERE EP.project_id = :projectId",
+        value = "SELECT * \n" +
+                "FROM employeedata.employees E \n" +
+                "INNER JOIN employeedata.employee_project EP ON E.id = EP.employee_id \n" +
+                "WHERE EP.project_id = :projectId",
         nativeQuery = true
     )
     List<Employee> findByProjectId(@Param("projectId") Long projectId);
 
     @Query(
-        value = "SELECT * FROM employeedata.employees E WHERE E.dev_language = :devLanguage",
+        value = "SELECT * \n" +
+                "FROM employeedata.employees E \n" +
+                "WHERE E.dev_language = :devLanguage",
         nativeQuery = true
     )
     List<Employee> findByDevLanguage(@Param("devLanguage") Integer devLanguage);
 
     @Query(
-        value = "SELECT * FROM employeedata.employees E WHERE E.role = :role",
+        value = "SELECT * \n" +
+                "FROM employeedata.employees E \n" +
+                "WHERE E.role = :role",
         nativeQuery = true
     )
     List<Employee> findByRole(@Param("role") Integer role);
 
     @Query(
-        value = "SELECT e.first_name, e.last_name, e.birth_date, e.role, e.dev_language, IFNULL(GROUP_CONCAT(ep.project_id SEPARATOR ', '), '') as projectIds FROM employeedata.employees e LEFT JOIN employeedata.employee_project ep on ep.employee_id = e.id GROUP BY e.id",
+        value = "SELECT e.first_name,\n" +
+                    "e.last_name, \n" +
+                    "e.birth_date, \n" +
+                    "e.role, \n" +
+                    "e.dev_language, \n"+
+                    "IFNULL(GROUP_CONCAT(ep.project_id SEPARATOR ', '), '') AS projectIds\n" +
+                "FROM employeedata.employees e \n" +
+                "LEFT JOIN employeedata.employee_project ep ON ep.employee_id = e.id \n" +
+                "GROUP BY e.id",
         nativeQuery = true
     )
     List<Object[]> findAllEmployeesInclProjects();
@@ -38,13 +53,21 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Page<Employee> findAll(Pageable pageable);
 
     @Query(
-        value = "SELECT *, (CASE WHEN first_name LIKE :likeQuery THEN 0 WHEN last_name LIKE :likeQuery THEN 2 ELSE 1 END) AS 'relevance' FROM employeedata.employees WHERE regexp_like(first_name, :regexQuery, 'i') OR regexp_like(last_name, :regexQuery, 'i') ORDER BY relevance ASC",
+        value = "SELECT *, \n" +
+                "(CASE WHEN first_name LIKE :likeQuery THEN 0 \n" +
+                "WHEN last_name LIKE :likeQuery THEN 2 ELSE 1 END) AS 'relevance' \n" +
+                "FROM employeedata.employees \n" +
+                "WHERE regexp_like(first_name, :regexQuery, 'i') OR \n" +
+                    "regexp_like(last_name, :regexQuery, 'i') \n" +
+                "ORDER BY relevance ASC",
         nativeQuery = true
     )
     Page<Employee> findAllByQuery(@Param("likeQuery") String likeQuery, @Param("regexQuery") String regexQuery, Pageable pageable);
 
     @Query(
-            value = "SELECT * FROM employeedata.employees E WHERE E.first_name = :fName AND E.last_name = :lName AND E.birth_date = :birthDate",
+            value = "SELECT * \n" +
+                    "FROM employeedata.employees E \n" +
+                    "WHERE E.first_name = :fName AND E.last_name = :lName AND E.birth_date = :birthDate",
             nativeQuery = true
     )
     Optional<Employee> findByFullNameAndBirthDate(@Param("fName") String fName, @Param("lName") String lName, @Param("birthDate") LocalDate birthDate);
