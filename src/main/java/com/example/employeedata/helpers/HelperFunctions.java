@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.example.employeedata.exception.CustomValidationException;
 import org.elasticsearch.common.UUIDs;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -59,4 +60,26 @@ public final class HelperFunctions {
         }
     }
 
+    public static String normalizeStr(String str) {
+        if (str.isBlank()) {
+            throw new CustomValidationException("text", "Text" + " cannot be blank");
+        }
+
+        String normalized = str.trim().toLowerCase();
+
+        char[] characters = normalized.toCharArray();
+
+        StringBuilder finalStr = new StringBuilder();
+
+        for (int i = 0; i < characters.length; i++) {
+            if (i == 0) {
+                char c = characters[i];
+                finalStr.append(Character.toUpperCase(c));
+                continue;
+            }
+            finalStr.append(characters[i]);
+        }
+
+        return finalStr.toString();
+    }
 }

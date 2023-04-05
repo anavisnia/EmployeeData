@@ -6,21 +6,18 @@ import java.util.stream.Collectors;
 
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.*;
-import com.example.employeedata.helpers.CustomPropValidators;
+import com.example.employeedata.enums.*;
 import org.apache.logging.log4j.util.Strings;
 
 public final class EmployeeMapper {
-    public static String errResource = "Employee";
-
     public static Employee mapToEmployee(CreateEmployeeDto employeeDto) {
         Employee employee = new Employee();
         
-        employee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
-        employee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
-        CustomPropValidators.validateBirthDate(employeeDto.getBirthDate(), errResource);
+        employee.setFirstName(employeeDto.getFirstName());
+        employee.setLastName(employeeDto.getLastName());
         employee.setBirthDate(employeeDto.getBirthDate());
-        employee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
-        employee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
+        employee.setRole(Role.values()[employeeDto.getRole()]);
+        employee.setDevLanguage(DevLanguage.values()[employeeDto.getDevLanguage()]);
         employee.setModificationDate(new Date());
 
         return employee;
@@ -29,12 +26,11 @@ public final class EmployeeMapper {
     public static Employee mapToEmployee(CreateEmployeeDto employeeDto, Collection<Project> projects) {
         Employee employee = new Employee();
         
-        employee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
-        employee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
-        CustomPropValidators.validateBirthDate(employeeDto.getBirthDate(), errResource);
+        employee.setFirstName(employeeDto.getFirstName());
+        employee.setLastName(employeeDto.getLastName());
         employee.setBirthDate(employeeDto.getBirthDate());
-        employee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
-        employee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
+        employee.setRole(Role.values()[employeeDto.getRole()]);
+        employee.setDevLanguage(DevLanguage.values()[employeeDto.getDevLanguage()]);
         employee.setProjects(new HashSet<>(projects));
         employee.setModificationDate(new Date());
 
@@ -42,19 +38,19 @@ public final class EmployeeMapper {
     }
 
     public static void mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto) {
-        existingEmployee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
-        existingEmployee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
-        existingEmployee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
-        existingEmployee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
+        existingEmployee.setFirstName(employeeDto.getFirstName());
+        existingEmployee.setLastName(employeeDto.getLastName());
+        existingEmployee.setRole(Role.values()[employeeDto.getRole()]);
+        existingEmployee.setDevLanguage(DevLanguage.values()[employeeDto.getDevLanguage()]);
         existingEmployee.setProjects(new HashSet<>());
         existingEmployee.setModificationDate(new Date());
     }
 
     public static void mapToEmployee(Employee existingEmployee, EditEmployeeDto employeeDto, Collection<Project> projects) {
-        existingEmployee.setFirstName(CustomPropValidators.normalizeStr(employeeDto.getFirstName()));
-        existingEmployee.setLastName(CustomPropValidators.normalizeStr(employeeDto.getLastName()));
-        existingEmployee.setRole(CustomPropValidators.validateRole(employeeDto.getRole(), errResource));
-        existingEmployee.setDevLanguage(CustomPropValidators.validateDevLang(employeeDto.getDevLanguage(), errResource));
+        existingEmployee.setFirstName(employeeDto.getFirstName());
+        existingEmployee.setLastName(employeeDto.getLastName());
+        existingEmployee.setRole(Role.values()[employeeDto.getRole()]);
+        existingEmployee.setDevLanguage(DevLanguage.values()[employeeDto.getDevLanguage()]);
         existingEmployee.setProjects(new HashSet<>(projects));
         existingEmployee.setModificationDate(new Date());
     }
@@ -75,13 +71,12 @@ public final class EmployeeMapper {
     public static Employee mapToEmployee(String[] employeeFieldsFromFile, Collection<Project> projects) {
         Employee employee = new Employee();
         
-        employee.setFirstName(CustomPropValidators.normalizeStr(employeeFieldsFromFile[0]));
-        employee.setLastName(CustomPropValidators.normalizeStr(employeeFieldsFromFile[1]));
+        employee.setFirstName(employeeFieldsFromFile[0]);
+        employee.setLastName(employeeFieldsFromFile[1]);
         LocalDate employeeDateOfBirth = LocalDate.parse(employeeFieldsFromFile[2]);
-        CustomPropValidators.validateBirthDate(employeeDateOfBirth, errResource);
         employee.setBirthDate(employeeDateOfBirth);
-        employee.setRole(CustomPropValidators.validateRole(Integer.parseInt(employeeFieldsFromFile[3].replace(".0", "")), errResource));
-        employee.setDevLanguage(CustomPropValidators.validateDevLang(Integer.parseInt(employeeFieldsFromFile[4].replace(".0", "")), errResource));
+        employee.setRole(Role.values()[Integer.parseInt(employeeFieldsFromFile[3].replace(".0", ""))]);
+        employee.setDevLanguage(DevLanguage.values()[Integer.parseInt(employeeFieldsFromFile[4].replace(".0", ""))]);
         employee.setProjects(new HashSet<>(projects));
         employee.setModificationDate(new Date());
 
@@ -96,13 +91,13 @@ public final class EmployeeMapper {
         return new ArrayList<>();
     }
 
-    public static String[] mapToEmployeeArr(Employee employee) {
+    public static String[] mapToEmployeeStringArr(Employee employee) {
         String[] employeeArr = {
                 Strings.isBlank(employee.getFirstName()) ? "" : employee.getFirstName(),
                 Strings.isBlank(employee.getLastName()) ? "" : employee.getLastName(),
                 Strings.isBlank(employee.getBirthDate().toString()) ? "" : employee.getBirthDate().toString(),
-                Strings.isBlank(employee.getRole().label.toString()) ? "" : employee.getRole().label.toString(),
-                Strings.isBlank(employee.getDevLanguage().label.toString()) ? "" : employee.getDevLanguage().label.toString(),
+                Strings.isBlank(employee.getRole().label) ? "" : employee.getRole().label,
+                Strings.isBlank(employee.getDevLanguage().label) ? "" : employee.getDevLanguage().label,
                 employee.getProjects().isEmpty() ? "" : getProjectIds(employee.getProjects()).toString()
         };
 

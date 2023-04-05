@@ -16,9 +16,8 @@ public class ProjectMapper {
         project.setTitle(projectDto.getTitle());
         project.setDescription(projectDto.getDescription());
         project.setCustomer(projectDto.getCustomer());
-        CustomPropValidators.validateTeamSize(projectDto.getTeamSize(), errResource);
         project.setTeamSize(projectDto.getTeamSize());
-        project.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
+        project.setDevLanguage(DevLanguage.values()[projectDto.getDevLanguage()]);
         project.setTerminationDate(projectDto.getTerminationDate());
         project.setCompletionDate(projectDto.getCompletionDate() == null ? null : projectDto.getCompletionDate());
         project.setModificationDate(DateTimeHelpers.getZDTFromLDTNow(projectDto.getTerminationDate().getZone().toString()));
@@ -30,9 +29,8 @@ public class ProjectMapper {
         existingProject.setTitle(projectDto.getTitle());
         existingProject.setDescription(projectDto.getDescription());
         existingProject.setCustomer(projectDto.getCustomer());
-        CustomPropValidators.validateTeamSize(projectDto.getTeamSize(), errResource);
         existingProject.setTeamSize(projectDto.getTeamSize());
-        existingProject.setDevLanguage(CustomPropValidators.validateDevLang(projectDto.getDevLanguage(), errResource));
+        existingProject.setDevLanguage(DevLanguage.values()[projectDto.getDevLanguage()]);
         existingProject.setTerminationDate(projectDto.getTerminationDate());
         existingProject.setCompletionDate(projectDto.getCompletionDate() == null ? null : projectDto.getCompletionDate());
         existingProject.setModificationDate(DateTimeHelpers.getZDTFromLDTNow(projectDto.getTerminationDate().getZone().toString()));
@@ -77,7 +75,7 @@ public class ProjectMapper {
                 Strings.isBlank(project.getDescription()) ? "" : project.getDescription(),
                 Strings.isBlank(project.getCustomer()) ? "" : project.getCustomer(),
                 Strings.isBlank(project.getTeamSize().toString()) ? "" : project.getTeamSize().toString(),
-                Strings.isBlank(project.getDevLanguage().label.toString()) ? "" : project.getDevLanguage().label.toString(),
+                Strings.isBlank(project.getDevLanguage().label) ? "" : project.getDevLanguage().label,
                 Strings.isBlank(project.getTerminationDate().toString()) ? "" : project.getTerminationDate().toString()
         };
 

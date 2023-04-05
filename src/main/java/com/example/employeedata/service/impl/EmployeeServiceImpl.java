@@ -48,6 +48,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     public ResponseDto saveEmployee(CreateEmployeeDto employeeDto) {
         constraintViolationCheck(employeeDto);
+        EmployeeValidator.validateCreateDto(employeeDto);
 
         Employee employee;
         
@@ -121,7 +122,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
 
                 if (!CustomPropValidators.areAllFieldsEmpty(employeeData)) {
-                    if (CustomPropValidators.isValidEmployeeFile(employeeData)) {
+                    if (EmployeeValidator.isValidEmployeeFile(employeeData)) {
+                        EmployeeValidator.validateFile(employeeData);
                         createEmployees.add(EmployeeMapper.mapToEmployee(employeeData, projects));
                     } else {
                         failedValidationEntities.add(employeeData);
@@ -150,7 +152,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!checkForDuplicates.isEmpty()) {
             checkForDuplicates.forEach(createEmployees::remove);
             checkForDuplicates.forEach(employee -> employee.setFirstName("duplicate employee: " + employee.getFirstName()));
-            failedValidationEntities.addAll(checkForDuplicates.stream().map(EmployeeMapper::mapToEmployeeArr).collect(Collectors.toList()));
+            failedValidationEntities.addAll(checkForDuplicates.stream().map(EmployeeMapper::mapToEmployeeStringArr).collect(Collectors.toList()));
         }
 
         ResponseDto response;
@@ -272,6 +274,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         );
 
         constraintViolationCheck(editEmployeeDto);
+        EmployeeValidator.validateEditDto(editEmployeeDto);
 
         if (editEmployeeDto.getProjectIds().isEmpty()) {
             EmployeeMapper.mapToEmployee(employee, editEmployeeDto);

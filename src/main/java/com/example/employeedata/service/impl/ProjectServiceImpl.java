@@ -50,6 +50,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     public ResponseDto saveProject(CreateProjectDto projectDto) {
         constraintViolationCheck(projectDto);
+        ProjectValidator.validateCreateDto(projectDto);
 
         DateTimeHelpers.validateZoneId(projectDto.getTerminationDate().getZone().getId());
 
@@ -112,7 +113,7 @@ public class ProjectServiceImpl implements ProjectService {
                 }
 
                 if (!CustomPropValidators.areAllFieldsEmpty(projectData)) {
-                    if (CustomPropValidators.isValidProjectFile(projectData, zoneId)) {
+                    if (ProjectValidator.isValidProjectFile(projectData, zoneId)) {
                         createProjects.add(ProjectMapper.mapToProject(projectData, zoneId));
                     } else {
                         failedValidationEntities.add(projectData);
@@ -307,6 +308,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional(rollbackFor = {RuntimeException.class, SQLException.class})
     public void updateProject(Long projectId, EditProjectDto projectDto) {
         constraintViolationCheck(projectDto);
+        ProjectValidator.validateEditDto(projectDto);
 
         Project existingProject = projectRepository.findById(projectId).orElseThrow(() ->
             new ResourceNotFoundException(RES_NAME, ID, projectId)
