@@ -14,11 +14,13 @@ public class ProjectValidator {
     public static void validateCreateDto(CreateProjectDto dto) {
         CustomPropValidators.validateTeamSize(dto.getTeamSize(), RES_NAME);
         CustomPropValidators.validateDevLang(dto.getDevLanguage(), RES_NAME);
+        CustomPropValidators.validateZoneId(dto.getTerminationDate());
     }
 
     public static void validateEditDto(EditProjectDto dto) {
         CustomPropValidators.validateTeamSize(dto.getTeamSize(), RES_NAME);
         CustomPropValidators.validateDevLang(dto.getDevLanguage(), RES_NAME);
+        CustomPropValidators.validateZoneId(dto.getTerminationDate());
     }
 
     public static boolean isValidProjectFile(String[] project, String zoneId) {

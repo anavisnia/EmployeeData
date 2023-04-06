@@ -52,8 +52,6 @@ public class ProjectServiceImpl implements ProjectService {
         constraintViolationCheck(projectDto);
         ProjectValidator.validateCreateDto(projectDto);
 
-        DateTimeHelpers.validateZoneId(projectDto.getTerminationDate().getZone().getId());
-
         Project dbResponse = projectRepository.save(ProjectMapper.mapToProject(projectDto));
 
         return new ResponseDto(dbResponse.getId(), RES_NAME, false);

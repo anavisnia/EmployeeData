@@ -1,6 +1,7 @@
 package com.example.employeedata.helpers;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.stream.Stream;
 
 import com.example.employeedata.enums.*;
@@ -61,6 +62,14 @@ public final class CustomPropValidators {
         }
 
         return teamSize;
+    }
+
+    public static void validateZoneId(ZonedDateTime zonedDateTime) {
+        if (zonedDateTime.getZone() == null) {
+            throw new CustomValidationException("zoneId/zoneOffset", "cannot be empty");
+        } else {
+            DateTimeHelpers.validateZoneId(zonedDateTime.getZone().getId());
+        }
     }
 
     public static boolean areAllFieldsEmpty(String[] fields) {
