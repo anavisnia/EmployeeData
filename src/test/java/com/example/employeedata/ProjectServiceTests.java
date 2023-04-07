@@ -245,6 +245,83 @@ class ProjectServiceTests {
         assertEquals(expectedPageSize, actualPageSize);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"Turkey", "Europe/Vilnius"})
+    public void getAllProjectsWithFutureTerminationDate_whenPassingValidZoneId_returnsListOfData(String zoneId) {
+        List<Project> projectsEntity = ProjectData.validProjectData();
+        List<ProjectDto> actualResult = projectsEntity.stream()
+                .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
+                .filter(p -> p.getTerminationDate().isAfter(LocalDate.now().atStartOfDay()))
+                .collect(Collectors.toList());
+
+        when(projectRepository.findByFutureTerminationDate(LocalDate.now())).thenReturn(projectsEntity);
+
+        List<ProjectDto> expectedResult = projectService.getAllProjectsWithFutureTerminationDate(zoneId);
+
+        assertThat(expectedResult).usingRecursiveComparison().isEqualTo(actualResult);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Turkey", "Europe/Vilnius"})
+    public void getAllProjectsWithFutureTerminationDate_whenPassingValidZoneId_returnsEmptyList(String zoneId) {
+        when(projectRepository.findByFutureTerminationDate(LocalDate.now())).thenReturn(new ArrayList<>());
+
+        List<ProjectDto> expectedResult = projectService.getAllProjectsWithFutureTerminationDate(zoneId);
+
+        assertThat(expectedResult).usingRecursiveComparison().isEqualTo(new ArrayList<>());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Tu", "Eur"})
+    public void getAllProjectsWithFutureTerminationDate_whenPassingNotValidZoneId_throwsCustomValidationError(String zoneId) {
+        Exception ex = assertThrowsExactly(CustomValidationException.class, () -> projectService.getAllProjectsWithFutureTerminationDate(zoneId));
+
+        assertEquals(ex.getClass(), CustomValidationException.class);
+
+        String expectedErrMessage  = "Validation error for zoneId/zoneOffset in zoneId/zoneOffset property. Was entered: '" + zoneId +"'.";
+        assertThat(ex.getMessage()).isEqualTo(expectedErrMessage);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Turkey", "Europe/Vilnius"})
+    public void getAllProjectsWithPriorTerminationDate_whenPassingValidZoneId_returnsListOfData(String zoneId) {
+        List<Project> projectsEntity = ProjectData.validProjectData();
+        List<ProjectDto> actualResult = projectsEntity.stream()
+                .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
+                .filter(p -> p.getTerminationDate().isBefore(LocalDate.now().atStartOfDay()))
+                .collect(Collectors.toList());
+
+        when(projectRepository.findByPriorTerminationDate(LocalDate.now()))
+                .thenReturn(projectsEntity.
+                        stream().filter(p -> p.getTerminationDate().isBefore(LocalDate.now().atStartOfDay(ZoneId.of(zoneId))))
+                        .collect(Collectors.toList()));
+
+        List<ProjectDto> expectedResult = projectService.getAllProjectsWithFutureTerminationDate(zoneId);
+
+        assertThat(expectedResult).usingRecursiveComparison().isEqualTo(actualResult);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Turkey", "Europe/Vilnius"})
+    public void getAllProjectsWithFuturePriorDate_whenPassingValidZoneId_returnsEmptyList(String zoneId) {
+        when(projectRepository.findByPriorTerminationDate(LocalDate.now())).thenReturn(new ArrayList<>());
+
+        List<ProjectDto> expectedResult = projectService.getAllProjectsWithPriorTerminationDate(zoneId);
+
+        assertThat(expectedResult).usingRecursiveComparison().isEqualTo(new ArrayList<>());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Assia", "Europe/"})
+    public void getAllProjectsWithPriorTerminationDate_whenPassingNotValidZoneId_throwsCustomValidationError(String zoneId) {
+        Exception ex = assertThrowsExactly(CustomValidationException.class, () -> projectService.getAllProjectsWithPriorTerminationDate(zoneId));
+
+        assertEquals(ex.getClass(), CustomValidationException.class);
+
+        String expectedErrMessage  = "Validation error for zoneId/zoneOffset in zoneId/zoneOffset property. Was entered: '" + zoneId +"'.";
+        assertThat(ex.getMessage()).isEqualTo(expectedErrMessage);
+    }
+
     @Test
     public void givenTimeZone_whenFetchingData_thenReturnsAllProjectWithSetTimeZone() {
         ZoneOffset zoneOffset = ZoneOffset.of("+02:00");
