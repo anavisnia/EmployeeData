@@ -8,7 +8,9 @@ import com.example.employeedata.MockData.ProjectData;
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.Project;
 import com.example.employeedata.exception.CustomValidationException;
+import com.example.employeedata.helpers.Constants;
 import com.example.employeedata.helpers.DateTimeHelpers;
+import com.example.employeedata.helpers.HelperFunctions;
 import com.example.employeedata.mappers.ProjectMapper;
 import com.example.employeedata.repository.EmployeeRepository;
 import com.example.employeedata.repository.ProjectRepository;
@@ -17,10 +19,12 @@ import com.example.employeedata.service.impl.ProjectServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.*;
 
 import java.time.*;
 import java.util.ArrayList;
@@ -120,6 +124,125 @@ class ProjectServiceTests {
 
         assertThat(actualList).isNotNull();
         assertThat(actualList).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = "NULL, 0, 10, 0, true, Europe/Vilnius", nullValues = "NULL")
+    public void getAllProjectsPage_whenPassingValidParamsWithoutSearchQuery_ReturnsPaginatedResponseAscendingOrder(
+            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
+    ) {
+        List<Project> entityData = ProjectData.validProjectData();
+        List<ProjectDto> dtoData = entityData.stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(Constants.PROJECT_FIELDS[sortBy]).ascending());
+        Page<Project> result = new PageImpl<>(entityData, paging, entityData.size());
+
+        when(projectRepository.findAll(paging)).thenReturn(result);
+
+        PaginatedResponseDto<ProjectDto> expectedResponse = new PaginatedResponseDto<>(dtoData, result.getTotalElements(), result.getTotalPages(), pageNumber);
+        PaginatedResponseDto<ProjectDto> actualResponse = projectService.getAllProjectsPage(searchQuery, pageNumber, pageSize, sortBy, isAsc, zoneId);
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = "NULL, 0, 10, 0, false, Europe/Vilnius", nullValues = "NULL")
+    public void getAllProjectsPage_whenPassingValidParamsWithoutSearchQuery_ReturnsPaginatedResponseDescendingOrder(
+            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
+    ) {
+        List<Project> entityData = ProjectData.validProjectData();
+        List<ProjectDto> dtoData = entityData.stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(Constants.PROJECT_FIELDS[sortBy]).descending());
+        Page<Project> result = new PageImpl<>(entityData, paging, entityData.size());
+
+        when(projectRepository.findAll(paging)).thenReturn(result);
+
+        PaginatedResponseDto<ProjectDto> expectedResponse = new PaginatedResponseDto<>(dtoData, result.getTotalElements(), result.getTotalPages(), pageNumber);
+        PaginatedResponseDto<ProjectDto> actualResponse = projectService.getAllProjectsPage(searchQuery, pageNumber, pageSize, sortBy, isAsc, zoneId);
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
+    }
+
+    @ParameterizedTest
+    @CsvSource("Project, 0, 10, 0, true, Europe/Vilnius")
+    public void getAllProjectsPage_whenPassingValidParamsWithValidSearchQuery_ReturnsPaginatedResponseAscendingOrder(
+            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
+    ) {
+        List<Project> entityData = ProjectData.validProjectData().stream()
+                .filter(p -> p.getTitle().contains(searchQuery) ||
+                        p.getDescription().contains(searchQuery) ||
+                        p.getCustomer().contains(searchQuery))
+                .collect(Collectors.toList());
+        List<ProjectDto> dtoData = entityData.stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(Constants.PROJECT_DB_FIELDS[sortBy]).ascending());
+        Page<Project> result = new PageImpl<>(entityData, paging, entityData.size());
+
+        when(projectRepository.findAllByQuery(searchQuery + "%", searchQuery, paging)).thenReturn(result);
+
+        PaginatedResponseDto<ProjectDto> expectedResponse = new PaginatedResponseDto<>(dtoData, result.getTotalElements(), result.getTotalPages(), pageNumber);
+        PaginatedResponseDto<ProjectDto> actualResponse = projectService.getAllProjectsPage(searchQuery, pageNumber, pageSize, sortBy, isAsc, zoneId);
+
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
+    }
+
+    @ParameterizedTest
+    @CsvSource("Astrog, 0, 10, 0, false, Europe/Vilnius")
+    public void getAllProjectsPage_whenPassingValidParamsWithValidSearchQuery_ReturnsPaginatedResponseDescendingOrder(
+            String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
+    ) {
+        List<Project> entityData = ProjectData.validProjectData().stream()
+                .filter(p -> p.getTitle().contains(searchQuery) ||
+                        p.getDescription().contains(searchQuery) ||
+                        p.getCustomer().contains(searchQuery))
+                .collect(Collectors.toList());
+        List<ProjectDto> dtoData = entityData.stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(Constants.PROJECT_DB_FIELDS[sortBy]).descending());
+        Page<Project> result = new PageImpl<>(entityData, paging, entityData.size());
+
+        when(projectRepository.findAllByQuery(searchQuery + "%", searchQuery, paging)).thenReturn(result);
+
+        PaginatedResponseDto<ProjectDto> expectedResponse = new PaginatedResponseDto<>(dtoData, result.getTotalElements(), result.getTotalPages(), pageNumber);
+        PaginatedResponseDto<ProjectDto> actualResponse = projectService.getAllProjectsPage(searchQuery, pageNumber, pageSize, sortBy, isAsc, zoneId);
+
+        assertThat(actualResponse.getNumberOfItems()).isEqualTo(expectedResponse.getNumberOfItems());
+        assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Europe/Vil", "Turk", "Asiaaa"})
+    public void getAllProjectsPage_whenPassingWrongZoneId_ThrowsCustomValidationException(String zoneId) {
+        Exception ex = assertThrowsExactly(CustomValidationException.class, () -> projectService.getAllProjectsPage("Astrog", 0, 10, 0, "true", zoneId));
+        String expectedErrMessage = "Validation error for zoneId/zoneOffset in zoneId/zoneOffset property. Was entered: '" + zoneId + "'.";
+
+        assertEquals(CustomValidationException.class, ex.getClass());
+        assertEquals(expectedErrMessage, ex.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-5, -1000, 0})
+    public void getAllProjectsPage_whenPassingWrongPageNumber_ThrowsCustomValidationException(int pageNumber) {
+        Exception ex = assertThrowsExactly(CustomValidationException.class, () -> projectService.getAllProjectsPage("Astrog", pageNumber == 0 ? null : pageNumber, 10, 0, "true", "Europe/Vilnius"));
+        String expectedErrMessage = "Validation error for pageNumber. It cannot be null or less than zero.";
+
+        assertEquals(CustomValidationException.class, ex.getClass());
+        assertEquals(expectedErrMessage, ex.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-5, -1000, 0, -1})
+    public void getAllProjectsPage_whenPassingWrongPageSizeNullOrSmallerThanZero_ReturnsValidSmallestNumber(int pageSize) {
+        int actualPageSize = 10;
+        int expectedPageSize = HelperFunctions.checkPageSize(pageSize == -1 ? null : pageSize);
+
+        assertEquals(expectedPageSize, actualPageSize);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {700, 501})
+    public void getAllProjectsPage_whenPassingWrongPageSizeMoreThan500_ReturnsValidLargestNumber(int pageSize) {
+        int actualPageSize = 500;
+        int expectedPageSize = HelperFunctions.checkPageSize(pageSize);
+
+        assertEquals(expectedPageSize, actualPageSize);
     }
 
     @Test
