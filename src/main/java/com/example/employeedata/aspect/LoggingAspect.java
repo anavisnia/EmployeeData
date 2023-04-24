@@ -17,7 +17,7 @@ public class LoggingAspect {
     }
 
     @Around("execution(* com.example.employeedata.service.*.*(..))")
-    public void log(ProceedingJoinPoint joinPoint) {
+    public Object log(ProceedingJoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String className = signature.getDeclaringType().getName();
         String methodName = signature.getName();
@@ -25,16 +25,19 @@ public class LoggingAspect {
         logger.info("Start of execution " + methodName + " in class " + className);
 
         Throwable exception = null;
+        Object returnObj = null;
 
         try{
-            joinPoint.proceed();
+            returnObj = joinPoint.proceed();
         } catch (Throwable ex) {
             exception = ex;
-            logger.info("Exception in " + methodName  + " in class " + className + ". Message: " + ex.getMessage());
+            logger.info("Unsuccessful execution. Exception in " + methodName  + " in class " + className + ". Message: " + ex.getMessage());
         }
 
         if (exception == null) {
             logger.info("Successful execution of " + methodName + " in class " + className);
         }
+
+        return returnObj;
     }
 }
