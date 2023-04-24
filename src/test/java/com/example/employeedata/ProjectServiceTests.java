@@ -1,9 +1,10 @@
 package com.example.employeedata;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.example.employeedata.MockData.EmployeeData;
 import com.example.employeedata.MockData.ProjectData;
 import com.example.employeedata.dto.*;
 import com.example.employeedata.entity.Project;
@@ -29,6 +30,7 @@ import org.springframework.data.domain.*;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.validation.*;
@@ -93,7 +95,7 @@ class ProjectServiceTests {
     @Test
     public void getAllProjects_whenThereAreData_ReturnsAListOfProjectDto() {
         String zoneId = "Europe/Vilnius";
-        List<Project> entityData = ProjectData.validProjectData();
+        List<Project> entityData = ProjectData.validProjectDataRandom();
 
         List<ProjectDto> dtoData = entityData.stream()
                 .map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
@@ -131,7 +133,7 @@ class ProjectServiceTests {
     public void getAllProjectsPage_whenPassingValidParamsWithoutSearchQuery_ReturnsPaginatedResponseAscendingOrder(
             String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
     ) {
-        List<Project> entityData = ProjectData.validProjectData();
+        List<Project> entityData = ProjectData.validProjectDataRandom();
         List<ProjectDto> dtoData = entityData.stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(Constants.PROJECT_FIELDS[sortBy]).ascending());
         Page<Project> result = new PageImpl<>(entityData, paging, entityData.size());
@@ -149,7 +151,7 @@ class ProjectServiceTests {
     public void getAllProjectsPage_whenPassingValidParamsWithoutSearchQuery_ReturnsPaginatedResponseDescendingOrder(
             String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
     ) {
-        List<Project> entityData = ProjectData.validProjectData();
+        List<Project> entityData = ProjectData.validProjectDataRandom();
         List<ProjectDto> dtoData = entityData.stream().map(p -> ProjectMapper.mapToProjectDto(p, zoneId)).collect(Collectors.toList());
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(Constants.PROJECT_FIELDS[sortBy]).descending());
         Page<Project> result = new PageImpl<>(entityData, paging, entityData.size());
@@ -167,7 +169,7 @@ class ProjectServiceTests {
     public void getAllProjectsPage_whenPassingValidParamsWithValidSearchQuery_ReturnsPaginatedResponseAscendingOrder(
             String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
     ) {
-        List<Project> entityData = ProjectData.validProjectData().stream()
+        List<Project> entityData = ProjectData.validProjectDataRandom().stream()
                 .filter(p -> p.getTitle().contains(searchQuery) ||
                         p.getDescription().contains(searchQuery) ||
                         p.getCustomer().contains(searchQuery))
@@ -189,7 +191,7 @@ class ProjectServiceTests {
     public void getAllProjectsPage_whenPassingValidParamsWithValidSearchQuery_ReturnsPaginatedResponseDescendingOrder(
             String searchQuery, Integer pageNumber, Integer pageSize, Integer sortBy, String isAsc, String zoneId
     ) {
-        List<Project> entityData = ProjectData.validProjectData().stream()
+        List<Project> entityData = ProjectData.validProjectDataRandom().stream()
                 .filter(p -> p.getTitle().contains(searchQuery) ||
                         p.getDescription().contains(searchQuery) ||
                         p.getCustomer().contains(searchQuery))
@@ -248,7 +250,7 @@ class ProjectServiceTests {
     @ParameterizedTest
     @ValueSource(strings = {"Turkey", "Europe/Vilnius"})
     public void getAllProjectsWithFutureTerminationDate_whenPassingValidZoneId_returnsListOfData(String zoneId) {
-        List<Project> projectsEntity = ProjectData.validProjectData();
+        List<Project> projectsEntity = ProjectData.validProjectDataRandom();
         List<ProjectDto> actualResult = projectsEntity.stream()
                 .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
                 .filter(p -> p.getTerminationDate().isAfter(LocalDate.now().atStartOfDay()))
@@ -285,7 +287,7 @@ class ProjectServiceTests {
     @ParameterizedTest
     @ValueSource(strings = {"Turkey", "Europe/Vilnius"})
     public void getAllProjectsWithPriorTerminationDate_whenPassingValidZoneId_returnsListOfData(String zoneId) {
-        List<Project> projectsEntity = ProjectData.validProjectData();
+        List<Project> projectsEntity = ProjectData.validProjectDataRandom();
         List<ProjectDto> actualResult = projectsEntity.stream()
                 .map(p -> ProjectMapper.mapToProjectDto(p, zoneId))
                 .filter(p -> p.getTerminationDate().isBefore(LocalDate.now().atStartOfDay()))
@@ -320,6 +322,22 @@ class ProjectServiceTests {
 
         String expectedErrMessage  = "Validation error for zoneId/zoneOffset in zoneId/zoneOffset property. Was entered: '" + zoneId +"'.";
         assertThat(ex.getMessage()).isEqualTo(expectedErrMessage);
+    }
+
+    @ParameterizedTest
+    @CsvSource("2, Turkey")
+    public void getAllProjectsNotAssignedToEmployeeFromCurrentDate_whenPassingValidData_doesNotThrow(Long employeeId, String zoneId) {
+        when(employeeRepository.findById(anyLong()))
+                .thenReturn(EmployeeData.validEmployeeData().stream().filter(e -> Objects.equals(e.getId(), employeeId)).findFirst());
+
+        List<Project> projectData = ProjectData.validProjectData().stream()
+                .filter(p -> p.getTerminationDate().isAfter(ZonedDateTime.now()))
+                .collect(Collectors.toList());
+
+        when(projectRepository.findByFutureTerminationDate(LocalDate.now())).thenReturn(projectData);
+
+        assertThatCode(() -> projectService.getAllProjectsNotAssignedToEmployeeFromCurrentDate(employeeId, zoneId))
+                .doesNotThrowAnyException();
     }
 
     @Test
